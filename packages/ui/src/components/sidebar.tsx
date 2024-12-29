@@ -6,7 +6,7 @@ import { PanelLeft } from "lucide-react";
 import * as React from "react";
 
 import { Button } from "@platter/ui/components/button";
-import { Input } from "@platter/ui/components/input.js";
+import { Input } from "@platter/ui/components/input";
 import { Separator } from "@platter/ui/components/separator";
 import { Sheet, SheetContent } from "@platter/ui/components/sheet";
 import { Skeleton } from "@platter/ui/components/skeleton";

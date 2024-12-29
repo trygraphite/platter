@@ -1,7 +1,7 @@
 import React from "react";
 
 function QrPage() {
-  return <main>QrPage</main>;
+  return <div>QrPage</div>;
 }
 
 export default QrPage;
