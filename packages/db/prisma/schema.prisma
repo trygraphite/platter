@@ -1,0 +1,273 @@
+// This is your Prisma schema file
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model QRCode {
+  id        String   @id @default(cuid())
+  target    String
+  targetId  String
+  link      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  room              Room?            @relation(fields: [roomId], references: [id])
+  roomId            String?
+  commonArea        CommonArea?      @relation(fields: [commonAreaId], references: [id])
+  commonAreaId      String?
+  restaurant        Restaurant?      @relation(fields: [restaurantId], references: [id])
+  restaurantId      String?
+  restaurantTable   RestaurantTable? @relation(fields: [restaurantTableId], references: [id])
+  restaurantTableId String?
+  orders            Order[]
+  reviews           Review[]
+  complaints        Complaint[]
+}
+
+model Room {
+  id          String   @id @default(cuid())
+  number      String   @unique
+  type        String
+  description String?
+  qrCodes     QRCode[]
+  orders      Order[]
+}
+
+model RestaurantTable {
+  id           String      @id @default(cuid())
+  number       String      @unique
+  description  String?
+  restaurant   Restaurant? @relation(fields: [restaurantId], references: [id])
+  restaurantId String?
+  qrCodes      QRCode[]
+  orders       Order[]
+}
+
+model CommonArea {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  qrCodes     QRCode[]
+}
+
+model Complaint {
+  id        String   @id @default(cuid())
+  content   String
+  status    String   @default("Pending") // e.g., Pending, Resolved
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  qrCode    QRCode   @relation(fields: [qrCodeId], references: [id])
+  qrCodeId  String
+}
+
+model Restaurant {
+  id              String            @id @default(cuid())
+  name            String
+  type            RestaurantType
+  code            String            @unique
+  password        String 
+  description     String?
+  isActive        Boolean           @default(true)
+  resturantTables RestaurantTable[]
+  categories      Category[]
+  menuItems       MenuItem[]
+  orders          Order[]
+  staff           Staff[]
+  qrCodes         QRCode[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  session         Session[]
+}
+
+model Category {
+  id           String     @id @default(cuid())
+  name         String
+  description  String?
+  displayOrder Int        @default(0)
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurantId String
+  menuItems    MenuItem[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@unique([restaurantId, name])
+}
+
+model MenuItem {
+  id           String      @id @default(cuid())
+  name         String
+  description  String
+  price        Decimal
+  image        String?
+  isAvailable  Boolean     @default(true)
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id])
+  restaurantId String
+  category     Category    @relation(fields: [categoryId], references: [id])
+  categoryId   String
+  orders       OrderItem[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@index([restaurantId, categoryId])
+}
+
+model Order {
+  id                String           @id @default(cuid())
+  orderNumber       String           @unique @default(dbgenerated("concat('ORD-', to_char(NOW(), 'YYMMDDHH24MISS'), '-', floor(random() * 1000)::text)"))
+  restaurant        Restaurant       @relation(fields: [restaurantId], references: [id])
+  restaurantId      String
+  items             OrderItem[]
+  status            OrderStatus      @default(PENDING)
+  totalAmount       Decimal
+  roomNumber        String?
+  tableNumber       String?
+  specialNotes      String?
+  guest             Guest            @relation(fields: [guestId], references: [id])
+  guestId           String
+  review            Review?
+  payment           Payment?
+  qrCode            QRCode?          @relation(fields: [qrCodeId], references: [id])
+  qrCodeId          String?
+  room              Room?            @relation(fields: [roomId], references: [id]) // New relation to Room
+  roomId            String?
+  restaurantTable   RestaurantTable? @relation(fields: [restaurantTableId], references: [id])
+  restaurantTableId String?
+
+  // Status timestamps
+  createdAt   DateTime  @default(now())
+  confirmedAt DateTime?
+  preparingAt DateTime?
+  readyAt     DateTime?
+  deliveredAt DateTime?
+  cancelledAt DateTime?
+
+  // Time metrics
+  confirmationTime Int? // Minutes between created and confirmed
+  preparationTime  Int? // Minutes between confirmed and ready
+  deliveryTime     Int? // Minutes between ready and delivered
+  totalTime        Int? // Total time from creation to delivery
+
+  @@index([restaurantId, status])
+  @@index([orderNumber])
+}
+
+model OrderItem {
+  id           String   @id @default(cuid())
+  quantity     Int
+  menuItem     MenuItem @relation(fields: [menuItemId], references: [id])
+  menuItemId   String
+  order        Order    @relation(fields: [orderId], references: [id])
+  orderId      String
+  price        Decimal // Price at time of order
+  specialNotes String? // Per-item special instructions
+}
+
+model Guest {
+  id           String    @id @default(cuid())
+  name         String
+  phoneNumber  String
+  email        String?
+  roomNumber   String?
+  checkInDate  DateTime?
+  checkOutDate DateTime?
+  accessCode   String?   @unique
+  orders       Order[]
+  reviews      Review[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([accessCode])
+  @@index([roomNumber])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int      @default(5)
+  comment   String?
+  order     Order?   @relation(fields: [orderId], references: [id])
+  orderId   String?  @unique
+  guest     Guest?   @relation(fields: [guestId], references: [id])
+  guestId   String?
+  qrCode    QRCode?  @relation(fields: [qrCodeId], references: [id])
+  qrCodeId  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Staff {
+  id           String      @id @default(cuid())
+  name         String
+  role         StaffRole
+  restaurant   Restaurant? @relation(fields: [restaurantId], references: [id])
+  restaurantId String? // Null for ADMIN staff
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model Payment {
+  id          String        @id @default(cuid())
+  order       Order         @relation(fields: [orderId], references: [id])
+  orderId     String        @unique
+  amount      Decimal
+  status      PaymentStatus @default(PENDING)
+  paymentType PaymentType
+  reference   String?       @unique
+  metadata    Json?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([reference])
+}
+
+// Authentication
+
+model Session {
+  token        String     @unique
+  restaurantId String
+  expires      DateTime
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum PaymentType {
+  CASH
+  BANK_TRANSFER
+  ATM_CARD
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESSFUL
+  REFUNDED
+  FAILED
+}
+
+enum RestaurantType {
+  SIGNATURE
+  STANDARD
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  READY
+  DELIVERED
+  CANCELLED
+}
+
+enum StaffRole {
+  ADMIN
+  MANAGER
+  KITCHEN
+  SERVICE
+}

@@ -1,31 +1,36 @@
-# shadcn/ui monorepo template
+# Platter
 
-This template is for creating a monorepo with shadcn/ui.
+Menu management system for restaurants.
 
-## Usage
+## Structure
 
-```bash
-pnpm dlx shadcn@latest init
-```
+platter is a monorepo with the following structure:
 
-## Adding components
+- `packages/*` - Contains all internally shared packages within apps.
+- `apps/*` - All applications that make up the system.
 
-To add components to your app, run the following command at the root of your `web` app:
+## Tools
 
-```bash
-pnpm dlx shadcn@latest add button -c apps/web
-```
+- [pnpm](https://pnpm.io/)
+- [biome](https://biomejs.dev/)
+- [turbo](https://turbo.build/repo/)
+- [Github actions](https://docs.github.com/actions)
 
-This will place the ui components in the `packages/ui/src/components` directory.
+## Setup
 
-## Tailwind
+1. Install pnpm: `npm install -g pnpm`
+2. Run `pnpm install` to install all dependencies.
 
-Your `tailwind.config.ts` and `globals.css` are already set up to use the components from the `ui` package.
+## Development
 
-## Using components
+1. Run `pnpm dev` to start the development server (this starts all workspace apps by default) to run specific apps run the app name + dev e.g `pnpm admin:dev`.
 
-To use the components in your app, import them from the `ui` package.
+2. To install specific dependencies for a workspace app `cd` into the app `cd apps/web` then run `pnpm add <package-name>` to install it as an app dependency.
 
-```tsx
-import { Button } from "@workspace/ui/components/ui/button"
-```
+3. To install specific dependencies for a package `cd` into the package `cd packages/email` then run `pnpm add <package-name>` to install it as a package dependency.
+
+4. To run a command in a workspace app `cd` into the app `cd apps/web` then run `pnpm <command>` to run the command.
+
+## Build
+
+1. Run `pnpm build` to build all workspace apps.
