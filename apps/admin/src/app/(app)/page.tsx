@@ -1,4 +1,4 @@
-import PageContent from "./page-component";
+import PageContent from "./page-content";
 
 export default function Page() {
   return (

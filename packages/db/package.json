@@ -11,7 +11,7 @@
     "db:studio": "prisma studio"
   },
   "dependencies": {
-    "@prisma/client": "^6.0.1"
+    "@prisma/client": "6.0.1"
   },
   "devDependencies": {
     "@platter/tsconfig": "workspace:*",

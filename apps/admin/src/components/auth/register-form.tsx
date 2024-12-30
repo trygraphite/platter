@@ -1,234 +1,124 @@
 "use client";
 
-import { states } from "@/lib/constants/states";
-import {
-  type RegistrationData,
-  registrationSchema,
-} from "@/lib/validations/auth";
+import { signUp } from "@/lib/auth/client";
+import { type AccountData, accountSchema } from "@/lib/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@platter/ui/components/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@platter/ui/components/card";
 import { Input } from "@platter/ui/components/input";
 import { Label } from "@platter/ui/components/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@platter/ui/components/select";
-import { Textarea } from "@platter/ui/components/textarea";
-import { Loader2 } from "lucide-react";
+import { toast } from "@platter/ui/components/sonner";
+import { EyeClosedIcon, EyeIcon, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-export default function RegistrationForm() {
+export default function RegisterForm() {
+  const [type, setType] = useState<"text" | "password">("password");
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    setValue,
-  } = useForm<RegistrationData>({
-    resolver: zodResolver(registrationSchema),
+  } = useForm<AccountData>({
+    resolver: zodResolver(accountSchema),
   });
 
-  const onSubmit = async (data: RegistrationData) => {
-    console.log("Form submitted:", data);
-    // TODO: Implement API call to register restaurant
+  const onSubmit = async (formdata: AccountData) => {
+    await signUp.email(
+      {
+        name: formdata.email.split("@")[0] as string,
+        email: formdata.email,
+        password: formdata.password,
+        callbackURL: "/register/details",
+      },
+      {
+        onRequest: () => {
+          toast.loading("Creating account...", { id: "signup" });
+        },
+        onSuccess: () => {
+          toast.success("Account created", { id: "signup" });
+          router.push("/register/details");
+        },
+        onError: (ctx) => {
+          toast.error("Failed to create account", { id: "signup" });
+        },
+      },
+    ).catch((error) => {
+      console.error(error);
+    });
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto">
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
-        <div className="space-y-2">
-          <Label htmlFor="name">Restaurant Name</Label>
-          <Input id="name" {...register("name")} aria-invalid={!!errors.name} />
-          {errors.name && (
-            <p className="text-xs text-red-500">{errors.name.message}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="description">Description</Label>
-          <Textarea
-            id="description"
-            {...register("description")}
-            aria-invalid={!!errors.description}
-          />
-          {errors.description && (
-            <p className="text-xs text-red-500">{errors.description.message}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="address">Address</Label>
-          <Input
-            id="address"
-            {...register("address")}
-            aria-invalid={!!errors.address}
-          />
-          {errors.address && (
-            <p className="text-xs text-red-500">{errors.address.message}</p>
-          )}
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="city">City</Label>
-            <Input
-              id="city"
-              {...register("city")}
-              aria-invalid={!!errors.city}
-            />
-            {errors.city && (
-              <p className="text-xs text-red-500">{errors.city.message}</p>
+    <Card className="w-96">
+      <CardHeader className="text-center">
+        <CardTitle>Create Account</CardTitle>
+        <CardDescription>Please fill in the details below.</CardDescription>
+      </CardHeader>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <CardContent className="space-y-4">
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="email">Email</Label>
+            <Input {...register("email")} type="email" />
+            {errors.email && (
+              <p className="text-red-500 text-sm">{errors.email.message}</p>
             )}
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="state">State</Label>
-            <Select onValueChange={(value) => setValue("state", value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select state" />
-              </SelectTrigger>
-              <SelectContent>
-                {states.map((state) => (
-                  <SelectItem
-                    key={state.abbreviation}
-                    value={state.abbreviation}
-                  >
-                    {state.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.state && (
-              <p className="text-xs text-red-500">{errors.state.message}</p>
-            )}
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="zipCode">ZIP Code</Label>
-          <Input
-            id="zipCode"
-            {...register("zipCode")}
-            aria-invalid={!!errors.zipCode}
-          />
-          {errors.zipCode && (
-            <p className="text-xs text-red-500">{errors.zipCode.message}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="phone">Phone Number</Label>
-          <Input
-            id="phone"
-            {...register("phone")}
-            type="tel"
-            aria-invalid={!!errors.phone}
-          />
-          {errors.phone && (
-            <p className="text-xs text-red-500">{errors.phone.message}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            {...register("email")}
-            type="email"
-            aria-invalid={!!errors.email}
-          />
-          {errors.email && (
-            <p className="text-xs text-red-500">{errors.email.message}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="website">Website</Label>
-          <Input
-            id="website"
-            {...register("website")}
-            type="url"
-            aria-invalid={!!errors.website}
-          />
-          {errors.website && (
-            <p className="text-xs text-red-500">{errors.website.message}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="cuisine">Cuisine Type</Label>
-          <Select onValueChange={(value) => setValue("cuisine", value)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select cuisine type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="italian">Italian</SelectItem>
-              <SelectItem value="chinese">Chinese</SelectItem>
-              <SelectItem value="mexican">Mexican</SelectItem>
-              <SelectItem value="indian">Indian</SelectItem>
-              <SelectItem value="american">American</SelectItem>
-              <SelectItem value="other">Other</SelectItem>
-            </SelectContent>
-          </Select>
-          {errors.cuisine && (
-            <p className="text-xs text-red-500">{errors.cuisine.message}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="seatingCapacity">Seating Capacity</Label>
-          <Input
-            id="seatingCapacity"
-            {...register("seatingCapacity")}
-            type="number"
-            aria-invalid={!!errors.seatingCapacity}
-          />
-          {errors.seatingCapacity && (
-            <p className="text-xs text-red-500">
-              {errors.seatingCapacity.message}
-            </p>
-          )}
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="openingHours">Opening Hours</Label>
-            <Input
-              id="openingHours"
-              {...register("openingHours")}
-              type="time"
-              aria-invalid={!!errors.openingHours}
-            />
-            {errors.openingHours && (
-              <p className="text-xs text-red-500">
-                {errors.openingHours.message}
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="password">Password</Label>
+            <div className="relative">
+              <Input {...register("password")} type={type} className="pr-6" />
+              <button
+                type="button"
+                title="toggle password visibility"
+                onClick={() =>
+                  setType(type === "password" ? "text" : "password")
+                }
+                className="absolute top-1/2 right-4 transform -translate-y-1/2 group"
+              >
+                {type === "password" ? (
+                  <EyeClosedIcon className="size-4 text-muted-foreground group-hover:text-primary" />
+                ) : (
+                  <EyeIcon className="size-4 text-muted-foreground group-hover:text-primary" />
+                )}
+              </button>
+            </div>
+            {errors.password && (
+              <p className="text-destructive text-sm">
+                {errors.password.message}
               </p>
             )}
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="closingHours">Closing Hours</Label>
-            <Input
-              id="closingHours"
-              {...register("closingHours")}
-              type="time"
-              aria-invalid={!!errors.closingHours}
-            />
-            {errors.closingHours && (
-              <p className="text-xs text-red-500">
-                {errors.closingHours.message}
-              </p>
+        </CardContent>
+        <CardFooter className="flex flex-col gap-4">
+          <Button
+            type="submit"
+            className="flex items-center gap-2 w-full"
+            disabled={isSubmitting}
+          >
+            {isSubmitting && (
+              <Loader2 className="size-4 animate-spin transition" />
             )}
-          </div>
-        </div>
+            {isSubmitting ? "Creating account..." : "Submit"}
+          </Button>
 
-        <Button type="submit" disabled={isSubmitting} className="w-full mt-8">
-          {isSubmitting && (
-            <Loader2 className="size-4 animate-spin transition" />
-          )}
-          {isSubmitting ? "Processing..." : "Register"}
-        </Button>
+          <p className="text-center text-muted-foreground text-xs">
+            Have an account?{" "}
+            <Link href="/login" className="hover:text-primary underline">
+              Login
+            </Link>
+          </p>
+        </CardFooter>
       </form>
-    </div>
+    </Card>
   );
 }

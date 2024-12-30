@@ -7,106 +7,75 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Restaurant {
+// user = restaurant
+model User {
   id              String            @id @default(cuid())
   name            String
   email           String            @unique
   website         String?
+  image           String?
   phone           String?
-  address         String
-  city            String
-  state           String
-  zipCode         String            // Added
-  password        String 
+  address         String?
+  city            String?
+  subdomain       String?           @unique
+  state           String?
+  zipCode         String?
   description     String?
-  seatingCapacity Int
+  seatingCapacity Int?
   cuisine         String?
-  openingHours    String            // Added
-  closingHours    String            // Added
-  tables          RestaurantTable[]
-  categories      Category[]
-  menuItems       MenuItem[]
-  qrCode          QRCode[]
+  openingHours    String?
+  closingHours    String?
+  emailVerified   Boolean           
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
-  session         Session[]
+  sessions        Session[]
+  accounts        Account[]
+
+  @@map("user")
 }
 
-model RestaurantTable {
-  id           String      @id @default(cuid())
-  number       String      @unique
-  description  String?
-  restaurant   Restaurant? @relation(fields: [restaurantId], references: [id])
-  restaurantId String?
-  qrCodes      QRCode[]
-}
-
-
-model Category {
-  id           String     @id @default(cuid())
-  name         String
-  description  String?
-  displayOrder Int        @default(0)
-  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
-  restaurantId String
-  menuItems    MenuItem[]
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-
-  @@unique([restaurantId, name])
-}
-
-model MenuItem {
-  id           String      @id @default(cuid())
-  name         String
-  description  String
-  price        Decimal
-  image        String?
-  isAvailable  Boolean     @default(true)
-  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id])
-  restaurantId String
-  category     Category    @relation(fields: [categoryId], references: [id])
-  categoryId   String
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-
-  @@index([restaurantId, categoryId])
-}
-
-model Review {
-  id        String   @id @default(cuid())
-  rating    Int      @default(5)
-  comment   String?
-  orderId   String?  @unique
-  guestId   String?
-  qrCode    QRCode?  @relation(fields: [qrCodeId], references: [id])
-  qrCodeId  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model QRCode {
-  id        String   @id @default(cuid())
-  target    String
-  targetId  String
-  link      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  restaurant        Restaurant?      @relation(fields: [restaurantId], references: [id])
-  restaurantId      String?
-  restaurantTable   RestaurantTable? @relation(fields: [restaurantTableId], references: [id])
-  restaurantTableId String?
-  reviews           Review[]
-}
-
-// Authentication
+// Auth tables
 model Session {
-  token        String     @unique
-  restaurantId String
-  expires      DateTime
-  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  @@unique([token])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
 }

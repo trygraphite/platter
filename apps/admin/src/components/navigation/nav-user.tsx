@@ -8,6 +8,7 @@ import {
   LogOut,
 } from "lucide-react";
 
+import { signOut } from "@/lib/auth/client";
 import {
   Avatar,
   AvatarFallback,
@@ -37,6 +38,10 @@ const user = {
 
 export function NavUser() {
   const { isMobile } = useSidebar();
+
+  const logOut = async () => {
+    await signOut();
+  };
 
   return (
     <SidebarMenu>
@@ -81,17 +86,17 @@ export function NavUser() {
                 <BadgeCheck />
                 Account
               </DropdownMenuItem>
-              <DropdownMenuItem >
+              <DropdownMenuItem>
                 <CreditCard />
                 Billing
               </DropdownMenuItem>
-              <DropdownMenuItem >
+              <DropdownMenuItem>
                 <Bell />
                 Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={logOut}>
               <LogOut />
               Log out
             </DropdownMenuItem>
