@@ -34,11 +34,12 @@ export default function RegisterForm() {
   });
 
   const onSubmit = async (formdata: AccountData) => {
+    const { confirmPassword, ...submitData } = formdata;
     await signUp.email(
       {
-        name: formdata.email.split("@")[0] as string,
-        email: formdata.email,
-        password: formdata.password,
+        name: submitData.email.split("@")[0] as string,
+        email: submitData.email,
+        password: submitData.password,
         callbackURL: "/register/details",
       },
       {
@@ -95,6 +96,17 @@ export default function RegisterForm() {
             {errors.password && (
               <p className="text-destructive text-sm">
                 {errors.password.message}
+              </p>
+            )}
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <div className="relative">
+              <Input {...register("confirmPassword")} type={type} className="pr-6" />
+            </div>
+            {errors.confirmPassword && (
+              <p className="text-destructive text-sm">
+                {errors.confirmPassword.message}
               </p>
             )}
           </div>

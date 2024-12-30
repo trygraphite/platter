@@ -29,6 +29,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@platter/ui/components/sidebar";
+import { useRouter } from "next/navigation";
 
 const user = {
   name: "platter",
@@ -38,10 +39,7 @@ const user = {
 
 export function NavUser() {
   const { isMobile } = useSidebar();
-
-  const logOut = async () => {
-    await signOut();
-  };
+  const router = useRouter();
 
   return (
     <SidebarMenu>
@@ -96,7 +94,11 @@ export function NavUser() {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={logOut}>
+            <DropdownMenuItem
+              onClick={async () =>
+                await signOut().then(() => router.push("/login"))
+              }
+            >
               <LogOut />
               Log out
             </DropdownMenuItem>

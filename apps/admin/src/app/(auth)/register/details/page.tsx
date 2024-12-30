@@ -1,5 +1,5 @@
 import RestaurantDetailsForm from "@/components/auth/restaurant-details-form";
-import session from "@/lib/auth/server";
+import getServerSession from "@/lib/auth/server";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
@@ -7,8 +7,9 @@ export const metadata: Metadata = {
   title: " Details",
 };
 
-export default async function DetailsPage() {
-  if (session === null) {
+async function DetailsPage() {
+  const session = await getServerSession();
+  if (!session) {
     redirect("/login");
   }
 
@@ -25,3 +26,5 @@ export default async function DetailsPage() {
     </div>
   );
 }
+
+export default DetailsPage;

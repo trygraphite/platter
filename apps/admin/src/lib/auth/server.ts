@@ -12,4 +12,4 @@ async function getServerSession() {
   }
 }
 
-export default await getServerSession();
+export default getServerSession

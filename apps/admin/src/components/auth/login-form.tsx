@@ -34,7 +34,7 @@ function LoginForm() {
   });
 
   const onSubmit = async (formdata: AccountData) => {
-    const {data, error} = await signIn.email(
+    const { data, error } = await signIn.email(
       {
         email: formdata.email,
         password: formdata.password,
@@ -45,7 +45,7 @@ function LoginForm() {
         },
         onSuccess: () => {
           toast.success("Account created", { id: "signup" });
-          router.push("/register/details");
+          router.push("/");
         },
         onError: () => {
           toast.error("Something went wrong", { id: "signup" });
