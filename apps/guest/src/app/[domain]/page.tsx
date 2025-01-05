@@ -51,7 +51,10 @@ async function Page({ params }: { params: Promise<{ domain: string }> }) {
 
   return (
     <div>
-      <RestaurantHero name={restaurantDetails.name} description={restaurantDetails.description} />
+      <RestaurantHero
+        name={restaurantDetails.name}
+        description={restaurantDetails.description}
+      />
     </div>
   );
 }

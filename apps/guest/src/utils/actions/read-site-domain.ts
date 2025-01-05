@@ -13,5 +13,5 @@ export const readSiteDomain = async (domain: string) => {
       subdomain: true,
     },
   });
- return data;
+  return data;
 };

@@ -1,7 +1,11 @@
 "use client";
 
 import { signIn } from "@/lib/auth/client";
-import { type AccountData, accountSchema } from "@/lib/validations/auth";
+import {
+  type AccountData,
+  accountSchema,
+  loginSchema,
+} from "@/lib/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@platter/ui/components/button";
 import {
@@ -30,7 +34,7 @@ function LoginForm() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<AccountData>({
-    resolver: zodResolver(accountSchema),
+    resolver: zodResolver(loginSchema),
   });
 
   const onSubmit = async (formdata: AccountData) => {
@@ -41,14 +45,14 @@ function LoginForm() {
       },
       {
         onRequest: () => {
-          toast.loading("Creating account...", { id: "signup" });
+          toast.loading("Loggin In", { id: "login" });
         },
         onSuccess: () => {
-          toast.success("Account created", { id: "signup" });
+          toast.success("Login Successfull", { id: "login" });
           router.push("/");
         },
         onError: () => {
-          toast.error("Something went wrong", { id: "signup" });
+          toast.error("Something went wrong", { id: "login" });
         },
       },
     );

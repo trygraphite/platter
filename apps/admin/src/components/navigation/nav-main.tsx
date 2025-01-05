@@ -8,7 +8,13 @@ import {
   SidebarMenuButton,
 } from "@platter/ui/components/sidebar";
 
-import { LayoutPanelTop, SettingsIcon, QrCode, PanelTopDashed } from "lucide-react";
+import {
+  LayoutPanelTop,
+  SettingsIcon,
+  QrCode,
+  PanelTopDashed,
+  ForkKnifeCrossedIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -17,6 +23,11 @@ const items = [
     name: "Dashboard",
     url: "/",
     icon: LayoutPanelTop,
+  },
+  {
+    name: "Orders",
+    url: "/orders",
+    icon: ForkKnifeCrossedIcon,
   },
   {
     name: "Menu",
@@ -56,7 +67,9 @@ export function NavMain() {
               }`}
             >
               <Link href={`${item.url}`}>
-                <item.icon className={`${pathname === item.url ? "text-primary" : "text-foreground"}`}/>
+                <item.icon
+                  className={`${pathname === item.url ? "text-primary" : "text-foreground"}`}
+                />
                 <span>{item.name}</span>
               </Link>
             </SidebarMenuButton>

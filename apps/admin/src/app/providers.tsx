@@ -1,3 +1,4 @@
+import { EdgeStoreProvider } from "@/lib/edgestore/edgestore";
 import { Toaster } from "@platter/ui/components/sonner";
 import type React from "react";
 
@@ -8,8 +9,10 @@ function Providers({
 }) {
   return (
     <>
-      {children}
-      <Toaster />
+      <EdgeStoreProvider>
+        {children}
+        <Toaster />
+      </EdgeStoreProvider>
     </>
   );
 }

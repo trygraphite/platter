@@ -20,7 +20,7 @@ export default async function middleware(req: NextRequest) {
   }
 
   // Verify the subdomain exists
-  const response = await readSiteDomain(currentHost)
+  const response = await readSiteDomain(currentHost);
 
   // If no matching domain is found, redirect to marketing site
   if (!response || response === null) {

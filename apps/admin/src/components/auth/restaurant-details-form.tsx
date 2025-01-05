@@ -43,7 +43,7 @@ export default function RestaurantDetailsForm() {
     }
 
     const result = await createRestaurantAction(data, session.user.id);
-    
+
     if (result.success) {
       toast.success("Restaurant details saved!");
       router.push("/dashboard");

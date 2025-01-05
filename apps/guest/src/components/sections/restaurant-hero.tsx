@@ -1,10 +1,13 @@
-import Image from 'next/image'
+import Image from "next/image";
 
 interface RestaurantHeroProps {
-  name: string
-  description: string | null
+  name: string;
+  description: string | null;
 }
-export default function RestaurantHero({ name, description }: RestaurantHeroProps) {
+export default function RestaurantHero({
+  name,
+  description,
+}: RestaurantHeroProps) {
   return (
     <section className="relative h-96 md:h-[500px] lg:h-[550px] xl:h-[650px] 2xl:h-[750px]">
       <Image
@@ -20,5 +23,5 @@ export default function RestaurantHero({ name, description }: RestaurantHeroProp
         </div>
       </div>
     </section>
-  )
+  );
 }

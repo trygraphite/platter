@@ -35,28 +35,30 @@ export default function RegisterForm() {
 
   const onSubmit = async (formdata: AccountData) => {
     const { confirmPassword, ...submitData } = formdata;
-    await signUp.email(
-      {
-        name: submitData.email.split("@")[0] as string,
-        email: submitData.email,
-        password: submitData.password,
-        callbackURL: "/register/details",
-      },
-      {
-        onRequest: () => {
-          toast.loading("Creating account...", { id: "signup" });
+    await signUp
+      .email(
+        {
+          name: submitData.email.split("@")[0] as string,
+          email: submitData.email,
+          password: submitData.password,
+          callbackURL: "/register/details",
         },
-        onSuccess: () => {
-          toast.success("Account created", { id: "signup" });
-          router.push("/register/details");
+        {
+          onRequest: () => {
+            toast.loading("Creating account...", { id: "signup" });
+          },
+          onSuccess: () => {
+            toast.success("Account created", { id: "signup" });
+            router.push("/register/details");
+          },
+          onError: (ctx) => {
+            toast.error("Failed to create account", { id: "signup" });
+          },
         },
-        onError: (ctx) => {
-          toast.error("Failed to create account", { id: "signup" });
-        },
-      },
-    ).catch((error) => {
-      console.error(error);
-    });
+      )
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   return (
@@ -102,7 +104,11 @@ export default function RegisterForm() {
           <div className="flex flex-col gap-2">
             <Label htmlFor="confirmPassword">Confirm Password</Label>
             <div className="relative">
-              <Input {...register("confirmPassword")} type={type} className="pr-6" />
+              <Input
+                {...register("confirmPassword")}
+                type={type}
+                className="pr-6"
+              />
             </div>
             {errors.confirmPassword && (
               <p className="text-destructive text-sm">

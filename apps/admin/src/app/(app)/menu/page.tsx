@@ -1,7 +1,12 @@
-import React from "react";
+"use client";
 
-function MenuPage() {
-  return <div>MenuPage</div>;
+import { RestaurantProvider } from "../context/resturant-context";
+import RestaurantContent from "./MenuContext";
+
+export default function RestaurantPage() {
+  return (
+    <RestaurantProvider>
+      <RestaurantContent />
+    </RestaurantProvider>
+  );
 }
-
-export default MenuPage;

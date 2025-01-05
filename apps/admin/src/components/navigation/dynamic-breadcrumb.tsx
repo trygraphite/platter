@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { usePathname } from "next/navigation";
 import {
@@ -14,7 +14,7 @@ const formatSegment = (segment: string) => {
   return segment
     .replace(/-/g, " ")
     .split(" ")
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 };
 
@@ -47,7 +47,9 @@ export default function DynamicBreadcrumb() {
               {index === segments.length - 1 ? (
                 <BreadcrumbPage>{formatSegment(segment)}</BreadcrumbPage>
               ) : (
-                <BreadcrumbLink href={`/${segments.slice(0, index + 1).join("/")}`}>
+                <BreadcrumbLink
+                  href={`/${segments.slice(0, index + 1).join("/")}`}
+                >
                   {formatSegment(segment)}
                 </BreadcrumbLink>
               )}

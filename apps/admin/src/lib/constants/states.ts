@@ -118,5 +118,5 @@ export const states = [
   {
     name: "New Jersey",
     abbreviation: "NJ",
-  }
+  },
 ];
