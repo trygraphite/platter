@@ -1,9 +1,13 @@
-import RestaurantHero from "@/components/sections/restaurant-hero";
-import Container from "@/components/shared/container";
-import db from "@platter/db";
-import type { Metadata } from "next";
+// pages/[domain]/page.tsx
+
+import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import React from "react";
+import db from "@platter/db";
+import { RestaurantHero } from "@/components/sections/restaurant-hero";
+import { ActionButtons } from "@/components/sections/Actionbtns";
+import { QrCodeSection } from "@/components/sections/Qrcode";
+import Header from "@/components/shared/header";
+
 
 const getRestaurantMetadata = async (params: string) => {
   const metadata = await db.user.findUnique({
@@ -13,6 +17,10 @@ const getRestaurantMetadata = async (params: string) => {
     select: {
       name: true,
       description: true,
+      image: true,
+      cuisine: true,
+      openingHours: true,
+      closingHours: true,
     },
   });
   return metadata;
@@ -20,7 +28,9 @@ const getRestaurantMetadata = async (params: string) => {
 
 export async function generateMetadata({
   params,
-}: { params: Promise<{ domain: string }> }): Promise<Metadata> {
+}: {
+  params: Promise<{ domain: string }>;
+}): Promise<Metadata> {
   const { domain } = await params;
   const data = await getRestaurantMetadata(domain);
   return {
@@ -39,9 +49,11 @@ async function Page({ params }: { params: Promise<{ domain: string }> }) {
     select: {
       name: true,
       description: true,
+      image: true,
       cuisine: true,
       openingHours: true,
       closingHours: true,
+      // add google maps review link
     },
   });
 
@@ -50,12 +62,27 @@ async function Page({ params }: { params: Promise<{ domain: string }> }) {
   }
 
   return (
-    <div>
-      <RestaurantHero
-        name={restaurantDetails.name}
-        description={restaurantDetails.description}
-      />
-    </div>
+    <section className="min-h-[calc(100vh-4rem)] bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
+       <Header 
+          restaurantName={restaurantDetails.name} 
+          reviewLink="https://maps.app.goo.gl/your-review-link" 
+        /> 
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex flex-col items-center text-center space-y-8">
+          <RestaurantHero
+            name={restaurantDetails.name}
+            description={restaurantDetails.description}
+            logo={restaurantDetails.image}
+
+            // pass google maps review link
+          />
+          <ActionButtons   
+        reviewLink="https://maps.app.goo.gl/your-review-link" 
+          />
+          <QrCodeSection />
+        </div>
+      </div>
+    </section>
   );
 }
 

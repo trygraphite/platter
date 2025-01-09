@@ -1,27 +1,35 @@
 import Image from "next/image";
 
+
 interface RestaurantHeroProps {
   name: string;
   description: string | null;
+  logo?: string | null;
 }
-export default function RestaurantHero({
-  name,
-  description,
-}: RestaurantHeroProps) {
+
+export function RestaurantHero({ name, description, logo }: RestaurantHeroProps) {
   return (
-    <section className="relative h-96 md:h-[500px] lg:h-[550px] xl:h-[650px] 2xl:h-[750px]">
-      <Image
-        src="/restaurant.jpg"
-        alt="gourmet delight"
-        fill
-        className="brightness-50 object-cover"
-      />
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-white mb-2">{name}</h1>
-          <p className="text-xl text-gray-200">{description}</p>
-        </div>
+    <div className="relative">
+      <div className="relative w-[300px] h-[300px] mb-4 rounded-lg overflow-hidden border-2">
+        <Image
+          src={logo || "/restaurant.jpg"}
+          alt={`${name} Logo`}
+          fill
+          className="object-cover"
+          priority
+        />
       </div>
-    </section>
+
+      <div className="text-center">
+        <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-teal-600 dark:from-blue-400 dark:to-teal-400">
+          {name}
+        </h1>
+        <p className="text-xl text-muted-foreground max-w-2xl mt-4">
+          {description || "Experience our seamless digital service"}
+        </p>
+      </div>
+    </div>
   );
 }
+
+
