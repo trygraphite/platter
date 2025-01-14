@@ -17,7 +17,7 @@ type Context = {
 function createContext({ req }: CreateContextOptions): Context {
 
   return {
-    userId: session?.user?.id || "",
+    userId: session?.user?.id || "user-id",
   };
 }
 
