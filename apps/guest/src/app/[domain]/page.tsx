@@ -7,6 +7,7 @@ import { RestaurantHero } from "@/components/sections/restaurant-hero";
 import { ActionButtons } from "@/components/sections/Actionbtns";
 import { QrCodeSection } from "@/components/sections/Qrcode";
 import Header from "@/components/shared/header";
+import { Params } from "@/types/pages";
 
 
 const getRestaurantMetadata = async (params: string) => {
@@ -26,11 +27,7 @@ const getRestaurantMetadata = async (params: string) => {
   return metadata;
 };
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ domain: string }>;
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { domain } = await params;
   const data = await getRestaurantMetadata(domain);
   return {
@@ -39,7 +36,7 @@ export async function generateMetadata({
   };
 }
 
-async function Page({ params }: { params: Promise<{ domain: string }> }) {
+async function Page({ params }: { params: Params }) {
   const domain = await params;
   const { domain: domainName } = domain;
   const restaurantDetails = await db.user.findUnique({
@@ -65,7 +62,7 @@ async function Page({ params }: { params: Promise<{ domain: string }> }) {
     <section className="min-h-[calc(100vh-4rem)] bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
        <Header 
           restaurantName={restaurantDetails.name} 
-          reviewLink="https://maps.app.goo.gl/your-review-link" 
+          reviewLink="" 
         /> 
       <div className="container mx-auto px-4 py-4">
         <div className="flex flex-col items-center text-center space-y-8">
@@ -77,7 +74,7 @@ async function Page({ params }: { params: Promise<{ domain: string }> }) {
             // pass google maps review link
           />
           <ActionButtons   
-        reviewLink="https://maps.app.goo.gl/your-review-link" 
+         reviewLink="" 
           />
           <QrCodeSection />
         </div>

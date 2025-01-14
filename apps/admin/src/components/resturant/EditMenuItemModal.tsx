@@ -57,7 +57,12 @@ export function EditMenuItemModal({
       price: parseFloat(price),
     };
     if (image) {
-      updatedData.image = image;
+      const reader = new FileReader();
+      const base64String = await new Promise<string>((resolve) => {
+        reader.onload = () => resolve(reader.result as string);
+        reader.readAsDataURL(image);
+      });
+      updatedData.image = base64String;
     }
     await handleUpdateMenuItem(menuItem.id, updatedData);
     onClose();

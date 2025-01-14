@@ -43,21 +43,13 @@ export function AddMenuItemModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    try {
-      console.log(
-        "Creating datas ",
-        name,
-        description,
-        price,
-        image,
-        categoryId,
-      );
+    try { 
       await handleAddMenuItem(categoryId, {
         name,
         description,
         categoryId,
         price: parseFloat(price),
-        image: image as any,
+        image:  image as  string | null,
         isAvailable: true,
       });
       setName("");

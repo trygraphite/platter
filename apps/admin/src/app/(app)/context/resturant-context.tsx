@@ -22,8 +22,8 @@ interface RestaurantContextType {
   fetchUserAndCategories: () => Promise<void>;
   handleAddCategory: (categoryData: Partial<Category>) => Promise<void>;
   handleAddMenuItem: (
-    categoryId: string,
-    menuItemData: Omit<MenuItem, "id" | "categoryId" | "userId">,
+    categoryId: String,
+    menuItemData: Omit<MenuItem, "id" | "createdAt" | "updatedAt" | "userId" >,
   ) => Promise<void>;
   handleUpdateCategory: (
     categoryId: string,
@@ -102,7 +102,7 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren<{}>> = ({
     }
   };
 
-  const handleAddMenuItem = async (categoryId: string, menuItemData: any) => {
+  const handleAddMenuItem = async (menuItemData: any) => {
     if (!session?.user?.id) {
       toast.error("Not authenticated");
       return;
@@ -110,6 +110,7 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren<{}>> = ({
     console.log(" menu items", menuItemData);
     try {
       if ("image" in menuItemData && menuItemData.image instanceof File) {
+        if (!edgestore?.publicFiles) throw new Error("EdgeStore not initialized");
         const res = await edgestore.publicFiles.upload({
           file: menuItemData.image,
           input: { type: "Platter-menuItem" },
@@ -154,6 +155,7 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren<{}>> = ({
 
     try {
       if ("image" in menuItemData && menuItemData.image instanceof File) {
+         if (!edgestore?.publicFiles) throw new Error("EdgeStore not initialized");
         const res = await edgestore.publicFiles.upload({
           file: menuItemData.image,
           input: { type: "Platter-menuItem" },

@@ -3,6 +3,8 @@
   "compilerOptions": {
     //"outDir": "dist"
     "baseUrl": ".",
+    "module": "ESNext",
+     "moduleResolution": "bundler",
     "paths": {
       "@platter/ui/*": ["./src/*"]
     }

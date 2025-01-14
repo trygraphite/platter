@@ -92,8 +92,8 @@ model Verification {
 
 model QRCode {
   id           String    @id @default(uuid())
-  target       String    // What the QR code is for (table, restaurant, etc)
-  targetNumber String    // The specific number/identifier of the target
+  target       String    // What the QR code is for (table, menu, etc)
+  targetNumber String?    // The specific number/identifier of the target
   link         String?   // Optional URL the QR code points to
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
@@ -121,6 +121,8 @@ model Table {
   userId          String
   qrCodes      QRCode[]
   orders       Order[]
+  review       Review[]
+  complaint    Complaint[]
 }
 
 model Category {
@@ -144,7 +146,7 @@ model MenuItem {
   id          String   @id @default(uuid())
   name        String
   description String
-  price       Decimal
+  price       Int
   image       String?
   isAvailable Boolean  @default(true)
   createdAt   DateTime @default(now())
@@ -162,28 +164,44 @@ model MenuItem {
 }
 
 model Order {
-  id           String      @id @default(uuid())
-  orderNumber  String      @unique @default(uuid())
-  status       OrderStatus @default(PENDING)
-  totalAmount  Decimal
-  specialNotes String?
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  id              String      @id @default(uuid())
+  orderNumber     String      @unique @default(uuid())
+  status          OrderStatus @default(PENDING)
+  totalAmount     Int
+  specialNotes    String?
+
+  // Status timestamps
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  confirmedAt     DateTime?
+  preparingAt     DateTime?
+  readyAt         DateTime?
+  deliveredAt     DateTime?
+  cancelledAt     DateTime?
+
+  // Time metrics (in minutes)
+  confirmationTime Int?       // Time between created and confirmed
+  preparationTime  Int?       // Time between confirmed and ready
+  deliveryTime     Int?       // Time between ready and delivered
+  totalTime        Int?       // Total time from creation to delivery
 
   // Relations
-    user        User     @relation(fields: [userId], references: [id])
+  user            User        @relation(fields: [userId], references: [id])
+  userId          String
+  table           Table       @relation(fields: [tableId], references: [id])
+  tableId         String
+  items           OrderItem[]
+  review          Review?
+  
 
-  userId        String
-  table        Table       @relation(fields: [tableId], references: [id])
-  tableId      String
-  items        OrderItem[]
-  review       Review?
+  @@index([status])
+  @@index([orderNumber])
 }
 
 model OrderItem {
   id           String   @id @default(uuid())
   quantity     Int
-  price        Decimal  // Price at time of order
+  price        Int  // Price at time of order
   specialNotes String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -201,19 +219,22 @@ model Review {
   comment String?
 
   // Relations
-  order     Order   @relation(fields: [orderId], references: [id])
-  orderId   String  @unique
+  order     Order?   @relation(fields: [orderId], references: [id])
+  orderId   String?  @unique
   qrCode    QRCode? @relation(fields: [qrCodeId], references: [id])
   qrCodeId  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   user        User      @relation(fields: [userId], references: [id])
   userId      String
+  table       Table?     @relation(fields: [tableId], references: [id])
+  tableId     String?
 }
 
 model Complaint {
   id        String          @id @default(uuid())
   content   String
+  category  String?
   status    ComplaintStatus @default(PENDING)
   createdAt DateTime        @default(now())
   updatedAt DateTime        @updatedAt
@@ -221,15 +242,16 @@ model Complaint {
   // Relations
   qrCode   QRCode @relation(fields: [qrCodeId], references: [id])
   qrCodeId String
-    user        User      @relation(fields: [userId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
   userId      String
+  table       Table?     @relation(fields: [tableId], references: [id])
+  tableId     String?
 }
 
 enum OrderStatus {
   PENDING
   CONFIRMED
   PREPARING
-  READY
   DELIVERED
   CANCELLED
 }

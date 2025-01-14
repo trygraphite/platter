@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache";
 interface CreateMenuItemData {
   name: string;
   description: string;
-  price: number | string | Decimal;
+  price: number ;
   image: string | null;
   categoryId: string;
   isAvailable?: boolean;
@@ -24,13 +24,12 @@ export async function createMenuItem(data: CreateMenuItemData, userId: string) {
       throw new Error("Name and price are required");
     }
     // Convert price to Decimal
-    const price = new Decimal(data.price.toString());
 
     const menuItem = await db.menuItem.create({
       data: {
         name: data.name,
         description: data.description || "",
-        price,
+        price: data.price,
         image: data.image,
         isAvailable: data.isAvailable ?? true,
         category: {
@@ -42,14 +41,10 @@ export async function createMenuItem(data: CreateMenuItemData, userId: string) {
       },
     });
 
-    // Convert Decimal to number before returning
-    const safeMenuItem = {
-      ...menuItem,
-      price: menuItem.price.toNumber(),
-    };
-    console.log("Created menu item:", safeMenuItem);
+  
+    console.log("Created menu item:", menuItem);
     revalidatePath("/menu-items");
-    return { success: true, safeMenuItem };
+    return { success: true, menuItem };
   } catch (error) {
     console.error("Failed to create menu item:", error);
     return {

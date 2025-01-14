@@ -6,6 +6,11 @@ export default async function middleware(req: NextRequest) {
   const hostname = req.headers.get("host");
   const pathname = url.pathname;
 
+  // Skip middleware for API routes
+  if (pathname.startsWith('/api/')) {
+    return NextResponse.next();
+  }
+
   // Extract subdomain
   const currentHost =
     process.env.NODE_ENV === "production"
@@ -38,5 +43,8 @@ export default async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)"],
+  matcher: [
+    // Skip api routes, public files, and next internal routes
+    "/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)",
+  ],
 };
