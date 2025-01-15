@@ -1,7 +1,7 @@
-import { PrismaClient } from "@prisma/client";
 import { OrdersPage } from "@/components/view-orders/view-order";
+import type { Params } from "@/types/pages";
+import { PrismaClient } from "@prisma/client";
 import { notFound } from "next/navigation";
-import { Params } from "@/types/pages";
 
 const prisma = new PrismaClient();
 

@@ -1,9 +1,9 @@
-import { notFound } from "next/navigation";
-import { OrderStatus } from "@prisma/client";
-import db from "@platter/db";
 import OrderStatusPage from "@/components/order-status-page/orderStatusPage";
 import ErrorCard from "@/components/shared/error-card";
-import { Params } from "@/types/pages";
+import type { Params } from "@/types/pages";
+import db from "@platter/db";
+import { OrderStatus } from "@prisma/client";
+import { notFound } from "next/navigation";
 
 export default async function OrderPage({ params }: { params: Params }) {
   const { qrId, orderId } = await params;

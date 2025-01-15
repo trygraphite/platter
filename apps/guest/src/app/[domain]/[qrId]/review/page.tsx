@@ -1,5 +1,5 @@
 import { ReviewPage } from "@/components/review/review-form";
-import { Params } from "@/types/pages";
+import type { Params } from "@/types/pages";
 import { PrismaClient } from "@prisma/client";
 import { notFound } from "next/navigation";
 

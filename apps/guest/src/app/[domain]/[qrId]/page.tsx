@@ -1,6 +1,6 @@
 import { QRCodeView } from "@/components/qr-comps/qrview";
 import Header from "@/components/shared/header";
-import { Params } from "@/types/pages";
+import type { Params } from "@/types/pages";
 import db from "@platter/db";
 import { notFound } from "next/navigation";
 
@@ -85,7 +85,7 @@ async function Page({ params }: { params: Params }) {
   return (
     <>
       <Header restaurantName={restaurantDetails.user.name} reviewLink="" />
-      <QRCodeView qrId={qrId} config={pageConfig} />;
+      <QRCodeView qrId={qrId} config={pageConfig} />
     </>
   );
 }

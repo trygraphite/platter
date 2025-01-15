@@ -1,55 +1,46 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { Button } from "@platter/ui/components/button";
-import Image from "next/image";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "@platter/ui/components/card";
+import type {
+  CartItem,
+  MenuCategory,
+  MenuItem,
+  RestaurantDetails,
+} from "@/types/menu";
 import {
   Accordion,
+  AccordionContent,
   AccordionItem,
   AccordionTrigger,
-  AccordionContent,
 } from "@platter/ui/components/accordion";
+import { Button } from "@platter/ui/components/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@platter/ui/components/card";
 import { MinusCircle, PlusCircle, ShoppingBag } from "@platter/ui/lib/icons";
-import { MenuItem } from "@platter/db/client";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 interface MenuPageProps {
   qrId: string;
-  category: Category[];
-  restaurantDetails: {
-    name: string;
-    description: string;
-    image: string;
-    cuisine: string;
-    openingHours: string;
-    closingHours: string;
-  };
-}
-
-interface CartItem extends MenuItem {
-  quantity: number;
-}
-
-interface Category {
-  id: string;
-  name: string;
-  menuItems: MenuItem[];
+  categories: MenuCategory[];
+  restaurantDetails: RestaurantDetails;
 }
 
 const formatPrice = (price: number | string | null | undefined): string => {
   const numPrice =
-    typeof price === "string" ? parseFloat(price) : Number(price);
-  return isNaN(numPrice) ? "0.00" : numPrice.toFixed(2);
+    typeof price === "string" ? Number.parseFloat(price) : Number(price);
+  return Number.isNaN(numPrice) ? "0.00" : numPrice.toFixed(2);
 };
 
-export function MenuPage({ qrId, category, restaurantDetails }: MenuPageProps) {
-  const [categories, setCategories] = useState<Category[]>(category);
+export function MenuPage({
+  qrId,
+  categories,
+  restaurantDetails,
+}: MenuPageProps) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [activeCategory, setActiveCategory] = useState<string>("");
   const router = useRouter();
@@ -59,10 +50,10 @@ export function MenuPage({ qrId, category, restaurantDetails }: MenuPageProps) {
     if (savedCart) {
       setCart(JSON.parse(savedCart));
     }
-    if (category.length > 0 && category[0]?.id) {
-      setActiveCategory(category[0].id);
+    if (categories.length > 0 && categories[0]?.id) {
+      setActiveCategory(categories[0].id);
     }
-  }, [qrId, category]);
+  }, [qrId, categories]);
 
   useEffect(() => {
     localStorage.setItem(`cart-${qrId}`, JSON.stringify(cart));

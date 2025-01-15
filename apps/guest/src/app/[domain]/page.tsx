@@ -1,13 +1,13 @@
 // pages/[domain]/page.tsx
 
-import { Metadata } from "next";
-import { notFound } from "next/navigation";
-import db from "@platter/db";
-import { RestaurantHero } from "@/components/sections/restaurant-hero";
 import { ActionButtons } from "@/components/sections/Actionbtns";
 import { QrCodeSection } from "@/components/sections/Qrcode";
+import { RestaurantHero } from "@/components/sections/restaurant-hero";
 import Header from "@/components/shared/header";
-import { Params } from "@/types/pages";
+import type { Params } from "@/types/pages";
+import db from "@platter/db";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 
 const getRestaurantMetadata = async (params: string) => {
   const metadata = await db.user.findUnique({

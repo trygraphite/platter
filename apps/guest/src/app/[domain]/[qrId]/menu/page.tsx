@@ -1,36 +1,13 @@
 import { MenuPage } from "@/components/order-menu-page/menuPage";
-import { Params } from "@/types/pages";
+import type { Params } from "@/types/pages";
+import type { RestaurantDetails, MenuCategory } from "@/types/menu";
 import db from "@platter/db";
 import { notFound } from "next/navigation";
-
-// interface RestaurantDetails {
-//   name: string;
-//   description: string;
-//   image: string;
-//   cuisine: string;
-//   openingHours: string;
-//   closingHours: string;
-//   menu: Category[];
-// }
-
-// interface Category {
-//   id: string;
-//   name: string;
-//   menuItems: MenuItem[];
-// }
-
-// interface MenuItem {
-//   id: string;
-//   name: string;
-//   description: string;
-//   price: number;
-//   image?: string;
-// }
 
 export default async function Page({ params }: { params: Params }) {
   const { qrId, domain } = await params;
 
-  const restaurantDetails = (await db.user.findUnique({
+  const restaurant = await db.user.findUnique({
     where: {
       subdomain: domain,
     },
@@ -42,10 +19,16 @@ export default async function Page({ params }: { params: Params }) {
       openingHours: true,
       closingHours: true,
       categories: {
+        where: {
+          isActive: true,
+        },
         select: {
           id: true,
           name: true,
           menuItems: {
+            where: {
+              isAvailable: true,
+            },
             select: {
               id: true,
               name: true,
@@ -58,17 +41,19 @@ export default async function Page({ params }: { params: Params }) {
         },
       },
     },
-  })) as any;
+  });
 
-  if (!restaurantDetails) {
+  if (!restaurant) {
     return notFound();
   }
+
+  const { categories, ...restaurantDetails } = restaurant;
 
   return (
     <MenuPage
       qrId={qrId}
-      category={restaurantDetails.categories}
-      restaurantDetails={restaurantDetails}
+      categories={categories as MenuCategory[]}
+      restaurantDetails={restaurantDetails as RestaurantDetails}
     />
   );
 }
