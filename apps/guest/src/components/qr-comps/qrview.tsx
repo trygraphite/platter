@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { Button } from "@platter/ui/components/button";
 import {
   Card,
@@ -7,11 +7,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@platter/ui/components/card";
-import { Building2, UtensilsCrossed, MessageSquare, Star, ScreenShare } from "@platter/ui/lib/icons";
+import {
+  Building2,
+  UtensilsCrossed,
+  MessageSquare,
+  Star,
+  ScreenShare,
+} from "@platter/ui/lib/icons";
 import Link from "next/link";
 import Image from "next/image";
 import { PageConfig } from "@/types/qr";
-
 
 interface QRCodeViewProps {
   qrId: string;
@@ -38,16 +43,16 @@ export function QRCodeView({ qrId, config }: QRCodeViewProps) {
                 <Building2 className="w-8 h-8 text-primary" />
               </div>
             )}
-            <CardTitle className="text-2xl font-bold">
-              {config.title}
-            </CardTitle>
+            <CardTitle className="text-2xl font-bold">{config.title}</CardTitle>
             <CardDescription className="text-base">
               {config.description}
             </CardDescription>
             {(config.restaurantInfo.cuisine || config.restaurantInfo.hours) && (
               <div className="text-sm text-muted-foreground">
                 {config.restaurantInfo.cuisine && (
-                  <p className="mb-1">Cuisine: {config.restaurantInfo.cuisine}</p>
+                  <p className="mb-1">
+                    Cuisine: {config.restaurantInfo.cuisine}
+                  </p>
                 )}
                 {config.restaurantInfo.hours && (
                   <p>Hours: {config.restaurantInfo.hours}</p>

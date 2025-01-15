@@ -3,7 +3,6 @@ import { Params } from "@/types/pages";
 import db from "@platter/db";
 import { notFound } from "next/navigation";
 
-
 // interface RestaurantDetails {
 //   name: string;
 //   description: string;
@@ -29,45 +28,44 @@ import { notFound } from "next/navigation";
 // }
 
 export default async function Page({ params }: { params: Params }) {
-      const { qrId, domain } = await params;
+  const { qrId, domain } = await params;
 
-
-  const restaurantDetails = await db.user.findUnique({
+  const restaurantDetails = (await db.user.findUnique({
     where: {
       subdomain: domain,
     },
     select: {
-    name: true,
-    description: true,
-    image: true,
-    cuisine: true,
-    openingHours: true,
-    closingHours: true,
-    categories: {
-      select: {
-        id: true,
-        name: true,
-        menuItems: {
-          select: {
-            id: true,
-            name: true,
-            description: true,
-            price: true,
-            image: true,
-            isAvailable: true,
+      name: true,
+      description: true,
+      image: true,
+      cuisine: true,
+      openingHours: true,
+      closingHours: true,
+      categories: {
+        select: {
+          id: true,
+          name: true,
+          menuItems: {
+            select: {
+              id: true,
+              name: true,
+              description: true,
+              price: true,
+              image: true,
+              isAvailable: true,
+            },
           },
         },
       },
     },
-  },
-}) as any;
+  })) as any;
 
   if (!restaurantDetails) {
     return notFound();
   }
 
   return (
-    <MenuPage 
+    <MenuPage
       qrId={qrId}
       category={restaurantDetails.categories}
       restaurantDetails={restaurantDetails}

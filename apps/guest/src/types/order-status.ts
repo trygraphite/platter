@@ -1,5 +1,11 @@
 // types/orderStatus.ts
-import { Order as PrismaOrder, OrderStatus, Order, Table, User } from "@prisma/client";
+import {
+  Order as PrismaOrder,
+  OrderStatus,
+  Order,
+  Table,
+  User,
+} from "@prisma/client";
 
 export interface OrderItem {
   id: string;
@@ -12,12 +18,10 @@ export interface OrderItem {
   };
 }
 
-
-
 export interface OrderStatusPageProps {
   initialOrder: Order;
   qrId: string;
-  table: Table
+  table: Table;
   user: User;
 }
 

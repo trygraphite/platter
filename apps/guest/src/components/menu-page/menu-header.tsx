@@ -1,4 +1,3 @@
-
 export function MenuHeader({ userDetails }: { userDetails: String }) {
   return (
     <header className="w-full bg-white shadow-sm py-6 px-4">
@@ -13,4 +12,3 @@ export function MenuHeader({ userDetails }: { userDetails: String }) {
     </header>
   );
 }
-

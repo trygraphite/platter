@@ -16,7 +16,7 @@ const config = {
         sans: ["var(--font-sans)", ...fontFamily.sans],
         mono: ["var(--font-mono)", ...fontFamily.mono],
       },
-        colors: {
+      colors: {
         platter: {
           primary: "#1E90FF",
           secondary: "#F8F9FA",

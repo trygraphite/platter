@@ -1,6 +1,6 @@
 // app/api/orders/[orderId]/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 import { headers } from "next/headers";
 
 const prisma = new PrismaClient();
@@ -24,19 +24,19 @@ export async function OPTIONS() {
 
 export async function GET(
   request: any,
- context: { params: Promise<{ orderId: string }> },
+  context: { params: Promise<{ orderId: string }> },
 ) {
   try {
-      const { orderId } = await context.params;
+    const { orderId } = await context.params;
     console.log("API Route Hit - GET /api/orders/[orderId]", orderId);
 
     if (!orderId) {
-      return new NextResponse("Order ID is required", { 
+      return new NextResponse("Order ID is required", {
         status: 400,
         headers: {
           ...corsHeaders(),
           "Content-Type": "application/json",
-        }
+        },
       });
     }
 
@@ -51,7 +51,7 @@ export async function GET(
         headers: {
           ...corsHeaders(),
           "Content-Type": "application/json",
-        }
+        },
       });
     }
 
@@ -81,7 +81,9 @@ export async function GET(
 
               if (!order) {
                 controller.enqueue(
-                  encoder.encode(`data: ${JSON.stringify({ error: "Order not found" })}\n\n`)
+                  encoder.encode(
+                    `data: ${JSON.stringify({ error: "Order not found" })}\n\n`,
+                  ),
                 );
                 return;
               }
@@ -89,7 +91,7 @@ export async function GET(
               const currentOrderJson = JSON.stringify(order);
               if (currentOrderJson !== previousOrderJson) {
                 controller.enqueue(
-                  encoder.encode(`data: ${currentOrderJson}\n\n`)
+                  encoder.encode(`data: ${currentOrderJson}\n\n`),
                 );
                 previousOrderJson = currentOrderJson;
               }
@@ -99,7 +101,9 @@ export async function GET(
             } catch (error) {
               console.error("Error in checkForUpdates:", error);
               controller.enqueue(
-                encoder.encode(`data: ${JSON.stringify({ error: "Error fetching order" })}\n\n`)
+                encoder.encode(
+                  `data: ${JSON.stringify({ error: "Error fetching order" })}\n\n`,
+                ),
               );
             }
           };
@@ -114,7 +118,7 @@ export async function GET(
             console.log("Client disconnected, cleaning up");
             clearInterval(interval);
           });
-        }
+        },
       });
 
       return new NextResponse(stream, {
@@ -122,8 +126,8 @@ export async function GET(
           ...corsHeaders(),
           "Content-Type": "text/event-stream",
           "Cache-Control": "no-cache, no-transform",
-          "Connection": "keep-alive",
-          "X-Accel-Buffering": "no"
+          Connection: "keep-alive",
+          "X-Accel-Buffering": "no",
         },
       });
     }
@@ -149,7 +153,7 @@ export async function GET(
       headers: {
         ...corsHeaders(),
         "Content-Type": "application/json",
-      }
+      },
     });
   }
 }

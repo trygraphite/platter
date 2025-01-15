@@ -7,7 +7,7 @@ export default async function middleware(req: NextRequest) {
   const pathname = url.pathname;
 
   // Skip middleware for API routes
-  if (pathname.startsWith('/api/')) {
+  if (pathname.startsWith("/api/")) {
     return NextResponse.next();
   }
 

@@ -37,19 +37,19 @@ export function OrdersPage({
   const [orders, setOrders] = useState<Order[]>(initialOrders);
   const router = useRouter();
 
-//   useEffect(() => {
-//     const fetchOrders = async () => {
-//       try {
-//         const updatedOrders = await viewOrders(userId, tableId);
-//         setOrders(updatedOrders);
-//       } catch (error) {
-//         console.error("Error updating orders:", error);
-//       }
-//     };
+  //   useEffect(() => {
+  //     const fetchOrders = async () => {
+  //       try {
+  //         const updatedOrders = await viewOrders(userId, tableId);
+  //         setOrders(updatedOrders);
+  //       } catch (error) {
+  //         console.error("Error updating orders:", error);
+  //       }
+  //     };
 
-//     const interval = setInterval(fetchOrders, 300000); // Update every 5 minutes
-//     return () => clearInterval(interval);
-//   }, [userId, tableId]);
+  //     const interval = setInterval(fetchOrders, 300000); // Update every 5 minutes
+  //     return () => clearInterval(interval);
+  //   }, [userId, tableId]);
 
   const handleOrderClick = (orderId: string) => {
     router.push(`/${qrId}/order-status/${orderId}`);
@@ -141,4 +141,3 @@ export function OrdersPage({
     </div>
   );
 }
-

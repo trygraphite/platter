@@ -13,7 +13,8 @@ export const Hero = () => {
               <span className="text-platter-primary">Platter</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 mb-8">
-              A seamless QR-based system for ordering, reviews, and menu exploration
+              A seamless QR-based system for ordering, reviews, and menu
+              exploration
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button

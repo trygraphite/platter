@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useState } from "react";
 
 import {
@@ -86,4 +86,4 @@ export const Features = () => {
       </div>
     </section>
   );
-}
+};

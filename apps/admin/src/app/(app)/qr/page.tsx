@@ -9,13 +9,19 @@ import { QRDisplay } from "@/components/qrcode/qr-display";
 export default function QRCodePage() {
   const [qrCode, setQRCode] = useState<string | null>(null);
   const [currentTable, setCurrentTable] = useState<number | null>(null);
-  const [currentType, setCurrentType] = useState<'table' | 'menu'>('table');
+  const [currentType, setCurrentType] = useState<"table" | "menu">("table");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleGenerateQR = async (data: { target: 'table' | 'menu', tableNumber?: number | null }) => {
+  const handleGenerateQR = async (data: {
+    target: "table" | "menu";
+    tableNumber?: number | null;
+  }) => {
     setIsLoading(true);
     try {
-      const result = await createQRCodeAction(data.tableNumber || undefined, data.target);
+      const result = await createQRCodeAction(
+        data.tableNumber || undefined,
+        data.target,
+      );
 
       if (result.success && result.qrCodeUrl) {
         setQRCode(result.qrCodeUrl);
@@ -45,9 +51,9 @@ export default function QRCodePage() {
         <QRForm onSubmit={handleGenerateQR} isLoading={isLoading} />
 
         {qrCode && (
-          <QRDisplay 
-            qrCodeUrl={qrCode} 
-            tableNumber={currentTable} 
+          <QRDisplay
+            qrCodeUrl={qrCode}
+            tableNumber={currentTable}
             type={currentType}
           />
         )}

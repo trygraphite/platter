@@ -1,4 +1,4 @@
-'use server'
+"use server";
 
 import db from "@platter/db";
 import { revalidatePath } from "next/cache";
@@ -25,7 +25,7 @@ export async function createOrder({
     // Get restaurant ID from QR code
     const qrCode = await db.qRCode.findUnique({
       where: { id: qrId },
-      select: { userId: true }
+      select: { userId: true },
     });
     if (!qrCode) {
       throw new Error("QR code not found");
@@ -35,32 +35,30 @@ export async function createOrder({
     const orderNumber = Math.floor(100000 + Math.random() * 900000).toString();
 
     // Create the order
-   const order = await db.order.create({
+    const order = await db.order.create({
       data: {
-        status: 'PENDING',
+        status: "PENDING",
         orderNumber,
         totalAmount,
         userId: qrCode.userId,
         tableId,
         items: {
-          create: items.map(item => ({
+          create: items.map((item) => ({
             menuItemId: item.id,
             quantity: item.quantity,
             price: item.price,
-            
-          }))
+          })),
         },
       },
-       include: {
-        items: true
-      }
+      include: {
+        items: true,
+      },
     });
-    console.log(order)
+    console.log(order);
     revalidatePath(`/${qrId}/order-status`);
     return { success: true, orderId: order.id };
-
   } catch (error) {
-    console.error('Error creating order:', error);
-    return { success: false, error: 'Failed to create order' };
+    console.error("Error creating order:", error);
+    return { success: false, error: "Failed to create order" };
   }
 }

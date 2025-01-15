@@ -17,8 +17,8 @@ import { createOrder } from "@/app/actions/create-order";
 interface OrderSummaryPageProps {
   qrId: string;
   domain: string;
-  tableDetails: { 
-    id:string;
+  tableDetails: {
+    id: string;
     number: string;
     capacity: number;
     isAvailable: boolean;
@@ -39,10 +39,10 @@ interface CartItem {
   image?: string;
 }
 
-export function OrderSummaryPage({ 
-  qrId, 
+export function OrderSummaryPage({
+  qrId,
   tableDetails,
-  restaurantDetails 
+  restaurantDetails,
 }: OrderSummaryPageProps) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const router = useRouter();
@@ -76,45 +76,46 @@ export function OrderSummaryPage({
   };
 
   const handleCheckout = async () => {
-  setIsLoading(true);
-  try {
-    if (!tableDetails?.id) {
-      toast.error("Table details not found");
-      return;
+    setIsLoading(true);
+    try {
+      if (!tableDetails?.id) {
+        toast.error("Table details not found");
+        return;
+      }
+
+      const orderData = {
+        tableId: tableDetails.id,
+        qrId,
+        items: cart.map((item) => ({
+          id: item.id,
+          quantity: item.quantity,
+          price: item.price,
+          name: item.name,
+        })),
+        totalAmount: calculateTotal(),
+      };
+
+      console.log("Client-side order data:", orderData);
+      const result = await createOrder(orderData);
+
+      if (result.success && result.orderId) {
+        // Clear the cart
+        localStorage.removeItem(`cart-${qrId}`);
+        setCart([]);
+        // Redirect to order status page
+        router.push(`/${qrId}/order-status/${result.orderId}`);
+      } else {
+        toast.error(
+          result.error || "Failed to create order. Please try again.",
+        );
+      }
+    } catch (error) {
+      console.error("Checkout error:", error);
+      toast.error("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
-
-    const orderData = {
-      tableId: tableDetails.id,
-      qrId,
-      items: cart.map(item => ({
-        id: item.id,
-        quantity: item.quantity,
-        price: item.price,
-        name: item.name
-      })),
-      totalAmount: calculateTotal()
-    };
-
-    console.log("Client-side order data:", orderData);
-    const result = await createOrder(orderData);
-
-    if (result.success && result.orderId) {
-      // Clear the cart
-      localStorage.removeItem(`cart-${qrId}`);
-      setCart([]);
-      // Redirect to order status page
-      router.push(`/${qrId}/order-status/${result.orderId}`);
-    } else {
-      toast.error(result.error || "Failed to create order. Please try again.");
-    }
-  } catch (error) {
-    console.error('Checkout error:', error);
-    toast.error("An unexpected error occurred. Please try again.");
-  } finally {
-    setIsLoading(false);
-  }
-};
-
+  };
 
   return (
     <div className="container mx-auto p-4">
@@ -132,7 +133,10 @@ export function OrderSummaryPage({
           <CardHeader className="border-b">
             <div className="flex items-center gap-2">
               <ShoppingBag className="h-5 w-5" />
-              <CardTitle>Order Summary for {restaurantDetails.name} Table {tableDetails.number}</CardTitle>
+              <CardTitle>
+                Order Summary for {restaurantDetails.name} Table{" "}
+                {tableDetails.number}
+              </CardTitle>
             </div>
             <p className="text-sm text-muted-foreground mt-1">
               {restaurantDetails.cuisine}
@@ -146,46 +150,45 @@ export function OrderSummaryPage({
               </div>
             ) : (
               <div className="space-y-6">
-               {cart.map((item) => (
-                <div
+                {cart.map((item) => (
+                  <div
                     key={item.id}
                     className="flex items-center justify-between py-2 border-b last:border-0"
-                >
+                  >
                     {/* Image and Item Details */}
                     <div className="flex items-center gap-4 flex-1">
-                    {/* Image */}
-                    <img
+                      {/* Image */}
+                      <img
                         src={item.image} // Replace with the correct path to the item's image
                         alt={item.name}
                         className="w-16 h-16 object-cover rounded" // Adjust size and styling as needed
-                    />
+                      />
 
-                    {/* Item Details */}
-                    <div>
+                      {/* Item Details */}
+                      <div>
                         <h3 className="font-medium">{item.name}</h3>
                         <p className="text-sm text-muted-foreground">
-                        ₦{Number(item.price).toFixed(2)} × {item.quantity}
+                          ₦{Number(item.price).toFixed(2)} × {item.quantity}
                         </p>
-                    </div>
+                      </div>
                     </div>
 
                     {/* Total Price and Remove Button */}
                     <div className="flex items-center gap-4">
-                    <p className="font-semibold">
+                      <p className="font-semibold">
                         ₦{(Number(item.price) * item.quantity).toFixed(2)}
-                    </p>
-                    <Button
+                      </p>
+                      <Button
                         variant="ghost"
                         size="icon"
                         className="text-destructive hover:text-destructive/90"
                         onClick={() => handleRemoveItem(item.id)}
-                    >
+                      >
                         <Trash2 className="h-4 w-4" />
-                    </Button>
+                      </Button>
                     </div>
-                </div>
+                  </div>
                 ))}
-
 
                 <div className="pt-4 border-t">
                   <div className="flex justify-between items-center text-lg font-bold">
@@ -205,13 +208,13 @@ export function OrderSummaryPage({
               >
                 Modify Order
               </Button>
-                        <Button 
-                className="w-full sm:w-auto" 
+              <Button
+                className="w-full sm:w-auto"
                 onClick={handleCheckout}
                 disabled={isLoading}
-                >
+              >
                 {isLoading ? "Creating Order..." : "Place Order"}
-                </Button>
+              </Button>
             </CardFooter>
           )}
         </Card>

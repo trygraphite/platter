@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader } from "@platter/ui/components/card";
 
-
 interface MenuItem {
   id: string;
   name: string;
@@ -32,9 +31,7 @@ export function MenuCard({ item }: MenuCardProps) {
       <CardContent className="p-4">
         <div className="flex justify-between items-start mb-2">
           <h3 className="font-semibold text-lg">{item.name}</h3>
-          <span className="text-black font-semibold">
-            ₦{(item.price)}
-          </span>
+          <span className="text-black font-semibold">₦{item.price}</span>
         </div>
         <p className="text-gray-600 text-sm">{item.description}</p>
       </CardContent>

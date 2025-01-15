@@ -10,7 +10,7 @@ type QRCodeTarget = "table" | "menu";
 export async function createQRCodeAction(
   tableNumber?: number,
   target: QRCodeTarget = "table",
-  capacity: number = 4 // Default capacity if not provided
+  capacity: number = 4, // Default capacity if not provided
 ): Promise<QRCodeResponse> {
   try {
     const session = await getServerSession();

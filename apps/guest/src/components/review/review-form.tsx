@@ -40,14 +40,14 @@ export function ReviewPage({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (rating === 0) {
       toast.error("Please select a rating before submitting");
       return;
     }
 
     setIsSubmitting(true);
-    
+
     try {
       const response = await createReview(
         userId,
@@ -57,13 +57,17 @@ export function ReviewPage({
         comment,
       );
 
-        console.log("Review submitted:", response);
+      console.log("Review submitted:", response);
 
       toast.success("Thank you for your valuable feedback!");
       router.push(`/${qrId}`);
     } catch (error) {
       console.error("Error submitting review:", error);
-      toast.error(error instanceof Error ? error.message : "Unable to submit review. Please try again.");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Unable to submit review. Please try again.",
+      );
     } finally {
       setIsSubmitting(false);
     }

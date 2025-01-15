@@ -23,7 +23,7 @@ interface RestaurantContextType {
   handleAddCategory: (categoryData: Partial<Category>) => Promise<void>;
   handleAddMenuItem: (
     categoryId: String,
-    menuItemData: Omit<MenuItem, "id" | "createdAt" | "updatedAt" | "userId" >,
+    menuItemData: Omit<MenuItem, "id" | "createdAt" | "updatedAt" | "userId">,
   ) => Promise<void>;
   handleUpdateCategory: (
     categoryId: string,
@@ -110,7 +110,8 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren<{}>> = ({
     console.log(" menu items", menuItemData);
     try {
       if ("image" in menuItemData && menuItemData.image instanceof File) {
-        if (!edgestore?.publicFiles) throw new Error("EdgeStore not initialized");
+        if (!edgestore?.publicFiles)
+          throw new Error("EdgeStore not initialized");
         const res = await edgestore.publicFiles.upload({
           file: menuItemData.image,
           input: { type: "Platter-menuItem" },
@@ -155,7 +156,8 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren<{}>> = ({
 
     try {
       if ("image" in menuItemData && menuItemData.image instanceof File) {
-         if (!edgestore?.publicFiles) throw new Error("EdgeStore not initialized");
+        if (!edgestore?.publicFiles)
+          throw new Error("EdgeStore not initialized");
         const res = await edgestore.publicFiles.upload({
           file: menuItemData.image,
           input: { type: "Platter-menuItem" },

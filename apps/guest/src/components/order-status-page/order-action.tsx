@@ -26,7 +26,13 @@ interface OrderActionsProps {
   onNavigate: (path: string) => void;
 }
 
-export function OrderActions({ orderId, status, qrId, onStatusChange, onNavigate }: OrderActionsProps) {
+export function OrderActions({
+  orderId,
+  status,
+  qrId,
+  onStatusChange,
+  onNavigate,
+}: OrderActionsProps) {
   const [isCancelling, setIsCancelling] = useState(false);
 
   const handleCancelOrder = async () => {
@@ -71,8 +77,8 @@ export function OrderActions({ orderId, status, qrId, onStatusChange, onNavigate
                 Are you sure you want to cancel this order?
               </AlertDialogTitle>
               <AlertDialogDescription>
-                This action cannot be undone. Your order will be cancelled
-                and you will need to place a new order if you change your mind.
+                This action cannot be undone. Your order will be cancelled and
+                you will need to place a new order if you change your mind.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -84,10 +90,7 @@ export function OrderActions({ orderId, status, qrId, onStatusChange, onNavigate
           </AlertDialogContent>
         </AlertDialog>
       )}
-      <Button
-        variant="outline"
-        onClick={() => onNavigate(`/${qrId}/menu`)}
-      >
+      <Button variant="outline" onClick={() => onNavigate(`/${qrId}/menu`)}>
         Place Another Order
       </Button>
     </div>

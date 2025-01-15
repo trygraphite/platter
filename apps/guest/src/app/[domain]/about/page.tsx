@@ -1,6 +1,10 @@
-
 import { Button } from "@platter/ui/components/button";
-import { MessageSquare, QrCode, Star, UtensilsCrossed } from "@platter/ui/lib/icons";
+import {
+  MessageSquare,
+  QrCode,
+  Star,
+  UtensilsCrossed,
+} from "@platter/ui/lib/icons";
 import Link from "next/link";
 
 export default function AboutPage() {

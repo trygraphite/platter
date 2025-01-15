@@ -1,13 +1,16 @@
 import Image from "next/image";
 
-
 interface RestaurantHeroProps {
   name: string;
   description: string | null;
   logo?: string | null;
 }
 
-export function RestaurantHero({ name, description, logo }: RestaurantHeroProps) {
+export function RestaurantHero({
+  name,
+  description,
+  logo,
+}: RestaurantHeroProps) {
   return (
     <div className="relative">
       <div className="relative w-[300px] h-[300px] mb-4 rounded-lg overflow-hidden border-2">
@@ -31,5 +34,3 @@ export function RestaurantHero({ name, description, logo }: RestaurantHeroProps)
     </div>
   );
 }
-
-

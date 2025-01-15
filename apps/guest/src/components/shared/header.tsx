@@ -3,7 +3,14 @@
 import React from "react";
 import Container from "./container";
 import Link from "next/link";
-import { Building2, ExternalLink, Info, Menu, ForkKnifeCrossedIcon, LucideMapPinHouse } from "@platter/ui/lib/icons";
+import {
+  Building2,
+  ExternalLink,
+  Info,
+  Menu,
+  ForkKnifeCrossedIcon,
+  LucideMapPinHouse,
+} from "@platter/ui/lib/icons";
 import { buttonVariants } from "@platter/ui/components/button";
 import {
   DropdownMenu,
@@ -35,21 +42,20 @@ function Header({ restaurantName, reviewLink }: HeaderProps) {
 
           <div className="flex items-center gap-4">
             <ul className="hidden md:flex items-center gap-6">
-             
-                <li>
-                  <Link
-                    href="/menu"
-                    target="_blank"
-                    className={buttonVariants({
-                      size: "sm",
-                      variant: "ghost",
-                    })}
-                  >
-                    Menu
-                    <ForkKnifeCrossedIcon className="ml-1 h-4 w-4" />
-                  </Link>
-                </li>
-            
+              <li>
+                <Link
+                  href="/menu"
+                  target="_blank"
+                  className={buttonVariants({
+                    size: "sm",
+                    variant: "ghost",
+                  })}
+                >
+                  Menu
+                  <ForkKnifeCrossedIcon className="ml-1 h-4 w-4" />
+                </Link>
+              </li>
+
               {reviewLink && (
                 <li>
                   <Link
@@ -79,8 +85,6 @@ function Header({ restaurantName, reviewLink }: HeaderProps) {
               </li>
             </ul>
 
-          
-
             <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
               <DropdownMenuTrigger asChild className="md:hidden">
                 <Button variant="ghost" size="icon" aria-label="Menu">
@@ -101,7 +105,10 @@ function Header({ restaurantName, reviewLink }: HeaderProps) {
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuItem asChild>
-                  <Link href="/about" className="flex items-center gap-2 w-full">
+                  <Link
+                    href="/about"
+                    className="flex items-center gap-2 w-full"
+                  >
                     <Info className="h-4 w-4" />
                     About
                   </Link>

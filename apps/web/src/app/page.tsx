@@ -3,7 +3,6 @@ import { Footer } from "@/components/footer";
 import { Hero } from "@/components/hero";
 import { HowItWorks } from "@/components/howitworks";
 
-
 const Index = () => {
   return (
     <div className="min-h-screen">

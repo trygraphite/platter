@@ -31,7 +31,13 @@ interface ComplaintPageProps {
   userId: string;
 }
 
-type ComplaintCategory = 'FOOD' | 'SERVICE' | 'CLEANLINESS' | 'WAIT_TIME' | 'ATMOSPHERE' | 'OTHER';
+type ComplaintCategory =
+  | "FOOD"
+  | "SERVICE"
+  | "CLEANLINESS"
+  | "WAIT_TIME"
+  | "ATMOSPHERE"
+  | "OTHER";
 
 export function ComplaintPage({
   qrId,
@@ -82,7 +88,10 @@ export function ComplaintPage({
               <Label htmlFor="category" className="text-lg font-medium">
                 Complaint Category
               </Label>
-              <Select value={category} onValueChange={(value: ComplaintCategory) => setCategory(value)}>
+              <Select
+                value={category}
+                onValueChange={(value: ComplaintCategory) => setCategory(value)}
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
@@ -91,7 +100,9 @@ export function ComplaintPage({
                   <SelectItem value="SERVICE">Customer Service</SelectItem>
                   <SelectItem value="CLEANLINESS">Cleanliness</SelectItem>
                   <SelectItem value="WAIT_TIME">Long Wait Times</SelectItem>
-                  <SelectItem value="ATMOSPHERE">Restaurant Atmosphere</SelectItem>
+                  <SelectItem value="ATMOSPHERE">
+                    Restaurant Atmosphere
+                  </SelectItem>
                   <SelectItem value="OTHER">Other</SelectItem>
                 </SelectContent>
               </Select>
@@ -124,4 +135,3 @@ export function ComplaintPage({
     </div>
   );
 }
-

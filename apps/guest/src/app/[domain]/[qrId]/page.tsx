@@ -4,11 +4,8 @@ import { Params } from "@/types/pages";
 import db from "@platter/db";
 import { notFound } from "next/navigation";
 
-
-
 async function Page({ params }: { params: Params }) {
-
-    const { qrId } = await params;
+  const { qrId } = await params;
 
   // Use qrId to fetch data from the database
   const restaurantDetails = await db.qRCode.findUnique({
@@ -42,18 +39,23 @@ async function Page({ params }: { params: Params }) {
 
   // Configure page using restaurantDetails
   const pageConfig = {
-    title: restaurantDetails.target === "table" 
-      ? `${restaurantDetails.user.name } Table ${restaurantDetails.targetNumber }  `
-      : restaurantDetails.target === "menu"
-        ? "Restaurant Menu"
-        : restaurantDetails.user.name,
-    description: restaurantDetails.user.description || `Welcome to ${restaurantDetails.user.name}`,
+    title:
+      restaurantDetails.target === "table"
+        ? `${restaurantDetails.user.name} Table ${restaurantDetails.targetNumber}  `
+        : restaurantDetails.target === "menu"
+          ? "Restaurant Menu"
+          : restaurantDetails.user.name,
+    description:
+      restaurantDetails.user.description ||
+      `Welcome to ${restaurantDetails.user.name}`,
     restaurantInfo: {
       name: restaurantDetails.user.name,
       cuisine: restaurantDetails.user.cuisine,
-      hours: restaurantDetails.user.openingHours && restaurantDetails.user.closingHours
-        ? `${restaurantDetails.user.openingHours} - ${restaurantDetails.user.closingHours}`
-        : undefined,
+      hours:
+        restaurantDetails.user.openingHours &&
+        restaurantDetails.user.closingHours
+          ? `${restaurantDetails.user.openingHours} - ${restaurantDetails.user.closingHours}`
+          : undefined,
       image: restaurantDetails.user.image,
     },
     buttons: [
@@ -80,13 +82,12 @@ async function Page({ params }: { params: Params }) {
     ],
   };
 
-  return <>
-        <Header 
-          restaurantName={restaurantDetails.user.name} 
-          reviewLink="" 
-        />
-        <QRCodeView qrId={qrId} config={pageConfig} />;
-  </>
+  return (
+    <>
+      <Header restaurantName={restaurantDetails.user.name} reviewLink="" />
+      <QRCodeView qrId={qrId} config={pageConfig} />;
+    </>
+  );
 }
 
 export default Page;

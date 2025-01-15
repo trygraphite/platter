@@ -22,7 +22,13 @@ interface ReviewModalProps {
   userId: string;
 }
 
-export function ReviewModal({ isOpen, onClose, qrId, tableId, userId }: ReviewModalProps) {
+export function ReviewModal({
+  isOpen,
+  onClose,
+  qrId,
+  tableId,
+  userId,
+}: ReviewModalProps) {
   const [rating, setRating] = useState<number>(0);
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);

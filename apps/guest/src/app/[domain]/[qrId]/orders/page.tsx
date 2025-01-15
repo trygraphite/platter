@@ -1,18 +1,18 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 import { OrdersPage } from "@/components/view-orders/view-order";
-import { notFound } from 'next/navigation';
-import { Params } from '@/types/pages';
+import { notFound } from "next/navigation";
+import { Params } from "@/types/pages";
 
 const prisma = new PrismaClient();
 
 export default async function Page({ params }: { params: Params }) {
-      const { qrId } = await params;
+  const { qrId } = await params;
 
   try {
     // Step 1: Fetch QRCode details
     const qrCode = await prisma.qRCode.findUnique({
       where: { id: qrId },
-      include: { table: true }
+      include: { table: true },
     });
 
     if (!qrCode) {
@@ -39,16 +39,16 @@ export default async function Page({ params }: { params: Params }) {
       include: {
         items: {
           include: {
-            menuItem: true
-          }
+            menuItem: true,
+          },
         },
         table: true,
         user: true,
-        review: true
+        review: true,
       },
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: "desc",
+      },
     });
 
     // Step 4: Pass data to child component
@@ -65,4 +65,3 @@ export default async function Page({ params }: { params: Params }) {
     return <div>Error loading orders. Please try again later.</div>;
   }
 }
-

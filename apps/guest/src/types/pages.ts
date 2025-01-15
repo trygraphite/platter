@@ -1,1 +1,1 @@
- export type Params = Promise<{ qrId: string; orderId: string; domain: string; }>;
+export type Params = Promise<{ qrId: string; orderId: string; domain: string }>;

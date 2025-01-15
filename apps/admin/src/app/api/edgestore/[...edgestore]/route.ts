@@ -6,7 +6,7 @@ import {
 } from "@edgestore/server/adapters/next/app";
 import { z } from "zod";
 
-  const session = await getServerSession();
+const session = await getServerSession();
 
 // Define the Context type
 type Context = {
@@ -15,7 +15,6 @@ type Context = {
 
 // Create context function
 function createContext({ req }: CreateContextOptions): Context {
-
   return {
     userId: session?.user?.id || "user-id",
   };
@@ -29,9 +28,10 @@ const es = initEdgeStore.context<Context>().create();
  */
 const edgeStoreRouter: any = es.router({
   publicFiles: es
-.imageBucket({
+    .imageBucket({
       maxSize: 1024 * 1024 * 1, // 1MB
-    })    .input(
+    })
+    .input(
       z.object({
         type: z.enum(["Platter-menuItem"]),
       }),

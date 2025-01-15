@@ -38,18 +38,25 @@ export default async function Page({ params }: { params: Params }) {
 
   const restaurantDetails = {
     name: qrCodeData.user.name,
-    description: qrCodeData.user.description ?? '',
-    image: qrCodeData.user.image ?? '',
-    cuisine: qrCodeData.user.cuisine ?? '',
+    description: qrCodeData.user.description ?? "",
+    image: qrCodeData.user.image ?? "",
+    cuisine: qrCodeData.user.cuisine ?? "",
   };
 
   // Include table information in the props
   return (
-    <OrderSummaryPage 
+    <OrderSummaryPage
       domain={domain}
       qrId={qrId}
       restaurantDetails={restaurantDetails}
-      tableDetails={qrCodeData.table || { id: '', number: '', capacity: 4, isAvailable: false }}
+      tableDetails={
+        qrCodeData.table || {
+          id: "",
+          number: "",
+          capacity: 4,
+          isAvailable: false,
+        }
+      }
     />
   );
 }

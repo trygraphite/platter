@@ -1,8 +1,7 @@
-'use client';
+"use client";
 
-import { cn } from '@platter/ui/lib/utils';
-import { useState } from 'react';
-
+import { cn } from "@platter/ui/lib/utils";
+import { useState } from "react";
 
 interface Category {
   id: string;
@@ -15,7 +14,11 @@ interface CategoryNavProps {
   onSelectCategory: (categoryId: string | null) => void;
 }
 
-export function CategoryNav({ categories, selectedCategory, onSelectCategory }: CategoryNavProps) {
+export function CategoryNav({
+  categories,
+  selectedCategory,
+  onSelectCategory,
+}: CategoryNavProps) {
   return (
     <div className="sticky top-0 z-10 bg-white shadow-sm">
       <div className="container max-w-6xl mx-auto">
@@ -26,7 +29,7 @@ export function CategoryNav({ categories, selectedCategory, onSelectCategory }: 
               "px-4 py-2 rounded-full whitespace-nowrap transition-colors",
               selectedCategory === null
                 ? "bg-primary text-white"
-                : "bg-secondary hover:bg-gray-200 text-gray-700"
+                : "bg-secondary hover:bg-gray-200 text-gray-700",
             )}
           >
             All
@@ -39,7 +42,7 @@ export function CategoryNav({ categories, selectedCategory, onSelectCategory }: 
                 "px-4 py-2 rounded-full whitespace-nowrap transition-colors",
                 selectedCategory === category.id
                   ? "bg-primary text-white"
-                  : "bg-secondary hover:bg-gray-200 text-gray-700"
+                  : "bg-secondary hover:bg-gray-200 text-gray-700",
               )}
             >
               {category.name}
@@ -50,4 +53,3 @@ export function CategoryNav({ categories, selectedCategory, onSelectCategory }: 
     </div>
   );
 }
-

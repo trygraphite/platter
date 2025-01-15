@@ -22,7 +22,7 @@ export const statusConfigs: Record<OrderStatus, StatusConfig> = {
     bgColor: "bg-blue-50",
     text: "Order Processing",
   },
- 
+
   DELIVERED: {
     icon: <CheckCircle2 className="h-8 w-8" />,
     color: "text-green-600",

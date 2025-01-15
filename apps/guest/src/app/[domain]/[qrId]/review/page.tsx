@@ -1,20 +1,17 @@
-import { ReviewPage } from '@/components/review/review-form';
-import { Params } from '@/types/pages';
-import { PrismaClient } from '@prisma/client';
-import { notFound } from 'next/navigation';
+import { ReviewPage } from "@/components/review/review-form";
+import { Params } from "@/types/pages";
+import { PrismaClient } from "@prisma/client";
+import { notFound } from "next/navigation";
 
 const prisma = new PrismaClient();
 
 export default async function Page({ params }: { params: Params }) {
-
-    const { qrId } = await params;
-
+  const { qrId } = await params;
 
   try {
     const qrCode = await prisma.qRCode.findUnique({
       where: { id: qrId },
-      include: { table: true, user: true }
-
+      include: { table: true, user: true },
     });
 
     if (!qrCode) {
@@ -28,10 +25,10 @@ export default async function Page({ params }: { params: Params }) {
     }
 
     return (
-      <ReviewPage 
+      <ReviewPage
         qrId={qrId}
         tableId={table.id}
-        userId = {qrCode.user.id}
+        userId={qrCode.user.id}
         title={`Review Your Experience at ${qrCode.user.name}`}
         description="We value your feedback to improve our service."
       />
@@ -41,4 +38,3 @@ export default async function Page({ params }: { params: Params }) {
     return <div>Error loading review page. Please try again later.</div>;
   }
 }
-

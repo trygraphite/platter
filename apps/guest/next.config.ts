@@ -2,15 +2,15 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   transpilePackages: ["@platter/db", "@platter/ui"],
-    images: {
+  images: {
     remotePatterns: [],
     domains: ["files.edgestore.dev"],
   },
-   async rewrites() {
+  async rewrites() {
     return [
       {
-        source: '/api/:path*',
-        destination: '/api/:path*',
+        source: "/api/:path*",
+        destination: "/api/:path*",
       },
     ];
   },

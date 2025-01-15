@@ -15,10 +15,11 @@ export function OrderDetails({ order, table }: OrderDetailsProps) {
         <p>
           <span className="font-medium">Table:</span> {table.number}
         </p>
-       
+
         {order.specialNotes && (
           <p>
-            <span className="font-medium">Special Notes:</span> {order.specialNotes}
+            <span className="font-medium">Special Notes:</span>{" "}
+            {order.specialNotes}
           </p>
         )}
       </div>
@@ -26,7 +27,7 @@ export function OrderDetails({ order, table }: OrderDetailsProps) {
       <div className="border-t pt-4 mt-4">
         <h4 className="font-semibold mb-4">Items Ordered</h4>
         <div className="space-y-3">
-          {order.items.map((item:any) => (
+          {order.items.map((item: any) => (
             <div key={item.id} className="flex justify-between">
               <div>
                 <p className="font-medium">{item.menuItem.name}</p>

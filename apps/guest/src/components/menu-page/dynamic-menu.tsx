@@ -1,9 +1,8 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { MenuItems } from './menu-Items';
-import { CategoryNav } from './category-nav';
-
+import { useState } from "react";
+import { MenuItems } from "./menu-Items";
+import { CategoryNav } from "./category-nav";
 
 interface Category {
   id: string;
@@ -28,21 +27,23 @@ interface DynamicMenuProps {
   initialMenuItems: MenuItem[];
 }
 
-export function DynamicMenu({ initialCategories, initialMenuItems }: DynamicMenuProps) {
+export function DynamicMenu({
+  initialCategories,
+  initialMenuItems,
+}: DynamicMenuProps) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   return (
     <>
-      <CategoryNav 
-        categories={initialCategories} 
+      <CategoryNav
+        categories={initialCategories}
         selectedCategory={selectedCategory}
         onSelectCategory={setSelectedCategory}
       />
-      <MenuItems 
-        menuItems={initialMenuItems} 
+      <MenuItems
+        menuItems={initialMenuItems}
         selectedCategory={selectedCategory}
       />
     </>
   );
 }
-

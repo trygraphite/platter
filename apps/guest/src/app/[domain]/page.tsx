@@ -9,7 +9,6 @@ import { QrCodeSection } from "@/components/sections/Qrcode";
 import Header from "@/components/shared/header";
 import { Params } from "@/types/pages";
 
-
 const getRestaurantMetadata = async (params: string) => {
   const metadata = await db.user.findUnique({
     where: {
@@ -27,7 +26,9 @@ const getRestaurantMetadata = async (params: string) => {
   return metadata;
 };
 
-export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: { params: Params }): Promise<Metadata> {
   const { domain } = await params;
   const data = await getRestaurantMetadata(domain);
   return {
@@ -60,10 +61,7 @@ async function Page({ params }: { params: Params }) {
 
   return (
     <section className="min-h-[calc(100vh-4rem)] bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
-       <Header 
-          restaurantName={restaurantDetails.name} 
-          reviewLink="" 
-        /> 
+      <Header restaurantName={restaurantDetails.name} reviewLink="" />
       <div className="container mx-auto px-4 py-4">
         <div className="flex flex-col items-center text-center space-y-8">
           <RestaurantHero
@@ -73,9 +71,7 @@ async function Page({ params }: { params: Params }) {
 
             // pass google maps review link
           />
-          <ActionButtons   
-         reviewLink="" 
-          />
+          <ActionButtons reviewLink="" />
           <QrCodeSection />
         </div>
       </div>

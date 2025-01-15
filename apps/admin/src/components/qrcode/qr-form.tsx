@@ -6,11 +6,18 @@ import { Button } from "@platter/ui/components/button";
 import { Input } from "@platter/ui/components/input";
 import { Label } from "@platter/ui/components/label";
 import { Loader2 } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@platter/ui/components/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@platter/ui/components/select";
 
 const qrFormSchema = z.object({
-  target: z.enum(['table', 'menu']),
-  tableNumber: z.number()
+  target: z.enum(["table", "menu"]),
+  tableNumber: z
+    .number()
     .min(1, "Table number must be at least 1")
     .max(999, "Table number must be less than 1000")
     .optional()
@@ -34,12 +41,12 @@ export function QRForm({ onSubmit, isLoading }: QRFormProps) {
   } = useForm<FormData>({
     resolver: zodResolver(qrFormSchema),
     defaultValues: {
-      target: 'table',
+      target: "table",
       tableNumber: 1,
     },
   });
 
-  const target = watch('target');
+  const target = watch("target");
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -48,10 +55,10 @@ export function QRForm({ onSubmit, isLoading }: QRFormProps) {
           <Label>QR Code Type</Label>
           <Select
             defaultValue="table"
-            onValueChange={(value: 'table' | 'menu') => {
-              setValue('target', value);
-              if (value === 'menu') {
-                setValue('tableNumber', null);
+            onValueChange={(value: "table" | "menu") => {
+              setValue("target", value);
+              if (value === "menu") {
+                setValue("tableNumber", null);
               }
             }}
           >
@@ -65,7 +72,7 @@ export function QRForm({ onSubmit, isLoading }: QRFormProps) {
           </Select>
         </div>
 
-        {target === 'table' && (
+        {target === "table" && (
           <div className="space-y-2">
             <Label htmlFor="tableNumber">Table Number</Label>
             <Input
@@ -75,7 +82,9 @@ export function QRForm({ onSubmit, isLoading }: QRFormProps) {
               aria-invalid={!!errors.tableNumber}
             />
             {errors.tableNumber && (
-              <p className="text-sm text-red-500">{errors.tableNumber.message}</p>
+              <p className="text-sm text-red-500">
+                {errors.tableNumber.message}
+              </p>
             )}
           </div>
         )}

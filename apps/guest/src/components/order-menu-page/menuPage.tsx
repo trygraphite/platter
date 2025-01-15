@@ -17,7 +17,7 @@ import {
   AccordionContent,
 } from "@platter/ui/components/accordion";
 import { MinusCircle, PlusCircle, ShoppingBag } from "@platter/ui/lib/icons";
-import {  MenuItem } from "@platter/db/client";
+import { MenuItem } from "@platter/db/client";
 
 interface MenuPageProps {
   qrId: string;
@@ -43,7 +43,8 @@ interface Category {
 }
 
 const formatPrice = (price: number | string | null | undefined): string => {
-  const numPrice = typeof price === "string" ? parseFloat(price) : Number(price);
+  const numPrice =
+    typeof price === "string" ? parseFloat(price) : Number(price);
   return isNaN(numPrice) ? "0.00" : numPrice.toFixed(2);
 };
 
@@ -116,7 +117,9 @@ export function MenuPage({ qrId, category, restaurantDetails }: MenuPageProps) {
         <div className="flex gap-4 mt-2 text-sm">
           <span>{restaurantDetails.cuisine}</span>
           <span>•</span>
-          <span>{restaurantDetails.openingHours} - {restaurantDetails.closingHours}</span>
+          <span>
+            {restaurantDetails.openingHours} - {restaurantDetails.closingHours}
+          </span>
         </div>
       </div>
 
@@ -170,28 +173,40 @@ export function MenuPage({ qrId, category, restaurantDetails }: MenuPageProps) {
                                 />
                               </div>
                             )}
-                            {cart.find((cartItem) => cartItem.id === item.id) ? (
+                            {cart.find(
+                              (cartItem) => cartItem.id === item.id,
+                            ) ? (
                               <div className="flex items-center gap-2">
                                 <Button
                                   size="icon"
                                   variant="outline"
-                                  onClick={() => handleQuantityChange(item, false)}
+                                  onClick={() =>
+                                    handleQuantityChange(item, false)
+                                  }
                                 >
                                   <MinusCircle className="h-4 w-4" />
                                 </Button>
                                 <span className="w-8 text-center">
-                                  {cart.find((cartItem) => cartItem.id === item.id)?.quantity}
+                                  {
+                                    cart.find(
+                                      (cartItem) => cartItem.id === item.id,
+                                    )?.quantity
+                                  }
                                 </span>
                                 <Button
                                   size="icon"
                                   variant="outline"
-                                  onClick={() => handleQuantityChange(item, true)}
+                                  onClick={() =>
+                                    handleQuantityChange(item, true)
+                                  }
                                 >
                                   <PlusCircle className="h-4 w-4" />
                                 </Button>
                               </div>
                             ) : (
-                              <Button onClick={() => handleQuantityChange(item, true)}>
+                              <Button
+                                onClick={() => handleQuantityChange(item, true)}
+                              >
                                 Add to Cart
                               </Button>
                             )}

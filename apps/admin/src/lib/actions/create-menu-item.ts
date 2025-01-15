@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache";
 interface CreateMenuItemData {
   name: string;
   description: string;
-  price: number ;
+  price: number;
   image: string | null;
   categoryId: string;
   isAvailable?: boolean;
@@ -41,7 +41,6 @@ export async function createMenuItem(data: CreateMenuItemData, userId: string) {
       },
     });
 
-  
     console.log("Created menu item:", menuItem);
     revalidatePath("/menu-items");
     return { success: true, menuItem };

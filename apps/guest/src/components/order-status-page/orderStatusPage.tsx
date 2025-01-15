@@ -20,7 +20,6 @@ import { OrderActions } from "./order-action";
 import { ReviewModal } from "./review-modal";
 import ErrorCard from "../shared/error-card";
 
-
 export default function OrderStatusPage({
   initialOrder,
   qrId,
@@ -29,7 +28,7 @@ export default function OrderStatusPage({
 }: OrderStatusPageProps) {
   const [order, setOrder] = useState<Order | any>(initialOrder);
   const [error, setError] = useState<string | null>(null);
-    const [hasShownModal, setHasShownModal] = useState(false);
+  const [hasShownModal, setHasShownModal] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const router = useRouter();
 
@@ -40,8 +39,8 @@ export default function OrderStatusPage({
     // 3. Order wasn't cancelled
     // 4. Modal hasn't been shown before for this order
     if (
-      order.status === 'DELIVERED' && 
-      !order.review && 
+      order.status === "DELIVERED" &&
+      !order.review &&
       !order.cancelledAt &&
       !hasShownModal
     ) {
@@ -50,92 +49,90 @@ export default function OrderStatusPage({
     }
   }, [order.status, order.review, order.cancelledAt, hasShownModal]);
 
-useEffect(() => {
-  console.log("Setting up SSE connection");
-  console.log(qrId)
-  console.log("Initial Order ID:", initialOrder.id);
-  
-  let eventSource: EventSource | null = null;
-  let retryCount = 0;
-  const maxRetries = 3;
-  
-  const connectSSE = () => {
-    if (retryCount >= maxRetries) {
-      setError("Failed to connect after multiple attempts");
-      return;
-    }
+  useEffect(() => {
+    console.log("Setting up SSE connection");
+    console.log(qrId);
+    console.log("Initial Order ID:", initialOrder.id);
 
-    try {
-      // Close existing connection if any
+    let eventSource: EventSource | null = null;
+    let retryCount = 0;
+    const maxRetries = 3;
+
+    const connectSSE = () => {
+      if (retryCount >= maxRetries) {
+        setError("Failed to connect after multiple attempts");
+        return;
+      }
+
+      try {
+        // Close existing connection if any
+        if (eventSource) {
+          eventSource.close();
+        }
+
+        const url = `/api/orders/${initialOrder.id}`;
+        console.log("Connecting to SSE at:", url);
+
+        eventSource = new EventSource(url);
+
+        eventSource.onopen = () => {
+          console.log("SSE connection opened successfully");
+          retryCount = 0; // Reset retry count on successful connection
+        };
+
+        eventSource.onmessage = (event) => {
+          console.log("Received SSE message:", event.data);
+          try {
+            const data = JSON.parse(event.data);
+            if (data.error) {
+              console.error("SSE data error:", data.error);
+              setError(data.error);
+              eventSource?.close();
+            } else {
+              setOrder(data);
+              setError(null); // Clear any previous errors
+            }
+          } catch (error) {
+            console.error("Error parsing SSE message:", error);
+          }
+        };
+
+        eventSource.onerror = (error) => {
+          console.error("SSE connection error:", error);
+          eventSource?.close();
+
+          // Attempt to reconnect
+          retryCount++;
+          if (retryCount < maxRetries) {
+            console.log(`Retrying connection (${retryCount}/${maxRetries})...`);
+            setTimeout(connectSSE, 3000 * retryCount); // Exponential backoff
+          } else {
+            setError("Unable to maintain connection to status updates");
+          }
+        };
+      } catch (error) {
+        console.error("Error setting up SSE:", error);
+        setError("Failed to connect to status updates");
+      }
+    };
+
+    // Initial connection
+    connectSSE();
+
+    // Cleanup function
+    return () => {
+      console.log("Cleaning up SSE connection");
       if (eventSource) {
         eventSource.close();
       }
-
-      const url = `/api/orders/${initialOrder.id}`;
-      console.log("Connecting to SSE at:", url);
-      
-      eventSource = new EventSource(url);
-      
-      eventSource.onopen = () => {
-        console.log("SSE connection opened successfully");
-        retryCount = 0; // Reset retry count on successful connection
-      };
-
-      eventSource.onmessage = (event) => {
-        console.log("Received SSE message:", event.data);
-        try {
-          const data = JSON.parse(event.data);
-          if (data.error) {
-            console.error("SSE data error:", data.error);
-            setError(data.error);
-            eventSource?.close();
-          } else {
-            setOrder(data);
-            setError(null); // Clear any previous errors
-          }
-        } catch (error) {
-          console.error("Error parsing SSE message:", error);
-        }
-      };
-
-      eventSource.onerror = (error) => {
-        console.error("SSE connection error:", error);
-        eventSource?.close();
-        
-        // Attempt to reconnect
-        retryCount++;
-        if (retryCount < maxRetries) {
-          console.log(`Retrying connection (${retryCount}/${maxRetries})...`);
-          setTimeout(connectSSE, 3000 * retryCount); // Exponential backoff
-        } else {
-          setError("Unable to maintain connection to status updates");
-        }
-      };
-
-    } catch (error) {
-      console.error("Error setting up SSE:", error);
-      setError("Failed to connect to status updates");
-    }
-  };
-
-  // Initial connection
-  connectSSE();
-
-  // Cleanup function
-  return () => {
-    console.log("Cleaning up SSE connection");
-    if (eventSource) {
-      eventSource.close();
-    }
-  };
-}, [initialOrder.id]); // 
+    };
+  }, [initialOrder.id]); //
 
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 py-8">
         <div className="container max-w-2xl mx-auto px-4">
           <ErrorCard error={error} />
-        
         </div>
       </div>
     );
@@ -169,22 +166,24 @@ useEffect(() => {
               orderId={order.id}
               status={order.status}
               qrId={qrId}
-              onStatusChange={(newStatus) => setOrder({ ...order, status: newStatus })}
+              onStatusChange={(newStatus) =>
+                setOrder({ ...order, status: newStatus })
+              }
               onNavigate={(path) => router.push(path)}
             />
           </CardFooter>
         </Card>
       </div>
-      
-     {isReviewModalOpen && (
+
+      {isReviewModalOpen && (
         <ReviewModal
           isOpen={isReviewModalOpen}
           onClose={() => setIsReviewModalOpen(false)}
           qrId={qrId}
-          tableId = {table.id}
-          userId = {user.id}
+          tableId={table.id}
+          userId={user.id}
         />
-      )} 
+      )}
     </div>
   );
 }

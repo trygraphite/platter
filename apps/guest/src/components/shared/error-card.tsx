@@ -1,6 +1,12 @@
 import Link from "next/link";
 import { Button } from "@platter/ui/components/button";
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@platter/ui/components/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from "@platter/ui/components/card";
 
 export default function ErrorCard(error: any) {
   return (
@@ -12,11 +18,10 @@ export default function ErrorCard(error: any) {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">
-              Sorry, we couldn't find the order you're looking for. It may have been deleted or you may have entered an incorrect URL.
+              Sorry, we couldn't find the order you're looking for. It may have
+              been deleted or you may have entered an incorrect URL.
             </p>
-            <p className="text-muted-foreground">
-              {error}
-            </p>
+            <p className="text-muted-foreground">{error}</p>
           </CardContent>
           <CardFooter>
             <Button asChild>

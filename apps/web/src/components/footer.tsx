@@ -1,7 +1,6 @@
 import { Button } from "@platter/ui/components/button";
 import { Input } from "@platter/ui/components/input";
 
-
 export const Footer = () => {
   return (
     <footer className="bg-gray-900 text-white py-12">
