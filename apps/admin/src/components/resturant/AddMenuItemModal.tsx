@@ -26,14 +26,14 @@ export function AddMenuItemModal({
 }: AddMenuItemModalProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [price, setPrice] = useState("");
+  const [price, setPrice] = useState<string>("");
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { handleAddMenuItem } = useRestaurant();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
+    if (e.target.files?.[0]) {
       const file = e.target.files[0];
       setImage(file);
       setImagePreview(URL.createObjectURL(file));
@@ -43,15 +43,25 @@ export function AddMenuItemModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+
     try {
-      await handleAddMenuItem(categoryId, {
-        name,
-        description,
-        categoryId,
-        price: parseFloat(price),
-        image: image as string | null,
-        isAvailable: true,
-      });
+      // Create FormData object
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("description", description || "");
+      formData.append("categoryId", categoryId);
+      formData.append("price", price || "0");
+      formData.append("isAvailable", "true");
+
+      // Only append image if it exists
+      if (image) {
+        formData.append("image", image);
+      }
+
+      // Pass the FormData to handleAddMenuItem
+      await handleAddMenuItem(categoryId, formData);
+
+      // Reset form state after successful submission
       setName("");
       setDescription("");
       setPrice("");
@@ -95,9 +105,9 @@ export function AddMenuItemModal({
             <Input
               id="price"
               type="number"
-              step="0.01"
+              step="1"
               value={price}
-              onChange={(e) => setPrice(e.target.value)}
+              onChange={(e) => setPrice((e.target.value))}
               required
             />
           </div>

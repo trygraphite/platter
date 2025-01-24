@@ -28,9 +28,7 @@ const es = initEdgeStore.context<Context>().create();
  */
 const edgeStoreRouter: any = es.router({
   publicFiles: es
-    .imageBucket({
-      maxSize: 1024 * 1024 * 1, // 1MB
-    })
+    .fileBucket()
     .input(
       z.object({
         type: z.enum(["Platter-menuItem"]),

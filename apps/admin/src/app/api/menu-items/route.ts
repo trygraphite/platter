@@ -9,7 +9,7 @@ export async function GET(request: Request) {
   if (!userId) {
     return NextResponse.json({ error: "User ID is required" }, { status: 400 });
   }
-
+  console.log("logged")
   try {
     const menuItems = await db.menuItem.findMany({
       where: {

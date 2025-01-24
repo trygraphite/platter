@@ -32,6 +32,7 @@ export function EditMenuItemModal({
   const [imagePreview, setImagePreview] = useState<string | null>(
     menuItem.image || null,
   );
+  const [isLoading, setIsLoading] = useState(false);
   const { handleUpdateMenuItem } = useRestaurant();
 
   useEffect(() => {
@@ -39,10 +40,11 @@ export function EditMenuItemModal({
     setDescription(menuItem.description || "");
     setPrice(menuItem.price.toString());
     setImagePreview(menuItem.image || null);
+    setImage(null); // Reset image when menuItem changes
   }, [menuItem]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
+    if (e.target.files?.[0]) {
       const file = e.target.files[0];
       setImage(file);
       setImagePreview(URL.createObjectURL(file));
@@ -51,21 +53,28 @@ export function EditMenuItemModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const updatedData: Partial<MenuItem> = {
-      name,
-      description,
-      price: parseFloat(price),
-    };
-    if (image) {
-      const reader = new FileReader();
-      const base64String = await new Promise<string>((resolve) => {
-        reader.onload = () => resolve(reader.result as string);
-        reader.readAsDataURL(image);
-      });
-      updatedData.image = base64String;
+    setIsLoading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("description", description);
+      formData.append("price", price);
+
+      if (image) {
+        formData.append("image", image);
+      } else if (imagePreview) {
+        // If there's an existing image but no new upload
+        formData.append("existingImage", imagePreview);
+      }
+
+      await handleUpdateMenuItem(menuItem.id, formData);
+      onClose();
+    } catch (error) {
+      console.error("Error updating menu item:", error);
+    } finally {
+      setIsLoading(false);
     }
-    await handleUpdateMenuItem(menuItem.id, updatedData);
-    onClose();
   };
 
   return (
@@ -119,7 +128,39 @@ export function EditMenuItemModal({
               />
             )}
           </div>
-          <Button type="submit">Update Menu Item</Button>
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className={isLoading ? "opacity-70 cursor-not-allowed" : ""}
+          >
+            {isLoading ? (
+              <span className="flex items-center gap-2">
+                <svg
+                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
+                </svg>
+                Updating...
+              </span>
+            ) : (
+              "Update Menu Item"
+            )}
+          </Button>
         </form>
       </DialogContent>
     </Dialog>

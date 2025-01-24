@@ -1,12 +1,13 @@
 import UpdateRestaurantDetailsForm from "@/components/setting/ProfileForm";
 import getServerSession from "@/lib/auth/server";
 import db from "@platter/db";
+import { redirect } from "next/navigation";
 
 export default async function EditRestaurantPage() {
   const user = await getServerSession();
 
   if (!user) {
-    return <div>Please log in to view this page.</div>;
+     return redirect("/login");
   }
   const restaurantData = await db.user.findUnique({
     where: { id: user.user.id },

@@ -46,7 +46,7 @@ export default function RestaurantDetailsForm() {
 
     if (result.success) {
       toast.success("Restaurant details saved!");
-      router.push("/dashboard");
+      router.push("/");
     } else {
       toast.error(result.error || "Something went wrong");
     }

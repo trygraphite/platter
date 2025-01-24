@@ -1,18 +1,19 @@
-import { Decimal } from "@prisma/client/runtime/library";
+"use server"
+
 import db from "@platter/db";
+import type { MenuItem } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 export async function updateMenuItem(
   userId: string,
   menuItemId: string,
-  data: any,
+  data: Partial<MenuItem>,
 ) {
   try {
     const menuItem = await db.menuItem.update({
       where: { id: menuItemId, userId },
       data: {
         ...data,
-        price: data.price ? data.price.toString() : undefined,
       },
     });
     revalidatePath("/menu-items");

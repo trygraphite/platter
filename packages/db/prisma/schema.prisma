@@ -165,7 +165,7 @@ model MenuItem {
 
 model Order {
   id              String      @id @default(uuid())
-  orderNumber     String      @unique @default(uuid())
+  orderNumber     Int?      
   status          OrderStatus @default(PENDING)
   totalAmount     Int
   specialNotes    String?
@@ -207,7 +207,7 @@ model OrderItem {
   updatedAt    DateTime @updatedAt
 
   // Relations
-  order      Order    @relation(fields: [orderId], references: [id])
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   orderId    String
   menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
   menuItemId String
