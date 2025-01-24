@@ -253,7 +253,7 @@ export default function CreateOrder({
                 <label htmlFor="table-select" className="block text-sm font-medium mb-2">
                   Select Table
                 </label>
-                <Select id="table-select" value={tableId} onValueChange={setTableId}>
+                <Select  value={tableId} onValueChange={setTableId}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select a table" />
                   </SelectTrigger>
