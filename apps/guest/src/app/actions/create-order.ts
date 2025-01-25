@@ -31,14 +31,30 @@ export async function createOrder({
       throw new Error("QR code not found");
     }
 
-    // Generate order number (you might want to customize this)
-    const orderNumber = Math.floor(100000 + Math.random() * 900000).toString();
+    // Get the start of the current day (12 AM)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Fetch the latest orderNumber for today
+    const lastOrder = await db.order.findFirst({
+      where: {
+        createdAt: {
+          gte: today, // Only consider orders created after 12 AM today
+        },
+      },
+      orderBy: {
+        orderNumber: "desc", // Get the highest order number
+      },
+    });
+
+    // Determine the next orderNumber
+    const orderNumber = lastOrder?.orderNumber ? lastOrder.orderNumber + 1 : 1;
 
     // Create the order
     const order = await db.order.create({
       data: {
         status: "PENDING",
-        orderNumber,
+        orderNumber, // Use the calculated orderNumber
         totalAmount,
         userId: qrCode.userId,
         tableId,
@@ -54,6 +70,7 @@ export async function createOrder({
         items: true,
       },
     });
+
     console.log(order);
     revalidatePath(`/${qrId}/order-status`);
     return { success: true, orderId: order.id };

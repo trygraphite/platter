@@ -52,7 +52,7 @@ function LoginForm() {
           router.push("/");
         },
         onError: () => {
-          toast.error("Something went wrong", { id: "login" });
+          toast.error("Invalid Password Or Email", { id: "login" });
         },
       },
     );

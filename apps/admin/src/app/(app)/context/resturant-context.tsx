@@ -1,16 +1,28 @@
-import React, { createContext, useContext, useState, useCallback } from "react";
-import { Category, MenuItem, User } from "@prisma/client";
-import { useSession } from "@/lib/auth/client";
-import { toast } from "@platter/ui/components/sonner";
-import { useEdgeStore } from "@/lib/edgestore/edgestore";
 import { createCategory } from "@/lib/actions/create-category";
+import { createMenuItem } from "@/lib/actions/create-menu-item";
 import { deleteCategory } from "@/lib/actions/delete-category";
 import { deleteMenuItem } from "@/lib/actions/delete-menu-item";
-import { updateMenuItem } from "@/lib/actions/update-menu-item";
 import { updateCategory } from "@/lib/actions/update-category";
-import { createMenuItem } from "@/lib/actions/create-menu-item";
+import { updateMenuItem } from "@/lib/actions/update-menu-item";
+import { useSession } from "@/lib/auth/client";
+import { useEdgeStore } from "@/lib/edgestore/edgestore";
+import { toast } from "@platter/ui/components/sonner";
+import type { Category, MenuItem, User } from "@prisma/client";
+import type React from "react";
+import { createContext, useCallback, useContext, useState } from "react";
 
 type CategoryWithMenuItems = Category & { menuItems: MenuItem[] };
+
+
+
+type MenuItemInput = Partial<Omit<MenuItem, "image">> & {
+  name: string;
+  description: string;
+  price: number;
+  categoryId: string;
+  isAvailable: boolean;
+  image: string  | null;
+};
 
 interface RestaurantContextType {
   user: User | null;
@@ -22,8 +34,8 @@ interface RestaurantContextType {
   fetchUserAndCategories: () => Promise<void>;
   handleAddCategory: (categoryData: Partial<Category>) => Promise<void>;
   handleAddMenuItem: (
-    categoryId: String,
-    menuItemData: Omit<MenuItem, "id" | "createdAt" | "updatedAt" | "userId">,
+    categoryId: string,
+    formData: FormData,
   ) => Promise<void>;
   handleUpdateCategory: (
     categoryId: string,
@@ -31,7 +43,7 @@ interface RestaurantContextType {
   ) => Promise<void>;
   handleUpdateMenuItem: (
     menuItemId: string,
-    menuItemData: Partial<MenuItem>,
+    formData: FormData,
   ) => Promise<void>;
   handleDeleteCategory: (categoryId: string) => Promise<void>;
   handleDeleteMenuItem: (menuItemId: string) => Promise<void>;
@@ -41,7 +53,7 @@ const RestaurantContext = createContext<RestaurantContextType | undefined>(
   undefined,
 );
 
-export const RestaurantProvider: React.FC<React.PropsWithChildren<{}>> = ({
+export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
   const { data: session } = useSession();
@@ -62,7 +74,7 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren<{}>> = ({
     setError(null);
     try {
       const [userResponse, categoriesResponse] = await Promise.all([
-        fetch(`/api/user`),
+        fetch("/api/user"),
         fetch(`/api/categories?userId=${session.user.id}`),
       ]);
 
@@ -102,27 +114,53 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren<{}>> = ({
     }
   };
 
-  const handleAddMenuItem = async (menuItemData: any) => {
+  const handleAddMenuItem = async (categoryId: string, formData: FormData) => {
     if (!session?.user?.id) {
       toast.error("Not authenticated");
       return;
     }
-    console.log(" menu items", menuItemData);
+
     try {
-      if ("image" in menuItemData && menuItemData.image instanceof File) {
-        if (!edgestore?.publicFiles)
+      // Extract file from FormData
+      const imageFile = formData.get("image") as File | null;
+
+      // Convert FormData to menu item data
+      const menuItemData: MenuItemInput = {
+        name: formData.get("name") as string,
+        description: formData.get("description") as string,
+        price: Number(formData.get("price")),
+        categoryId: formData.get("categoryId") as string,
+        isAvailable: formData.get("isAvailable") === "true",
+        image: null,
+      };
+
+      console.log("menu items", menuItemData);
+
+      // Handle image upload if present
+      if (imageFile instanceof File) {
+        if (!edgestore?.publicFiles) {
           throw new Error("EdgeStore not initialized");
+        }
+
         const res = await edgestore.publicFiles.upload({
-          file: menuItemData.image,
+          file: imageFile,
           input: { type: "Platter-menuItem" },
         });
+
         menuItemData.image = res.url;
+      } else {
+        menuItemData.image = null;
       }
+
+      // Create menu item
       await createMenuItem(menuItemData, session.user.id);
       fetchUserAndCategories();
+
+      toast.success("Menu item added successfully");
     } catch (error) {
       console.error("Error adding menu item:", error);
       toast.error("Failed to add menu item");
+      throw error; // Re-throw to handle in the component
     }
   };
 
@@ -145,31 +183,43 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren<{}>> = ({
     }
   };
 
-  const handleUpdateMenuItem = async (
-    menuItemId: string,
-    menuItemData: any,
-  ) => {
+  const handleUpdateMenuItem = async (menuItemId: string, formData: FormData) => {
     if (!session?.user?.id) {
       toast.error("Not authenticated");
       return;
     }
 
     try {
-      if ("image" in menuItemData && menuItemData.image instanceof File) {
-        if (!edgestore?.publicFiles)
+      const updatedData: Partial<MenuItem> = {
+        name: formData.get("name") as string,
+        description: formData.get("description") as string,
+        price: Number(formData.get("price")),
+      };
+
+      // Handle image upload
+      const imageFile = formData.get("image") as File | null;
+      const existingImage = formData.get("existingImage") as string | null;
+
+      if (imageFile instanceof File) {
+        if (!edgestore?.publicFiles) {
           throw new Error("EdgeStore not initialized");
+        }
         const res = await edgestore.publicFiles.upload({
-          file: menuItemData.image,
+          file: imageFile,
           input: { type: "Platter-menuItem" },
         });
-        menuItemData.image = res.url;
+        updatedData.image = res.url;
+      } else if (existingImage) {
+        updatedData.image = existingImage;
       }
-      await updateMenuItem(session.user.id, menuItemId, menuItemData);
+
+      await updateMenuItem(session.user.id, menuItemId, updatedData);
       toast.success("Menu item updated");
       fetchUserAndCategories();
     } catch (error) {
       console.error("Error updating menu item:", error);
       toast.error("Failed to update menu item");
+      throw error; // Re-throw to handle in the component
     }
   };
 
