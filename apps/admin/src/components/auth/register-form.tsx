@@ -1,6 +1,6 @@
 "use client";
 
-import { signUp } from "@/lib/auth/client";
+import { authClient, signUp } from "@/lib/auth/client";
 import { type AccountData, accountSchema } from "@/lib/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@platter/ui/components/button";
@@ -34,31 +34,29 @@ export default function RegisterForm() {
   });
 
   const onSubmit = async (formdata: AccountData) => {
-    const { confirmPassword, ...submitData } = formdata;
-    await signUp
-      .email(
+    const { confirmPassword, ...submittedData } = formdata;
+
+    try {
+      await authClient.signUp.email(
         {
-          name: submitData.email.split("@")[0] as string,
-          email: submitData.email,
-          password: submitData.password,
+          name: submittedData.email.split("@")[0] as string,
+          email: submittedData.email,
+          password: submittedData.password,
           callbackURL: "/register/details",
         },
         {
-          onRequest: () => {
-            toast.loading("Creating account...", { id: "signup" });
-          },
           onSuccess: () => {
-            toast.success("Account created", { id: "signup" });
+            toast.success("Account created");
             router.push("/register/details");
           },
           onError: (ctx) => {
-            toast.error("Failed to create account", { id: "signup" });
+            toast.error("Failed to create account");
           },
         },
-      )
-      .catch((error) => {
-        console.error(error);
-      });
+      );
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (

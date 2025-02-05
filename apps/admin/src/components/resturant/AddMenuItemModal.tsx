@@ -107,7 +107,7 @@ export function AddMenuItemModal({
               type="number"
               step="1"
               value={price}
-              onChange={(e) => setPrice((e.target.value))}
+              onChange={(e) => setPrice(e.target.value)}
               required
             />
           </div>

@@ -32,16 +32,19 @@ export default function OrderPageClient({
   tables,
   userId,
 }: OrderPageClientProps) {
-  const [orders, setOrders] = useState<(Order & {
-    tableNumber: string;
-    items: {
-      quantity: number;
-      menuItem: {
-        name: string;
-        price: number;
-      };
-    }[];
-  })[]>(initialOrders);
+  const [orders, setOrders] =
+    useState<
+      (Order & {
+        tableNumber: string;
+        items: {
+          quantity: number;
+          menuItem: {
+            name: string;
+            price: number;
+          };
+        }[];
+      })[]
+    >(initialOrders);
   const [showCreateOrder, setShowCreateOrder] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "all">("all");

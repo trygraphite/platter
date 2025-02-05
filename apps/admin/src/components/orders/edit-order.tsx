@@ -89,7 +89,7 @@ export default function EditOrderModal({
               </SelectContent>
             </Select>
           </div>
-              {/*TO EDIT TABLE NUMBER OF AN ORDER */}
+          {/*TO EDIT TABLE NUMBER OF AN ORDER */}
           {/* <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="table" className="text-right">
               Table

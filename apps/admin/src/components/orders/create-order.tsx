@@ -250,10 +250,13 @@ export default function CreateOrder({
             {/* Table and Special Notes */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="table-select" className="block text-sm font-medium mb-2">
+                <label
+                  htmlFor="table-select"
+                  className="block text-sm font-medium mb-2"
+                >
                   Select Table
                 </label>
-                <Select  value={tableId} onValueChange={setTableId}>
+                <Select value={tableId} onValueChange={setTableId}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select a table" />
                   </SelectTrigger>

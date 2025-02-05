@@ -7,7 +7,7 @@ export default async function EditRestaurantPage() {
   const user = await getServerSession();
 
   if (!user) {
-     return redirect("/login");
+    return redirect("/login");
   }
   const restaurantData = await db.user.findUnique({
     where: { id: user.user.id },

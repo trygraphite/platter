@@ -3,10 +3,10 @@ import { z } from "zod";
 export const accountSchema = z
   .object({
     email: z.string().email("Invalid email address"),
-    password: z.string().min(8, "Password must be at least 8 characters"),
+    password: z.string().min(8, "Password must be at least 8 characters").max(32, "Password too long"),
     confirmPassword: z
       .string()
-      .min(8, "Password must be at least 8 characters"),
+      .min(8, "Password must be at least 8 characters").max(32, "Password too long"),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
@@ -37,7 +37,7 @@ export type RestaurantDetailsData = z.infer<typeof restaurantDetailsSchema>;
 
 export const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  password: z.string().min(8, "Password must be at least 8 characters").max(32, "Password too long"),
 });
 
 export type LoginData = z.infer<typeof loginSchema>;

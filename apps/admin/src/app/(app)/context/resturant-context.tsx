@@ -13,15 +13,13 @@ import { createContext, useCallback, useContext, useState } from "react";
 
 type CategoryWithMenuItems = Category & { menuItems: MenuItem[] };
 
-
-
 type MenuItemInput = Partial<Omit<MenuItem, "image">> & {
   name: string;
   description: string;
   price: number;
   categoryId: string;
   isAvailable: boolean;
-  image: string  | null;
+  image: string | null;
 };
 
 interface RestaurantContextType {
@@ -33,10 +31,7 @@ interface RestaurantContextType {
   setEditMode: (mode: boolean) => void;
   fetchUserAndCategories: () => Promise<void>;
   handleAddCategory: (categoryData: Partial<Category>) => Promise<void>;
-  handleAddMenuItem: (
-    categoryId: string,
-    formData: FormData,
-  ) => Promise<void>;
+  handleAddMenuItem: (categoryId: string, formData: FormData) => Promise<void>;
   handleUpdateCategory: (
     categoryId: string,
     categoryData: Partial<Category>,
@@ -183,7 +178,10 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
     }
   };
 
-  const handleUpdateMenuItem = async (menuItemId: string, formData: FormData) => {
+  const handleUpdateMenuItem = async (
+    menuItemId: string,
+    formData: FormData,
+  ) => {
     if (!session?.user?.id) {
       toast.error("Not authenticated");
       return;
