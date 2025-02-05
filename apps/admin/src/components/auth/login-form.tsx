@@ -1,11 +1,7 @@
 "use client";
 
-import { signIn } from "@/lib/auth/client";
-import {
-  type AccountData,
-  accountSchema,
-  loginSchema,
-} from "@/lib/validations/auth";
+import { authClient } from "@/lib/auth/client";
+import { type AccountData, loginSchema } from "@/lib/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@platter/ui/components/button";
 import {
@@ -16,14 +12,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@platter/ui/components/card";
+import Link from "next/link";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 import { Input } from "@platter/ui/components/input";
 import { Label } from "@platter/ui/components/label";
 import { toast } from "@platter/ui/components/sonner";
 import { EyeClosedIcon, EyeIcon, Loader2 } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
 
 function LoginForm() {
   const router = useRouter();
@@ -38,24 +34,25 @@ function LoginForm() {
   });
 
   const onSubmit = async (formdata: AccountData) => {
-    const { data, error } = await signIn.email(
-      {
-        email: formdata.email,
-        password: formdata.password,
-      },
-      {
-        onRequest: () => {
-          toast.loading("Loggin In", { id: "login" });
+    try {
+      await authClient.signIn.email(
+        {
+          email: formdata.email,
+          password: formdata.password,
         },
-        onSuccess: () => {
-          toast.success("Login Successfull", { id: "login" });
-          router.push("/");
+        {
+          onSuccess: () => {
+            toast.success("Login Successfull");
+            router.push("/");
+          },
+          onError: () => {
+            toast.error("Invalid Password Or Email");
+          },
         },
-        onError: () => {
-          toast.error("Invalid Password Or Email", { id: "login" });
-        },
-      },
-    );
+      );
+    } catch (error) {
+      toast.error("Request failed. Please try again.");
+    }
   };
 
   return (
@@ -116,7 +113,7 @@ function LoginForm() {
             {isSubmitting && (
               <Loader2 className="size-4 animate-spin transition" />
             )}
-            {isSubmitting ? "Creating account..." : "Login"}
+            {isSubmitting ? "Logging In..." : "Login"}
           </Button>
 
           <p className="text-center text-muted-foreground text-xs">
