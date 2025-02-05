@@ -12,6 +12,8 @@ import {
   SidebarRail,
 } from "@platter/ui/components/sidebar";
 import HomeLink from "./home-link";
+import { NavSecondary } from "./nav-secondary";
+import { items } from "@/lib/constants/nav-items";
 
 export function AppSidebar({ ...props }) {
   const [user, setUser] = useState(null);

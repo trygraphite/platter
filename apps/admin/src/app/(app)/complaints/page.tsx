@@ -1,0 +1,52 @@
+import type { Metadata } from "next";
+
+import getServerSession from "@/lib/auth/server";
+import db from "@platter/db";
+import { DashboardShell } from "@/components/dashboard/dashboard-shell";
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
+import { ComplaintsTable } from "@/components/feedback/complaints-table";
+
+export const metadata: Metadata = {
+  title: "Complaints | Platter Admin",
+  description: "View and manage customer complaints",
+};
+
+export default async function ComplaintsPage() {
+  const session = await getServerSession();
+  const userId = session?.session?.userId;
+
+  if (!userId) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="bg-white p-8 rounded-lg shadow-md">
+          <h1 className="text-2xl font-bold mb-4">Authentication Required</h1>
+          <p className="text-gray-600">
+            Please log in to view the complaints page.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const complaints = await db.complaint.findMany({
+    where: { userId },
+    include: {
+      qrCode: true,
+      table: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return (
+    <DashboardShell>
+      <DashboardHeader
+        heading="Customer Complaints"
+        text="View and manage customer complaints."
+      />
+      <ComplaintsTable complaints={complaints} />
+    </DashboardShell>
+  );
+}
+

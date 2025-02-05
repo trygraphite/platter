@@ -1,7 +1,91 @@
-import React from "react";
+import type { Metadata } from "next";
 
-function PageContent() {
-  return <div>PageComponent</div>;
+import getServerSession from "@/lib/auth/server";
+import db from "@platter/db";
+import { DashboardShell } from "@/components/dashboard/dashboard-shell";
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
+import { Overview } from "@/components/dashboard/dashboard-overview";
+import { RevenueChart } from "@/components/dashboard/revenue-chart";
+import { OrdersByTimeChart } from "@/components/dashboard/orders-by-time";
+import { LiveOrderTracking } from "@/components/dashboard/live-order-tracking";
+import DashboardOrdersTable from "@/components/dashboard/dashboard-order-table";
+
+export const metadata: Metadata = {
+  title: "Admin Dashboard | Platter",
+  description: "Admin dashboard for Platter",
+};
+
+export default async function AdminDashboardPage() {
+  const session = await getServerSession();
+  const userId = session?.session?.userId;
+
+  if (!userId) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="bg-white p-8 rounded-lg shadow-md">
+          <h1 className="text-2xl font-bold mb-4">Authentication Required</h1>
+          <p className="text-gray-600">
+            Please log in to view the admin dashboard.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const [initialOrders, tables] = await Promise.all([
+    db.order.findMany({
+      where: { userId },
+      include: {
+        items: {
+          include: {
+            menuItem: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    }),
+    db.table.findMany(),
+  ]);
+
+  const tableMap = new Map(tables.map((table) => [table.id, table.number]));
+
+  const ordersWithTableNumber = initialOrders.map((order) => ({
+    ...order,
+    tableNumber: tableMap.get(order.tableId) || "Unknown",
+  }));
+
+  return (
+    <DashboardShell>
+      <DashboardHeader
+        heading="Dashboard"
+        text="Welcome to your Platter admin dashboard."
+      />
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Overview orders={ordersWithTableNumber} />
+      </div>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+        <RevenueChart className="col-span-4" orders={ordersWithTableNumber} />
+        <OrdersByTimeChart
+          className="col-span-3"
+          orders={ordersWithTableNumber}
+        />
+      </div>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+        <LiveOrderTracking
+          className="col-span-3"
+          orders={ordersWithTableNumber}
+        />
+        <div className="col-span-4">
+          <DashboardOrdersTable
+            orders={ordersWithTableNumber}
+            onEditOrder={() => {}}
+            onDeleteOrder={() => {}}
+          />
+        </div>
+      </div>
+    </DashboardShell>
+  );
 }
 
-export default PageContent;
