@@ -94,7 +94,6 @@ export async function createOrder(orderData: {
   return order;
 }
 
-
 export async function updateOrder(order: any) {
   const updatedOrder = await db.order.update({
     where: { id: order.id },
@@ -120,4 +119,3 @@ export async function deleteOrder(orderId: string) {
     where: { id: orderId },
   });
 }
-

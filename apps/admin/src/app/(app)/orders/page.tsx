@@ -2,8 +2,6 @@ import OrderPageClient from "@/components/orders/order-page";
 import getServerSession from "@/lib/auth/server";
 import db from "@platter/db";
 
-
-
 export default async function OrderPage() {
   const session = await getServerSession();
   const userId = session?.session?.userId;
@@ -37,9 +35,9 @@ export default async function OrderPage() {
     }),
     db.table.findMany(),
   ]);
-  console.log(initialOrders)
+  console.log(initialOrders);
   const tableMap = new Map(tables.map((table) => [table.id, table.number]));
-  
+
   const ordersWithTableNumber = initialOrders.map((order) => ({
     ...order,
     tableNumber: tableMap.get(order.tableId) || "Unknown",
@@ -53,4 +51,3 @@ export default async function OrderPage() {
     />
   );
 }
-
