@@ -24,7 +24,10 @@ export function Overview({ orders }: OverviewProps) {
     {
       title: "Total Revenue",
       icon: DollarSign,
-      content: `$${totalRevenue.toFixed(2)}`,
+      content: `₦${totalRevenue.toLocaleString("en-NG", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
       description: "Total revenue from all orders",
     },
     {

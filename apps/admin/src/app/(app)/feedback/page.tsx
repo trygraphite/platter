@@ -48,6 +48,16 @@ export default async function FeedbackPage() {
     }),
   ]);
 
+  const formattedReviews = reviews.map(review => ({
+    id: review.id,
+    rating: review.rating,
+    comment: review.comment ?? '',
+    createdAt: review.createdAt,
+    order: review.order ? {
+      orderNumber: String(review.order.orderNumber)
+    } : null
+  }));
+
   return (
     <DashboardShell>
       <DashboardHeader
@@ -58,7 +68,7 @@ export default async function FeedbackPage() {
         <RatingsDistribution className="col-span-2" reviews={reviews} />
         <ComplaintsTrend className="row-span-2" complaints={complaints} />
       </div>
-      <CustomerReviewsTable reviews={reviews} />
+      <CustomerReviewsTable reviews={formattedReviews} />
     </DashboardShell>
   );
 }

@@ -21,23 +21,23 @@ export function LiveOrderTracking({
 }: LiveOrderTrackingProps) {
   const [liveOrders, setLiveOrders] = React.useState<Order[]>([]);
 
-  React.useEffect(() => {
-    setLiveOrders(orders.slice(-5));
+  // React.useEffect(() => {
+  //   setLiveOrders(orders.slice(-5));
 
-    // Simulating live updates
-    const interval = setInterval(() => {
-      setLiveOrders((prev) => {
-        const newOrder = {
-          ...orders[Math.floor(Math.random() * orders.length)],
-          id: Math.random().toString(36).substr(2, 9),
-          createdAt: new Date(),
-        };
-        return [...prev.slice(-4), newOrder];
-      });
-    }, 5000);
+  //   // Simulating live updates
+  //   const interval = setInterval(() => {
+  //     setLiveOrders((prev) => {
+  //       const newOrder = {
+  //         ...orders[Math.floor(Math.random() * orders.length)],
+  //         id: Math.random().toString(36).substr(2, 9),
+  //         createdAt: new Date(),
+  //       };
+  //       return [...prev.slice(-4), newOrder];
+  //     });
+  //   }, 5000);
 
-    return () => clearInterval(interval);
-  }, [orders]);
+  //   return () => clearInterval(interval);
+  // }, [orders]);
 
   return (
     <Card className={className}>

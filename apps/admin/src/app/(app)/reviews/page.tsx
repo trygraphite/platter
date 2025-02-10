@@ -40,13 +40,23 @@ export default async function ReviewsPage() {
     },
   });
 
+  const formattedReviews = reviews.map(review => ({
+    id: review.id,
+    rating: review.rating,
+    comment: review.comment,
+    createdAt: review.createdAt,
+    order: review.order ? { orderNumber: String(review.order.orderNumber) } : null,
+    qrCode: review.qrCode ? { code: review.qrCode.target } : null,
+    table: review.table ? { number: review.table.number } : null
+  }));
+
   return (
     <DashboardShell>
       <DashboardHeader
         heading="Customer Reviews"
         text="View customer reviews and ratings."
       />
-      <ReviewsTable reviews={reviews} />
+      <ReviewsTable reviews={formattedReviews} />
     </DashboardShell>
   );
 }

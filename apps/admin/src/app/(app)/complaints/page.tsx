@@ -30,14 +30,30 @@ export default async function ComplaintsPage() {
 
   const complaints = await db.complaint.findMany({
     where: { userId },
-    include: {
-      qrCode: true,
-      table: true,
+    select: {
+      id: true,
+      content: true,
+      category: true,
+      status: true,
+      createdAt: true,
+      qrCode: {
+        select: {
+          target: true,
+        },
+      },
+      table: {
+        select: {
+          number: true,
+        },
+      },
     },
     orderBy: {
       createdAt: "desc",
     },
-  });
+  }).then(complaints => complaints.map(complaint => ({
+    ...complaint,
+    qrCode: { code: complaint.qrCode.target },
+  })));
 
   return (
     <DashboardShell>

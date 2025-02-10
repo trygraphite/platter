@@ -1,5 +1,4 @@
 "use client";
-
 import React from "react";
 import {
   Bar,
@@ -31,9 +30,14 @@ export function RatingsDistribution({
 }: RatingsDistributionProps) {
   const data = React.useMemo(() => {
     const distribution = [0, 0, 0, 0, 0];
-    reviews.forEach((review) => {
-      distribution[review.rating - 1]++;
-    });
+
+    for (const review of reviews) {
+      if (review.rating && review.rating >= 1 && review.rating <= 5) {
+        distribution[review.rating - 1] =
+          (distribution[review.rating - 1] || 0) + 1;
+      }
+    }
+
     return [1, 2, 3, 4, 5].map((rating) => ({
       rating: rating.toString(),
       count: distribution[rating - 1],
@@ -84,5 +88,3 @@ export function RatingsDistribution({
     </Card>
   );
 }
-
-

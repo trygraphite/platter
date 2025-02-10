@@ -31,12 +31,12 @@ export function ComplaintsTrend({
 }: ComplaintsTrendProps) {
   const data = React.useMemo(() => {
     const complaintsByMonth: { [key: string]: number } = {};
-    complaints.forEach((complaint) => {
+    for (const complaint of complaints) {
       const month = new Date(complaint.createdAt).toLocaleString("default", {
         month: "short",
       });
       complaintsByMonth[month] = (complaintsByMonth[month] || 0) + 1;
-    });
+    }
     return Object.entries(complaintsByMonth).map(([name, count]) => ({
       name,
       count,
