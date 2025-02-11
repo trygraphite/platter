@@ -7,6 +7,7 @@ import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { RatingsDistribution } from "@/components/feedback/ratings-distribution";
 import { ComplaintsTrend } from "@/components/feedback/complaints-trend";
 import { CustomerReviewsTable } from "@/components/feedback/customer-review-table";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Customer Feedback | Platter Admin",
@@ -25,6 +26,12 @@ export default async function FeedbackPage() {
           <p className="text-gray-600">
             Please log in to view the feedback dashboard.
           </p>
+          <Link
+            href="/login"
+            className="inline-block px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Go to Login
+          </Link>
         </div>
       </div>
     );

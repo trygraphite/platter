@@ -2,7 +2,7 @@
 
 import QRCode from "qrcode";
 import db from "@platter/db";
-import { QRCodeResponse } from "@/types/qr-code";
+import type { QRCodeResponse } from "@/types/qr-code";
 import getServerSession from "../auth/server";
 
 type QRCodeTarget = "table" | "menu";
@@ -10,7 +10,7 @@ type QRCodeTarget = "table" | "menu";
 export async function createQRCodeAction(
   tableNumber?: number,
   target: QRCodeTarget = "table",
-  capacity: number = 4, // Default capacity if not provided
+  capacity = 4, // Default capacity if not provided
 ): Promise<QRCodeResponse> {
   try {
     const session = await getServerSession();
