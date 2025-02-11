@@ -4,7 +4,9 @@ import getServerSession from "@/lib/auth/server";
 
 export default async function Page() {
   const session = await getServerSession();
-  if (session === null) return redirect("/login");
-
+  // Check if the session is valid
+  if (!session?.user) {
+    return redirect("/login");
+  }
   return <PageContent />;
 }
