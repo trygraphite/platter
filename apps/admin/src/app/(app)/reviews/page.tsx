@@ -5,6 +5,7 @@ import db from "@platter/db";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { ReviewsTable } from "@/components/feedback/reviews-table";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Reviews | Platter Admin",
@@ -23,6 +24,12 @@ export default async function ReviewsPage() {
           <p className="text-gray-600">
             Please log in to view the reviews page.
           </p>
+          <Link
+            href="/login"
+            className="inline-block px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Go to Login
+          </Link>
         </div>
       </div>
     );

@@ -9,6 +9,7 @@ import { RevenueChart } from "@/components/dashboard/revenue-chart";
 import { OrdersByTimeChart } from "@/components/dashboard/orders-by-time";
 import { LiveOrderTracking } from "@/components/dashboard/live-order-tracking";
 import DashboardOrdersTable from "@/components/dashboard/dashboard-order-table";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Admin Dashboard | Platter",
@@ -27,6 +28,12 @@ export default async function AdminDashboardPage() {
           <p className="text-gray-600">
             Please log in to view the admin dashboard.
           </p>
+          <Link
+            href="/login"
+            className="inline-block px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Go to Login
+          </Link>
         </div>
       </div>
     );
