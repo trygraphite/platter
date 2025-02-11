@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Order, OrderStatus } from "@prisma/client";
+import type { Order } from "@prisma/client";
 import { ArrowLeft } from "@platter/ui/lib/icons";
 import { Button } from "@platter/ui/components/button";
 import {
@@ -13,7 +13,7 @@ import {
   CardContent,
   CardFooter,
 } from "@platter/ui/components/card";
-import { OrderStatusPageProps } from "@/types/order-status";
+import type { OrderStatusPageProps } from "@/types/order-status";
 import { OrderStatusDisplay } from "./order-status";
 import { OrderDetails } from "./order-details";
 import { OrderActions } from "./order-action";

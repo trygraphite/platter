@@ -1,8 +1,5 @@
-import QRCodePage from "@/components/qrcode/qr-page-content";
 import RestaurantPage from "@/components/resturant/menu-page";
-import UpdateRestaurantDetailsForm from "@/components/setting/ProfileForm";
 import getServerSession from "@/lib/auth/server";
-import db from "@platter/db";
 import { redirect } from "next/navigation";
 
 export default async function EditRestaurantPage() {
