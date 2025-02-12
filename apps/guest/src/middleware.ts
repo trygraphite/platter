@@ -19,9 +19,16 @@ export default async function middleware(req: NextRequest) {
 
   if (process.env.NODE_ENV === "production") {
     // Handle Vercel preview deployments
-    if (hostname?.endsWith(".vercel.app")) {
-      // Extract the subdomain part from the Vercel hostname
-      currentHost = hostname.replace(".vercel.app", "").split(".")[0];
+    if (hostname?.includes(".vercel.app")) {
+      // Split the hostname into parts
+      const parts = hostname.split(".");
+      if (parts.length >= 3) {
+        // Extract the subdomain (e.g., "the-grill" from "the-grill.platter-guest-two.vercel.app")
+        currentHost = parts[0];
+      } else {
+        // Handle cases where there is no subdomain (e.g., "platter-guest-two.vercel.app")
+        currentHost = null;
+      }
     } else {
       // Handle custom domain or traditional subdomains
       currentHost = hostname?.replace(`.${process.env.BASE_DOMAIN}`, "");
