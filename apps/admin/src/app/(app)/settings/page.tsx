@@ -12,7 +12,7 @@ export default async function EditRestaurantPage() {
   });
 
   if (!restaurantData) {
-    return <div>Restaurant not found.</div>;
+    return <div>Restaurant not found</div>;
   }
 
   return (
