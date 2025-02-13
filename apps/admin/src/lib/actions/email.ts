@@ -17,7 +17,7 @@ export async function sendVerificationEmailAction({
   url,
 }: SendVerificationEmailProps) {
   if (!process.env.RESEND_API_KEY) {
-    console.error("RESEND_API_KEY is not set");
+    console.error("RESEND_API_KEY is not set or is missing");
     return { error: "Email configuration missing" };
   }
   const session = await getServerSession();
