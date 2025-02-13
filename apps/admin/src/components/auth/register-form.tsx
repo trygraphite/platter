@@ -42,12 +42,12 @@ export default function RegisterForm() {
           name: submittedData.email.split("@")[0] as string,
           email: submittedData.email,
           password: submittedData.password,
-          callbackURL: "/register/details",
+          callbackURL: "/verify",
         },
         {
           onSuccess: () => {
-            toast.success("Account created");
-            router.push("/register/details");
+            toast.success("Account created. Please verify your email.");
+            router.push("/verify");
           },
           onError: (ctx) => {
             toast.error("Failed to create account");

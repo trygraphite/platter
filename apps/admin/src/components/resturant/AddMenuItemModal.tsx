@@ -1,17 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useRestaurant } from "@/context/resturant-context";
+import { Button } from "@platter/ui/components/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@platter/ui/components/dialog";
-import { Label } from "@platter/ui/components/label";
 import { Input } from "@platter/ui/components/input";
+import { Label } from "@platter/ui/components/label";
 import { Textarea } from "@platter/ui/components/textarea";
-import { Button } from "@platter/ui/components/button";
-import { useRestaurant } from "@/app/(app)/context/resturant-context";
+import { useState } from "react";
 
 interface AddMenuItemModalProps {
   isOpen: boolean;

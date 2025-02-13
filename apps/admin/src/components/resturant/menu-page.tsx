@@ -1,7 +1,7 @@
 "use client";
 
-import { RestaurantProvider } from "@/app/(app)/context/resturant-context";
 import RestaurantContent from "@/app/(app)/menu/MenuContext";
+import { RestaurantProvider } from "@/context/resturant-context";
 
 export default function RestaurantPage() {
   return (

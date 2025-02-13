@@ -1,20 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useRestaurant } from "@/context/resturant-context";
+import { Button } from "@platter/ui/components/button";
 import {
   Card,
+  CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardContent,
 } from "@platter/ui/components/card";
-import { Button } from "@platter/ui/components/button";
+import type { Category, MenuItem } from "@prisma/client";
 import { Pencil, Trash2 } from "lucide-react";
+import { useState } from "react";
 import { AddMenuItemModal } from "./AddMenuItemModal";
 import { EditCategoryModal } from "./EditCategoryModal";
 import { EditMenuItemModal } from "./EditMenuItemModal";
-import type { Category, MenuItem } from "@prisma/client";
-import { useRestaurant } from "@/app/(app)/context/resturant-context";
 
 interface CategoryCardProps {
   category: Category & { menuItems: MenuItem[] };

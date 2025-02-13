@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
 import { Button } from "@platter/ui/components/button";
+import { useEffect } from "react";
 
-import { Switch } from "@platter/ui/components/switch";
-import { CategoryCard } from "@/components/resturant/CategoryCard";
 import { AddCategoryModal } from "@/components/resturant/AddCategoryModel";
-import { useRestaurant } from "../context/resturant-context";
+import { CategoryCard } from "@/components/resturant/CategoryCard";
+import { Switch } from "@platter/ui/components/switch";
+import { useRestaurant } from "../../../context/resturant-context";
 
 export default function RestaurantContent() {
   const {

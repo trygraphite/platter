@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRestaurant } from "@/context/resturant-context";
 import { Button } from "@platter/ui/components/button";
 import {
   Dialog,
@@ -11,7 +11,7 @@ import {
 import { Input } from "@platter/ui/components/input";
 import { Label } from "@platter/ui/components/label";
 import { Textarea } from "@platter/ui/components/textarea";
-import { useRestaurant } from "@/app/(app)/context/resturant-context";
+import { useState } from "react";
 
 export function AddCategoryModal() {
   const [isOpen, setIsOpen] = useState(false);

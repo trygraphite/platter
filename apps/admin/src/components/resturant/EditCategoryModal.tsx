@@ -1,18 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useRestaurant } from "@/context/resturant-context";
+import { Button } from "@platter/ui/components/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@platter/ui/components/dialog";
-import { Label } from "@platter/ui/components/label";
 import { Input } from "@platter/ui/components/input";
+import { Label } from "@platter/ui/components/label";
 import { Textarea } from "@platter/ui/components/textarea";
-import { Button } from "@platter/ui/components/button";
 import type { Category } from "@prisma/client";
-import { useRestaurant } from "@/app/(app)/context/resturant-context";
+import { useEffect, useState } from "react";
 
 interface EditCategoryModalProps {
   isOpen: boolean;
