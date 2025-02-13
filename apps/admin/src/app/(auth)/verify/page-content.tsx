@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { authClient } from "@/lib/auth/client";
 import { Button } from "@platter/ui/components/button";
@@ -19,7 +19,7 @@ function PageContent({ userEmail }: { userEmail: string }) {
     "pending",
   );
 
-  console.log(userEmail)
+  console.log(userEmail);
 
   const handleEmailVerification = async (email: string) => {
     setSending(true);

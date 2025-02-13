@@ -41,7 +41,6 @@ export function ComplaintsTable({ complaints }: ComplaintsTableProps) {
         <Table>
           <TableHeader>
             <TableRow>
-      
               <TableHead>Table</TableHead>
               <TableHead>Category</TableHead>
               <TableHead>Content</TableHead>
@@ -52,7 +51,6 @@ export function ComplaintsTable({ complaints }: ComplaintsTableProps) {
           <TableBody>
             {complaints.map((complaint) => (
               <TableRow key={complaint.id}>
-             
                 <TableCell>{complaint.table?.number || "N/A"}</TableCell>
                 <TableCell>{complaint.category || "Uncategorized"}</TableCell>
                 <TableCell>{complaint.content}</TableCell>
@@ -68,4 +66,3 @@ export function ComplaintsTable({ complaints }: ComplaintsTableProps) {
     </Card>
   );
 }
-

@@ -36,14 +36,16 @@ export default async function FeedbackPage() {
     }),
   ]);
 
-  const formattedReviews = reviews.map(review => ({
+  const formattedReviews = reviews.map((review) => ({
     id: review.id,
     rating: review.rating,
-    comment: review.comment ?? '',
+    comment: review.comment ?? "",
     createdAt: review.createdAt,
-    order: review.order ? {
-      orderNumber: String(review.order.orderNumber)
-    } : null
+    order: review.order
+      ? {
+          orderNumber: String(review.order.orderNumber),
+        }
+      : null,
   }));
 
   return (
@@ -60,4 +62,3 @@ export default async function FeedbackPage() {
     </DashboardShell>
   );
 }
-

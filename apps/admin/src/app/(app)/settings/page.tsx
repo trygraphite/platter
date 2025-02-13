@@ -10,7 +10,7 @@ export default async function EditRestaurantPage() {
   const restaurantData = await db.user.findUnique({
     where: { id: userId as string },
   });
-  
+
   if (!restaurantData) {
     return <div>Restaurant not found.</div>;
   }

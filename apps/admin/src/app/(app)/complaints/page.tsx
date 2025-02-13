@@ -16,32 +16,36 @@ export default async function ComplaintsPage() {
   const session = await getServerSession();
   const userId = session?.session?.userId;
 
-  const complaints = await db.complaint.findMany({
-    where: { userId },
-    select: {
-      id: true,
-      content: true,
-      category: true,
-      status: true,
-      createdAt: true,
-      qrCode: {
-        select: {
-          target: true,
+  const complaints = await db.complaint
+    .findMany({
+      where: { userId },
+      select: {
+        id: true,
+        content: true,
+        category: true,
+        status: true,
+        createdAt: true,
+        qrCode: {
+          select: {
+            target: true,
+          },
+        },
+        table: {
+          select: {
+            number: true,
+          },
         },
       },
-      table: {
-        select: {
-          number: true,
-        },
+      orderBy: {
+        createdAt: "desc",
       },
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  }).then(complaints => complaints.map(complaint => ({
-    ...complaint,
-    qrCode: { code: complaint.qrCode.target },
-  })));
+    })
+    .then((complaints) =>
+      complaints.map((complaint) => ({
+        ...complaint,
+        qrCode: { code: complaint.qrCode.target },
+      })),
+    );
 
   return (
     <DashboardShell>
@@ -53,4 +57,3 @@ export default async function ComplaintsPage() {
     </DashboardShell>
   );
 }
-

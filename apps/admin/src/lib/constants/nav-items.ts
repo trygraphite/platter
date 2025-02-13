@@ -10,7 +10,6 @@ import {
   BookMarkedIcon,
 } from "lucide-react";
 
-
 export const items = [
   {
     name: "Dashboard",
@@ -39,18 +38,18 @@ export const items = [
       {
         name: "Feedback",
         url: "/feedback",
-        icon: BookMarkedIcon
+        icon: BookMarkedIcon,
       },
       {
-       name: "Reviews",
+        name: "Reviews",
         url: "/reviews",
         icon: PencilLine,
-      }, 
+      },
       {
-       name: "Complaints",
+        name: "Complaints",
         url: "/complaints",
         icon: HeartCrack,
-      }, 
+      },
     ],
   },
   {

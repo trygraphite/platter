@@ -87,4 +87,3 @@ export function RevenueChart({ orders, className }: RevenueChartProps) {
     </Card>
   );
 }
-

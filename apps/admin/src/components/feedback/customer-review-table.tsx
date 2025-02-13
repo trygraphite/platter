@@ -37,7 +37,6 @@ export function CustomerReviewsTable({ reviews }: CustomerReviewsTableProps) {
         <Table>
           <TableHeader>
             <TableRow>
-            
               <TableHead>Rating</TableHead>
               <TableHead>Comment</TableHead>
               <TableHead>Date</TableHead>
@@ -46,7 +45,6 @@ export function CustomerReviewsTable({ reviews }: CustomerReviewsTableProps) {
           <TableBody>
             {reviews.slice(0, 5).map((review) => (
               <TableRow key={review.id}>
-               
                 <TableCell>{review.rating}</TableCell>
                 <TableCell>{review.comment || "No comment"}</TableCell>
                 <TableCell>{review.createdAt.toLocaleDateString()}</TableCell>
@@ -58,4 +56,3 @@ export function CustomerReviewsTable({ reviews }: CustomerReviewsTableProps) {
     </Card>
   );
 }
-

@@ -45,7 +45,6 @@ export function ReviewsTable({ reviews }: ReviewsTableProps) {
         <Table>
           <TableHeader>
             <TableRow>
-         
               <TableHead>Table</TableHead>
               <TableHead>Rating</TableHead>
               <TableHead>Comment</TableHead>
@@ -55,7 +54,6 @@ export function ReviewsTable({ reviews }: ReviewsTableProps) {
           <TableBody>
             {reviews.map((review) => (
               <TableRow key={review.id}>
-             
                 <TableCell>{review.table?.number || "N/A"}</TableCell>
                 <TableCell>{review.rating}</TableCell>
                 <TableCell>{review.comment || "No comment"}</TableCell>
@@ -68,4 +66,3 @@ export function ReviewsTable({ reviews }: ReviewsTableProps) {
     </Card>
   );
 }
-

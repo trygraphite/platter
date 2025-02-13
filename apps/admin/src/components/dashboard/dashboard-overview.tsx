@@ -67,4 +67,3 @@ export function Overview({ orders }: OverviewProps) {
     </>
   );
 }
-
