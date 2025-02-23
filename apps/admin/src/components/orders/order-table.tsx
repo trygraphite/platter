@@ -1,5 +1,5 @@
 import type { Order, OrderStatus } from "@prisma/client";
-import { ChevronDown, ChevronUp, Edit2, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, ClipboardIcon, Edit2, PackageIcon, Trash2 } from "lucide-react";
 import React, { useState } from "react";
 
 import {
@@ -125,8 +125,10 @@ export default function OrdersTable({
                       <div className="font-medium">
                         Order #{order.orderNumber}
                       </div>
-                      <div className="text-sm text-muted-foreground">
-                        Table: {order.tableNumber}
+                      <div className=" text-muted-foreground">
+                        {order.orderType === "TABLE"
+                          ? `Table: ${order.tableNumber || "N/A"}`
+                          : "Pickup Order"}
                       </div>
                     </div>
                   </div>
@@ -166,32 +168,58 @@ export default function OrdersTable({
               </TableRow>
               {expandedOrderIds.has(order.id) && (
                 <TableRow>
-                  <TableCell colSpan={5} className="bg-secondary/10 p-4">
-                    <div className="space-y-2">
-                      <h4 className="font-medium">Order Items:</h4>
-                      <div className="space-y-1">
-                        {order.items.map((item, index) => (
-                          <div
-                            key={index}
-                            className="flex justify-between text-sm"
-                          >
-                            <span>
-                              {item.quantity}x {item.menuItem.name}
-                            </span>
-                            <span>
-                              {formatNaira(item.menuItem.price * item.quantity)}
-                            </span>
+                  <TableCell colSpan={5} className="p-0">
+                    <div className="bg-secondary/10 border-t-2 border-primary/20 p-4">
+                      <div className="space-y-4">
+                        {/* Order Items Section */}
+                        <div className="rounded-lg bg-background p-4 shadow-sm">
+                          <div className="flex items-center gap-2 mb-3">
+                            <PackageIcon className="h-5 w-5 text-primary" />
+                            <h4 className="font-semibold text-base">
+                              Order Details
+                            </h4>
                           </div>
-                        ))}
-                      </div>
-                      {order.specialNotes && (
-                        <div className="mt-2">
-                          <h4 className="font-medium">Special Notes:</h4>
-                          <p className="text-sm text-muted-foreground">
-                            {order.specialNotes}
-                          </p>
+                          <div className="space-y-3">
+                            {order.items.map((item, index) => (
+                              <div
+                                key={index}
+                                className="flex justify-between items-center p-2 rounded-md bg-muted/30 hover:bg-muted/50 transition-colors"
+                              >
+                                <div className="flex items-center gap-3">
+                                  <span className="font-medium text-sm">
+                                    {item.quantity}x
+                                  </span>
+                                  <span className="text-sm">
+                                    {item.menuItem.name}
+                                  </span>
+                                </div>
+                                <span className="font-medium text-sm">
+                                  {formatNaira(
+                                    item.menuItem.price * item.quantity,
+                                  )}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      )}
+
+                        {/* Special Notes Section */}
+                        {order.specialNotes && (
+                          <div className="rounded-lg bg-background p-4 shadow-sm">
+                            <div className="flex items-center gap-2 mb-3">
+                              <ClipboardIcon className="h-5 w-5 text-primary" />
+                              <h4 className="font-semibold text-base">
+                                Special Instructions
+                              </h4>
+                            </div>
+                            <div className="p-3 bg-blue-50/30 rounded-md border border-blue-100">
+                              <p className="text-sm text-foreground/80 leading-relaxed">
+                                {order.specialNotes}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </TableCell>
                 </TableRow>

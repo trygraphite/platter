@@ -21,8 +21,8 @@ export default async function Page({ params }: { params: Params }) {
     const table = qrCode.table;
     const user = qrCode.user;
 
-    if (!table) {
-      return <div>Table not found for this QR code.</div>;
+    if (!table || !user) {
+      return <div>Table or user not found for this QR code.</div>;
     }
 
     return (

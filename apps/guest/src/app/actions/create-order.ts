@@ -27,8 +27,10 @@ export async function createOrder({
       where: { id: qrId },
       select: { userId: true },
     });
-    if (!qrCode) {
-      throw new Error("QR code not found");
+
+    // Check if QR code exists and has a valid userId
+    if (!qrCode?.userId) {
+      throw new Error("QR code not found or not associated with a user");
     }
 
     // Get the start of the current day (12 AM)
@@ -39,24 +41,24 @@ export async function createOrder({
     const lastOrder = await db.order.findFirst({
       where: {
         createdAt: {
-          gte: today, // Only consider orders created after 12 AM today
+          gte: today,
         },
       },
       orderBy: {
-        orderNumber: "desc", // Get the highest order number
+        orderNumber: "desc",
       },
     });
 
     // Determine the next orderNumber
     const orderNumber = lastOrder?.orderNumber ? lastOrder.orderNumber + 1 : 1;
 
-    // Create the order
+    // Create the order with validated userId
     const order = await db.order.create({
       data: {
         status: "PENDING",
-        orderNumber, // Use the calculated orderNumber
+        orderNumber,
         totalAmount,
-        userId: qrCode.userId,
+        userId: qrCode.userId, // Now guaranteed to be a string
         tableId,
         items: {
           create: items.map((item) => ({

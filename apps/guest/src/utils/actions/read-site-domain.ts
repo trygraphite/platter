@@ -13,5 +13,6 @@ export const readSiteDomain = async (domain: string) => {
       subdomain: true,
     },
   });
+  console.log(data)
   return data;
 };

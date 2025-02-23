@@ -11,9 +11,7 @@ export async function GET() {
     }
 
     const user = await db.user.findUnique({
-      where: {
-        id: session.user.id,
-      },
+      where: { id: session.user.id },
       select: {
         id: true,
         name: true,
@@ -21,6 +19,18 @@ export async function GET() {
         image: true,
         address: true,
         city: true,
+        seatingCapacity: true,
+        location: {
+          select: {
+            id: true,
+            name: true,
+            address: true,
+            seatingCapacity: true,
+            city: true,
+            state: true,
+            zipCode: true,
+          },
+        },
       },
     });
 
@@ -28,7 +38,15 @@ export async function GET() {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    return NextResponse.json(user);
+    return NextResponse.json({
+      ...user,
+      location: user.location || {
+        name: user.address,
+        address: user.address,
+        city: user.city,
+        seatingCapacity: user.seatingCapacity,
+      },
+    });
   } catch (error) {
     return NextResponse.json(
       { error: "Internal server error" },

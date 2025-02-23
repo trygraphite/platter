@@ -3,95 +3,68 @@
 import db from "@platter/db";
 import { revalidatePath } from "next/cache";
 
-export async function createOrder(orderData: {
+interface CreateOrderParams {
   userId: string;
-  tableId: string;
-  items: Array<{
-    menuItemId: string;
+  orderType: "TABLE" | "PICKUP";
+  tableId: string | null;
+  items: {
+    id: string;
     quantity: number;
-  }>;
-  specialNotes?: string;
-}) {
-  const { userId, tableId, items, specialNotes } = orderData;
+    price: number;
+    name: string;
+  }[];
+  totalAmount: number;
+}
 
-  // Determine the start of the current day (12 AM)
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+export async function createOrder({
+  userId,
+  orderType,
+  tableId,
+  items,
+  totalAmount,
+}: CreateOrderParams) {
+  try {
+    // Get the start of the current day (12 AM)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-  // Fetch the latest orderNumber for today
-  const lastOrder = await db.order.findFirst({
-    where: {
-      createdAt: {
-        gte: today, // Only consider orders created after 12 AM today
+    // Fetch the latest orderNumber for today
+    const lastOrder = await db.order.findFirst({
+      where: {
+        createdAt: { gte: today },
+        userId,
       },
-    },
-    orderBy: {
-      orderNumber: "desc", // Get the highest order number
-    },
-  });
+      orderBy: { orderNumber: "desc" },
+    });
 
-  // Determine the next orderNumber
-  const orderNumber = lastOrder ? (lastOrder.orderNumber ?? 0) + 1 : 1;
+    const orderNumber = lastOrder?.orderNumber ? lastOrder.orderNumber + 1 : 1;
 
-  // Fetch the menu items to get their current prices
-  const menuItems = await db.menuItem.findMany({
-    where: {
-      id: {
-        in: items.map((item) => item.menuItemId),
-      },
-    },
-    select: {
-      id: true,
-      price: true,
-    },
-  });
-
-  // Create a map of menuItemId to price for easy lookup
-  const priceMap = menuItems.reduce(
-    (acc, item) => {
-      acc[item.id] = item.price;
-      return acc;
-    },
-    {} as Record<string, number>,
-  );
-
-  // Calculate total amount before creating the order
-  const totalAmount = items.reduce(
-    (total, item) => total + (priceMap[item.menuItemId] ?? 0) * item.quantity,
-    0,
-  );
-
-  // Create the order with the calculated orderNumber
-  const order = await db.order.create({
-    data: {
-      userId,
-      tableId,
-      specialNotes,
-      orderNumber, // Assign the calculated orderNumber
-      status: "PENDING",
-      totalAmount, // Set the total amount directly
-      items: {
-        create: items.map((item) => ({
-          quantity: item.quantity,
-          price: priceMap[item.menuItemId] ?? 0,
-          menuItem: {
-            connect: { id: item.menuItemId },
-          },
-        })),
-      },
-    },
-    include: {
-      items: {
-        include: {
-          menuItem: true,
+    // Create the order with proper type
+    const order = await db.order.create({
+      data: {
+        status: "PENDING",
+        orderNumber,
+        totalAmount,
+        orderType,
+        userId,
+        tableId,
+        items: {
+          create: items.map((item) => ({
+            menuItemId: item.id,
+            quantity: item.quantity,
+            price: item.price,
+          })),
         },
       },
-    },
-  });
+      include: { items: true },
+    });
 
-  revalidatePath("/orders"); // Trigger revalidation for orders
-
-  return order;
+    revalidatePath('/orders');
+    return { success: true, orderId: order.id };
+  } catch (error) {
+    console.error("Error creating order:", error);
+    return { success: false, error: "Failed to create order" };
+  }
 }
 
 export async function updateOrder(order: any) {

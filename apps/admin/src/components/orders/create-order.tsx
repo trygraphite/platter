@@ -2,7 +2,7 @@
 
 import { createOrder } from "@/lib/actions/order-actions";
 import type { MenuItem, Table } from "@prisma/client";
-import { Minus, Plus, X, Search } from "lucide-react";
+import { Minus, Plus, X, Search, Info } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type React from "react";
 import { useEffect, useState } from "react";
@@ -47,8 +47,23 @@ export default function CreateOrder({
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [orderType, setOrderType] = useState<"TABLE" | "PICKUP">("TABLE");
+  const [lastOrderNumber, setLastOrderNumber] = useState<number>(0);
 
   const router = useRouter();
+
+  useEffect(() => {
+    const fetchLastOrderNumber = async () => {
+      try {
+        const response = await fetch(`/api/orders/last?userId=${userId}`);
+        const data = await response.json();
+        setLastOrderNumber(data.lastOrderNumber);
+      } catch (error) {
+        console.error("Error fetching last order number:", error);
+      }
+    };
+    fetchLastOrderNumber();
+  }, [userId]);
 
   useEffect(() => {
     const fetchMenuItems = async () => {
@@ -130,24 +145,40 @@ export default function CreateOrder({
     e.preventDefault();
     if (selectedItems.length === 0 || isSubmitting) return;
 
+    // Validate table selection for table orders
+    if (orderType === "TABLE" && !tableId) {
+      setError("Please select a table for table orders");
+      return;
+    }
+
     setIsSubmitting(true);
 
     const orderData = {
       userId,
-      tableId,
-      items: selectedItems.map(({ menuItemId, quantity }) => ({
-        menuItemId,
+      orderType,
+      tableId: orderType === "TABLE" ? tableId : null, // Explicit null for pickup
+      items: selectedItems.map(({ menuItemId, quantity, price, name }) => ({
+        id: menuItemId,
         quantity,
+        price,
+        name,
       })),
-      specialNotes: specialNotes || undefined,
+      totalAmount,
     };
 
     try {
-      await createOrder(orderData);
-      router.refresh();
-      onCancel();
+      const result = await createOrder(orderData);
+
+      if (result.success) {
+        router.refresh();
+        onCancel();
+      } else {
+        setError(result.error || "Failed to create order");
+      }
     } catch (error) {
       console.error("Error creating order:", error);
+      setError("An unexpected error occurred");
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -247,37 +278,58 @@ export default function CreateOrder({
               </div>
             )}
 
-            {/* Table and Special Notes */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label
-                  htmlFor="table-select"
-                  className="block text-sm font-medium mb-2"
+            {/* Order Type Selection */}
+            <div className="space-y-4">
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant={orderType === "TABLE" ? "default" : "outline"}
+                  onClick={() => setOrderType("TABLE")}
                 >
-                  Select Table
-                </label>
-                <Select value={tableId} onValueChange={setTableId}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a table" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {tables.map((table) => (
-                      <SelectItem key={table.id} value={table.id}>
-                        Table {table.number}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  Table Order
+                </Button>
+                <Button
+                  type="button"
+                  variant={orderType === "PICKUP" ? "default" : "outline"}
+                  onClick={() => setOrderType("PICKUP")}
+                >
+                  Pickup Order
+                </Button>
               </div>
+
+              {orderType === "TABLE" ? (
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Select Table
+                  </label>
+                  <Select value={tableId} onValueChange={setTableId}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a table" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {tables.map((table) => (
+                        <SelectItem key={table.id} value={table.id}>
+                          Table {table.number}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Info className="h-4 w-4" />
+                  <span>
+                    Pickup orders will use system-generated order numbers
+                  </span>
+                </div>
+              )}
+
+              {/* Special Notes */}
               <div>
-                <label
-                  htmlFor="specialNotes"
-                  className="block text-sm font-medium mb-2"
-                >
+                <label className="block text-sm font-medium mb-2">
                   Special Notes (Optional)
                 </label>
                 <Input
-                  id="specialNotes"
                   type="text"
                   value={specialNotes}
                   onChange={(e) => setSpecialNotes(e.target.value)}
@@ -300,17 +352,12 @@ export default function CreateOrder({
                 <Button
                   type="submit"
                   disabled={
-                    selectedItems.length === 0 || !tableId || isSubmitting
+                    selectedItems.length === 0 ||
+                    (orderType === "TABLE" && !tableId) ||
+                    isSubmitting
                   }
                 >
-                  {isSubmitting ? (
-                    <>
-                      <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                      Creating Order...
-                    </>
-                  ) : (
-                    "Create Order"
-                  )}
+                  {isSubmitting ? "Creating Order..." : "Create Order"}
                 </Button>
               </div>
             </div>

@@ -66,7 +66,6 @@ export default function OrderPageClient({
       // Handle error (e.g., show error message to user)
     }
   };
-
   const handleDeleteOrder = async (orderId: string) => {
     try {
       await deleteOrder(orderId);
@@ -85,7 +84,7 @@ export default function OrderPageClient({
       statusFilter === "all" || order.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
-
+  console.log(filteredOrders)
   return (
     <div className="min-h-screen ">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

@@ -59,6 +59,10 @@ export default async function OrderPage({ params }: { params: Params }) {
       });
     }
 
+    if (!order.table) {
+      notFound();
+    }
+
     return (
       <OrderStatusPage
         initialOrder={order}

@@ -31,7 +31,7 @@ export const restaurantDetailsSchema = z.object({
   phone: z.string().regex(/^\+?[1-9]\d{1,14}$/, "Invalid phone number"),
   website: z.string().url("Invalid URL").optional().or(z.literal("")),
   cuisine: z.string().min(1, "Please select a cuisine type"),
-  seatingCapacity: z.string().min(1, "Seating capacity is required"),
+  seatingCapacity: z.number().min(1, "Seating capacity is required"),
   openingHours: z.string().min(1, "Opening hours are required"),
   closingHours: z.string().min(1, "Closing hours are required"),
 });
