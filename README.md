@@ -33,4 +33,6 @@ platter is a monorepo with the following structure:
 
 ## Build
 
-1. Run `pnpm build` to build all workspace apps.
+1. Run `pnpm build` to build all workspace apps. 
+
+by Ibrahim and Taqib
