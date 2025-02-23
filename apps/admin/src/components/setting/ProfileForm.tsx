@@ -21,7 +21,7 @@ import { toast } from "@platter/ui/components/sonner";
 import { Textarea } from "@platter/ui/components/textarea";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { useEffect } from "react";
 import { updateRestaurantAction } from "@/lib/actions/update-profile";
 
@@ -33,6 +33,7 @@ export default function UpdateRestaurantDetailsForm({ initialData }: any) {
   const { data: session } = useSession();
   const router = useRouter();
   const {
+    control,
     register,
     handleSubmit,
     formState: { errors, isSubmitting, isDirty },
@@ -43,11 +44,7 @@ export default function UpdateRestaurantDetailsForm({ initialData }: any) {
     defaultValues: initialData,
   });
 
-  useEffect(() => {
-    // Set initial values for select fields
-    setValue("state", initialData.state);
-    setValue("cuisine", initialData.cuisine);
-  }, [initialData, setValue]);
+
 
   const onSubmit = async (data: RestaurantDetailsData) => {
     if (!session?.user?.id) {
@@ -123,24 +120,31 @@ export default function UpdateRestaurantDetailsForm({ initialData }: any) {
           </div>
           <div className="space-y-2">
             <Label htmlFor="state">State</Label>
-            <Select
-              onValueChange={(value) => setValue("state", value)}
-              defaultValue={initialData.state}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select state" />
-              </SelectTrigger>
-              <SelectContent>
-                {states.map((state) => (
-                  <SelectItem
-                    key={state.abbreviation}
-                    value={state.abbreviation}
-                  >
-                    {state.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Controller
+              name="state"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  onValueChange={field.onChange}
+                  value={field.value}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select state" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {states.map((state) => (
+                      <SelectItem
+                        key={state.abbreviation}
+                        value={state.abbreviation}
+                      >
+                        {state.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
             {errors.state && (
               <p className="text-xs text-red-500">{errors.state.message}</p>
             )}
@@ -190,22 +194,31 @@ export default function UpdateRestaurantDetailsForm({ initialData }: any) {
 
         <div className="space-y-2">
           <Label htmlFor="cuisine">Cuisine Type</Label>
-          <Select
-            onValueChange={(value) => setValue("cuisine", value)}
-            defaultValue={initialData.cuisine}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select cuisine type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="italian">Italian</SelectItem>
-              <SelectItem value="chinese">Chinese</SelectItem>
-              <SelectItem value="mexican">Mexican</SelectItem>
-              <SelectItem value="indian">Indian</SelectItem>
-              <SelectItem value="american">American</SelectItem>
-              <SelectItem value="other">Other</SelectItem>
-            </SelectContent>
-          </Select>
+          <Controller
+            name="cuisine"
+            control={control}
+            render={({ field }) => (
+              <Select
+                {...field}
+                onValueChange={field.onChange}
+                value={field.value}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select cuisine type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Nigerian">Nigerian</SelectItem>
+                  <SelectItem value="African">African</SelectItem>
+                  <SelectItem value="italian">Italian</SelectItem>
+                  <SelectItem value="chinese">Chinese</SelectItem>
+                  <SelectItem value="mexican">Mexican</SelectItem>
+                  <SelectItem value="indian">Indian</SelectItem>
+                  <SelectItem value="american">American</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          />
           {errors.cuisine && (
             <p className="text-xs text-red-500">{errors.cuisine.message}</p>
           )}

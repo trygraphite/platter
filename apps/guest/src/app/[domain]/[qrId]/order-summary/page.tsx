@@ -32,7 +32,7 @@ export default async function Page({ params }: { params: Params }) {
     },
   });
   console.log(qrCodeData);
-  if (!qrCodeData || qrCodeData.user.subdomain !== domain) {
+  if (!qrCodeData || !qrCodeData.user || qrCodeData.user.subdomain !== domain) {
     return notFound();
   }
 

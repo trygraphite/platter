@@ -12,12 +12,15 @@ interface OverviewProps {
 }
 
 export function Overview({ orders }: OverviewProps) {
-  const totalRevenue = orders.reduce(
+    const deliveredOrders = orders.filter((order) => order.status === "DELIVERED");
+
+  const totalRevenue = deliveredOrders.reduce(
     (sum, order) => sum + order.totalAmount,
     0,
   );
   const totalOrders = orders.length;
-  const uniqueCustomers = new Set(orders.map((order) => order.userId)).size;
+  // const uniqueCustomers = new Set(orders.map((order) => order.userId)).size;
+  // DISPLAY TOTAL NUMBER OF SCANS
   const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
   const items = [
@@ -30,12 +33,13 @@ export function Overview({ orders }: OverviewProps) {
       })}`,
       description: "Total revenue from all orders",
     },
-    {
-      title: "Unique Customers",
-      icon: Users,
-      content: uniqueCustomers.toString(),
-      description: "Number of unique customers",
-    },
+    // DISPLAY NUMBER OF TOTAL SCANS HERE
+    // {
+    //   title: "Unique Customers",
+    //   icon: Users,
+    //   content: uniqueCustomers.toString(),
+    //   description: "Number of unique customers",
+    // },
     {
       title: "Total Orders",
       icon: ShoppingCart,
@@ -45,7 +49,10 @@ export function Overview({ orders }: OverviewProps) {
     {
       title: "Average Order Value",
       icon: TrendingUp,
-      content: `$${averageOrderValue.toFixed(2)}`,
+      content: `₦${averageOrderValue.toLocaleString("en-NG", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
       description: "Average value per order",
     },
   ];

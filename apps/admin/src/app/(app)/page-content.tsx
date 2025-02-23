@@ -48,6 +48,7 @@ export default async function AdminDashboardPage() {
             menuItem: true,
           },
         },
+        
       },
       orderBy: {
         createdAt: "desc",
@@ -58,10 +59,10 @@ export default async function AdminDashboardPage() {
 
   const tableMap = new Map(tables.map((table) => [table.id, table.number]));
 
-  const ordersWithTableNumber = initialOrders.map((order) => ({
-    ...order,
-    tableNumber: tableMap.get(order.tableId) || "Unknown",
-  }));
+const ordersWithTableNumber = initialOrders.map((order) => ({
+  ...order,
+  tableNumber: order.tableId ? tableMap.get(order.tableId) || "Unknown" : "N/A", // Handle null tableId explicitly
+}));
 
   return (
     <DashboardShell>

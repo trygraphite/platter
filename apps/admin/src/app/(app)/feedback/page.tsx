@@ -47,9 +47,10 @@ export default async function FeedbackPage() {
         }
       : null,
   }));
-
+    // ADD AVERAGE RATING WIDGET
   return (
     <DashboardShell>
+      
       <DashboardHeader
         heading="Customer Feedback"
         text="View and analyze customer reviews and complaints."

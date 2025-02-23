@@ -9,11 +9,15 @@ import { QRDisplay } from "@/components/qrcode/qr-display";
 export default function QRCodePage() {
   const [qrCode, setQRCode] = useState<string | null>(null);
   const [currentTable, setCurrentTable] = useState<number | null>(null);
-  const [currentType, setCurrentType] = useState<"table" | "menu">("table");
+  const [locationName, setLocationName] = useState<string>("");
+
+  const [currentType, setCurrentType] = useState<"table" | "menu" | "location">(
+    "table",
+  );
   const [isLoading, setIsLoading] = useState(false);
 
   const handleGenerateQR = async (data: {
-    target: "table" | "menu";
+    target: "table" | "menu" | "location";
     tableNumber?: number | null;
   }) => {
     setIsLoading(true);
@@ -27,6 +31,8 @@ export default function QRCodePage() {
         setQRCode(result.qrCodeUrl);
         setCurrentTable(data.tableNumber ?? null);
         setCurrentType(data.target);
+        setLocationName(result.locationName || "");
+
         toast.success("QR Code generated successfully!");
       } else {
         toast.error(result.error || "Failed to generate QR code");
@@ -44,7 +50,7 @@ export default function QRCodePage() {
         <div>
           <h1 className="text-2xl font-bold">Generate QR Codes</h1>
           <p className="text-muted-foreground mt-2">
-            Create QR codes for your restaurant tables and menu
+            Create QR codes for your restaurant tables, menu, and location
           </p>
         </div>
 
@@ -55,6 +61,7 @@ export default function QRCodePage() {
             qrCodeUrl={qrCode}
             tableNumber={currentTable}
             type={currentType}
+            locationName={locationName}
           />
         )}
       </div>

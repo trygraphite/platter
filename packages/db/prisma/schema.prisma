@@ -42,6 +42,10 @@ model User {
   qrCodes         QRCode[]
   reviews         Review[]   
   complaints      Complaint[] 
+  role            UserRole    @default(RESTAURANT)
+  locationId String?   // Optional: If the restaurant is part of a location
+  location   Location? @relation(fields: [locationId], references: [id])
+  joinRequests JoinRequest[]
 }
 
 // Auth tables
@@ -55,6 +59,8 @@ model Session {
   userAgent String?
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      UserRole?
+
 
   @@unique([token])
   @@map("session")
@@ -90,6 +96,25 @@ model Verification {
   @@map("verification")
 }
 
+model Location {
+  id          String   @id @default(uuid())
+  name        String   // Name of the location (e.g., "Downtown Food Truck Park")
+  address     String   // Address of the location
+  city        String?
+  state       String?
+  zipCode     String?
+  seatingCapacity Int?
+  description String?  // Optional description of the location
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  users       User[]   // Restaurants in this location
+  qrCodes     QRCode[] // QR codes for tables in this location
+  table       Table[]
+  joinRequests JoinRequest[]
+}
+
 model QRCode {
   id           String    @id @default(uuid())
   target       String    // What the QR code is for (table, menu, etc)
@@ -99,18 +124,23 @@ model QRCode {
   updatedAt    DateTime  @updatedAt
 
   // Relations
-   user        User     @relation(fields: [userId], references: [id])
-    userId        String
+ 
+  userId      String?
+  user        User?       @relation(fields: [userId], references: [id])
   table      Table?       @relation(fields: [tableId], references: [id])
   tableId    String?
+  location   Location? @relation(fields: [locationId], references: [id])
+  locationId String?
   reviews    Review[]
   complaints Complaint[]
+
+
 }
 
 
 model Table {
   id          String   @id @default(uuid())
-  number      String   @unique
+  number      String   
   capacity    Int
   isAvailable Boolean  @default(true)
   createdAt   DateTime @default(now())
@@ -119,6 +149,8 @@ model Table {
   // Relations
   user        User     @relation(fields: [userId], references: [id])
   userId          String
+  location   Location? @relation(fields: [locationId], references: [id])
+  locationId String?
   qrCodes      QRCode[]
   orders       Order[]
   review       Review[]
@@ -153,7 +185,7 @@ model MenuItem {
   updatedAt   DateTime @updatedAt
 
   // Relations
-    user        User     @relation(fields: [userId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
 
   userId String
   category     Category     @relation(fields: [categoryId], references: [id])
@@ -186,10 +218,11 @@ model Order {
   totalTime        Int?       // Total time from creation to delivery
 
   // Relations
+  orderType       OrderType   @default(TABLE)
   user            User        @relation(fields: [userId], references: [id])
   userId          String
-  table           Table       @relation(fields: [tableId], references: [id])
-  tableId         String
+  table           Table?       @relation(fields: [tableId], references: [id])
+  tableId         String?
   items           OrderItem[]
   review          Review?
   
@@ -221,7 +254,7 @@ model Review {
   // Relations
   order     Order?   @relation(fields: [orderId], references: [id])
   orderId   String?  @unique
-  qrCode    QRCode? @relation(fields: [qrCodeId], references: [id])
+  qrCode    QRCode? @relation(fields: [qrCodeId], references: [id], onDelete: SetNull)
   qrCodeId  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -240,12 +273,34 @@ model Complaint {
   updatedAt DateTime        @updatedAt
 
   // Relations
-  qrCode   QRCode @relation(fields: [qrCodeId], references: [id])
-  qrCodeId String
+  qrCode    QRCode? @relation(fields: [qrCodeId], references: [id], onDelete: SetNull)
+  qrCodeId  String?
   user        User      @relation(fields: [userId], references: [id])
   userId      String
   table       Table?     @relation(fields: [tableId], references: [id])
   tableId     String?
+}
+
+model JoinRequest {
+  id          String      @id @default(uuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
+  locationId  String
+  location    Location    @relation(fields: [locationId], references: [id])
+  status      RequestStatus @default(PENDING)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+enum OrderType {
+  TABLE
+  PICKUP
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 enum OrderStatus {
@@ -261,4 +316,9 @@ enum ComplaintStatus {
   IN_PROGRESS
   RESOLVED
   CANCELLED
+}
+
+enum UserRole {
+  ADMIN
+  RESTAURANT
 }

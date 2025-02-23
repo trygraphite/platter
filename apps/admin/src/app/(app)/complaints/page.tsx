@@ -43,7 +43,7 @@ export default async function ComplaintsPage() {
     .then((complaints) =>
       complaints.map((complaint) => ({
         ...complaint,
-        qrCode: { code: complaint.qrCode.target },
+        qrCode: { code: complaint.qrCode?.target ?? "N/A" },
       })),
     );
 

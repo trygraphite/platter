@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 
 async function Page({ params }: { params: Params }) {
   const { qrId } = await params;
+  // console.log(qrId);
 
   // Use qrId to fetch data from the database
   const restaurantDetails = await db.qRCode.findUnique({
@@ -33,30 +34,31 @@ async function Page({ params }: { params: Params }) {
     },
   });
 
-  if (!restaurantDetails) {
+  // Check if restaurantDetails AND user exists
+  if (!restaurantDetails || !restaurantDetails.user) {
     return notFound();
   }
+
+  // Now TypeScript knows that user exists
+  const { user } = restaurantDetails;
 
   // Configure page using restaurantDetails
   const pageConfig = {
     title:
       restaurantDetails.target === "table"
-        ? `${restaurantDetails.user.name} Table ${restaurantDetails.targetNumber}  `
+        ? `${user.name} Table ${restaurantDetails.targetNumber}`
         : restaurantDetails.target === "menu"
           ? "Restaurant Menu"
-          : restaurantDetails.user.name,
-    description:
-      restaurantDetails.user.description ||
-      `Welcome to ${restaurantDetails.user.name}`,
+          : user.name,
+    description: user.description || `Welcome to ${user.name}`,
     restaurantInfo: {
-      name: restaurantDetails.user.name,
-      cuisine: restaurantDetails.user.cuisine,
+      name: user.name,
+      cuisine: user.cuisine,
       hours:
-        restaurantDetails.user.openingHours &&
-        restaurantDetails.user.closingHours
-          ? `${restaurantDetails.user.openingHours} - ${restaurantDetails.user.closingHours}`
+        user.openingHours && user.closingHours
+          ? `${user.openingHours} - ${user.closingHours}`
           : undefined,
-      image: restaurantDetails.user.image,
+      image: user.image,
     },
     buttons: [
       {
@@ -84,7 +86,7 @@ async function Page({ params }: { params: Params }) {
 
   return (
     <>
-      <Header restaurantName={restaurantDetails.user.name} reviewLink="" />
+      <Header restaurantName={user.name} reviewLink="" />
       <QRCodeView qrId={qrId} config={pageConfig} />
     </>
   );

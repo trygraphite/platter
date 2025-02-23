@@ -24,6 +24,10 @@ export default async function Page({ params }: { params: Params }) {
       return <div>Table not found for this QR code.</div>;
     }
 
+    if (!qrCode.user) {
+      return <div>User not found for this QR code.</div>;
+    }
+
     return (
       <ReviewPage
         qrId={qrId}

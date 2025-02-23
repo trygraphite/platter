@@ -6,8 +6,8 @@ export default async function middleware(req: NextRequest) {
   const hostname = req.headers.get("host");
   const pathname = url.pathname;
 
-  // Skip middleware for API routes
-  if (pathname.startsWith("/api/")) {
+  // Skip middleware for API routes and location routes
+  if (pathname.startsWith("/api/") || pathname.startsWith("/location/")) {
     return NextResponse.next();
   }
 
@@ -64,7 +64,7 @@ export default async function middleware(req: NextRequest) {
 
     const site_subdomain = response.subdomain;
 
-    // Rewrite to the dynamic route
+    // Rewrite to the dynamic route - note the "/sites/" prefix from the second middleware
     return NextResponse.rewrite(
       new URL(`/${site_subdomain}${pathname}`, req.url),
     );

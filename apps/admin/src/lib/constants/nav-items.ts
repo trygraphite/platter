@@ -8,6 +8,7 @@ import {
   PencilLine,
   HeartCrack,
   BookMarkedIcon,
+  PinIcon,
 } from "lucide-react";
 
 export const items = [
@@ -30,6 +31,11 @@ export const items = [
     name: "Qr Code",
     url: "/qr",
     icon: QrCode,
+  },
+  {
+    name: "Location",
+    url: "/location",
+    icon: PinIcon,
   },
   {
     name: "Feedback",

@@ -1,85 +1,157 @@
-// "use client";
+// components/qrcode/qrcode-canvas.tsx (updated)
+"use client";
 
-// import React, { useEffect, useState } from 'react';
-// import dynamic from 'next/dynamic';
+import React, { useEffect, useState } from "react";
 
-// interface QRCodeCanvasProps {
-//   qrCodeUrl: string;
-//   width: number;
-//   height: number;
-//   target: string;
-//   targetId: string;
-// }
+interface QRCodeCanvasProps {
+  qrCodeUrl: string;
+  width: number;
+  height: number;
+  target: "table" | "menu" | "location";
+  targetId: string;
+  locationName?: string;
+  onImageGenerated?: (url: string) => void;
+}
 
-// const backgroundImages = {
-//   "restaurant-table": "/qrimages/restaurant-table-bg.jpg",
-// };
+const backgroundImages = {
+  table:
+    "https://hhvjh1chgk.ufs.sh/f/31hJxXO5ls8pOpSo9By02cXudOvWY6AM75Nzg1TjRoEaIqSy",
+  menu: "https://hhvjh1chgk.ufs.sh/f/31hJxXO5ls8pIOOxxjEnJ46GFk3TzvKm9yZAHRjqO2PpUlXg",
+  location:
+    "https://hhvjh1chgk.ufs.sh/f/31hJxXO5ls8pYAIjmzw4tyquXSKRj5cT7zxNHUfVlDZgr2Ea",
+  default:
+    "https://hhvjh1chgk.ufs.sh/f/31hJxXO5ls8pZQZhL8iNDmaVRkOEFwqGIW7QrxljB5ULosuX",
+};
 
-// export function QRCodeCanvas({ qrCodeUrl, width, height, target, targetId }: QRCodeCanvasProps) {
-//   const [combinedImageUrl, setCombinedImageUrl] = useState<string | null>(null);
+export function QRCodeCanvas({
+  qrCodeUrl,
+  width,
+  height,
+  target,
+  targetId,
+  locationName,
+  onImageGenerated,
+}: QRCodeCanvasProps) {
+  const [combinedImageUrl, setCombinedImageUrl] = useState<string | null>(null);
 
-//   useEffect(() => {
-//     let sketch: any;
+useEffect(() => {
+  let sketch: any;
 
-//     const generateCombinedImage = async () => {
-//       const p5 = await import('p5');
-//       sketch = new p5.default((p: any) => {
-//         let qrCode: any;
-//         let backgroundImage: any;
+  const generateCombinedImage = async () => {
+    const p5 = await import("p5");
+    sketch = new p5.default((p: any) => {
+      let qrCode: any;
+      let backgroundImage: any;
 
-//         p.preload = () => {
-//           qrCode = p.loadImage(qrCodeUrl);
-//           backgroundImage = p.loadImage(backgroundImages["restaurant-table"]);
-//         };
+      p.preload = () => {
+        qrCode = p.loadImage(qrCodeUrl);
+        const bgImage = backgroundImages[target] || backgroundImages.default;
+        backgroundImage = p.loadImage(bgImage);
+      };
 
-//         p.setup = () => {
-//           const canvas = p.createCanvas(width, height);
-//           p.image(backgroundImage, 0, 0, width, height);
+      p.setup = () => {
+        const canvas = p.createCanvas(width, height);
+        // Draw background
+        p.image(backgroundImage, 0, 0, width, height);
 
-//           // Draw QR Code
-//           const qrSize = Math.min(width, height) * 0.5;
-//           const x = (width - qrSize) / 2;
-//           const y = (height - qrSize) / 2;
-//           p.image(qrCode, x, y, qrSize, qrSize);
+        // Text styling constants
+        const titleMargin = 50;
+        const qrMargin = 60;
+        const textBelowMargin = 40;
 
-//           // Draw text at the top
-//           p.textSize(40);
-//           p.textAlign(p.CENTER, p.TOP);
-//           p.fill(255);
-//           p.text('Scan to Explore Our Menu & Order Now!', width / 2, 20);
+        // Draw title above QR code
+        p.textAlign(p.CENTER, p.TOP);
+        p.fill(255);
+        p.textSize(26);
+        p.textStyle(p.BOLD);
+        p.text("Scan to Explore Our Menu & Order Now!", width / 2, titleMargin);
 
-//           // Draw "Table" and the target ID below
-//           p.textSize(60);
-//           p.textAlign(p.LEFT, p.CENTER);
-//           p.text('TABLE', 20, height / 2 - 40);
-//           p.text(targetId, 20, height / 2 + 40);
+        // Calculate QR code position
+        const qrSize = Math.min(width, height) * 0.5;
+        const qrX = width / 2 - qrSize / 2;
+        const qrY = titleMargin + 160; // Space below title
 
-//           setCombinedImageUrl(canvas.elt.toDataURL());
-//           p.remove();
-//         };
-//       });
-//     };
+        // QR code container styling
+        p.drawingContext.shadowColor = "rgba(0, 0, 0, 0.3)";
+        p.drawingContext.shadowBlur = 25;
+        p.drawingContext.shadowOffsetY = 15;
 
-//     generateCombinedImage();
+        // Draw QR code background
+        p.fill(255);
+        p.noStroke();
+        p.rect(qrX - 20, qrY - 20, qrSize + 40, qrSize + 40, 20);
 
-//     return () => {
-//       if (sketch) {
-//         sketch.remove();
-//       }
-//     };
-//   }, [qrCodeUrl, width, height, target, targetId]);
+        // Reset shadow
+        p.drawingContext.shadowColor = "transparent";
 
-//   if (!combinedImageUrl) {
-//     return <div>Loading...</div>;
-//   }
+        // Draw QR code
+        p.image(qrCode, qrX, qrY, qrSize, qrSize);
 
-//   return (
-//     <div className="w-full h-full flex items-center justify-center">
-//       <img
-//         src={combinedImageUrl}
-//         alt="QR Code with Background"
-//         className="max-w-full max-h-full object-contain"
-//       />
-//     </div>
-//   );
-// }
+        // Add QR code border
+        p.stroke(255, 0.9);
+        p.strokeWeight(6);
+        p.noFill();
+        p.rect(qrX, qrY, qrSize, qrSize, 12);
+
+        // Target information below QR code
+        const infoStartY = qrY + qrSize + textBelowMargin;
+
+        // Location name or target type
+        p.textSize(34);
+        p.textStyle(p.NORMAL);
+        p.fill(255);
+
+        if (target === "location" && locationName) {
+          p.text(locationName.toUpperCase(), width / 2, infoStartY);
+        } else {
+          p.text(target.toUpperCase(), width / 2, infoStartY);
+        }
+
+        if (targetId) {
+          // Target ID (table number)
+          p.textSize(42);
+          p.textStyle(p.BOLD);
+          p.fill(255);
+          const idText = target === "location" ? `TABLE ${targetId}` : targetId;
+          p.text(idText, width / 2, infoStartY + 50);
+        }
+
+        // Add decorative line
+        p.stroke(255, 0.8);
+        p.strokeWeight(2);
+        p.line(
+          width / 2 - 60,
+          infoStartY - 20,
+          width / 2 + 60,
+          infoStartY - 20,
+        );
+
+        const dataUrl = canvas.elt.toDataURL();
+        setCombinedImageUrl(dataUrl);
+        onImageGenerated?.(dataUrl);
+        p.remove();
+      };
+    });
+  };
+
+  generateCombinedImage();
+
+  return () => sketch?.remove();
+}, [qrCodeUrl, width, height, target, targetId, locationName, onImageGenerated]);
+
+  if (!combinedImageUrl) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        Generating QR Code...
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={combinedImageUrl}
+      alt="Combined QR Code"
+      className="w-full h-full object-contain"
+    />
+  );
+}

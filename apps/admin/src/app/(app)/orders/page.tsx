@@ -22,14 +22,16 @@ export default async function OrderPage() {
     }),
     db.table.findMany(),
   ]);
-  console.log(initialOrders);
+  // console.log(initialOrders);
   const tableMap = new Map(tables.map((table) => [table.id, table.number]));
 
   const ordersWithTableNumber = initialOrders.map((order) => ({
     ...order,
-    tableNumber: tableMap.get(order.tableId) || "Unknown",
+    tableNumber: order.tableId
+      ? tables.find((t) => t.id === order.tableId)?.number || "Unknown"
+      : "N/A",
   }));
-
+  // console.log(tables)
   return (
     <OrderPageClient
       initialOrders={ordersWithTableNumber}
