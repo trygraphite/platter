@@ -8,6 +8,7 @@ platter is a monorepo with the following structure:
 
 - `packages/*` - Contains all internally shared packages within apps.
 - `apps/*` - All applications that make up the system.
+- Site - Contains the landing page of the app
 
 ## Tools
 
