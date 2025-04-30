@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@platter/ui/components/button";
+import { ChocoLoader } from "@platter/ui/components/choco-loader";
 import {
   Card,
   CardHeader,
@@ -13,7 +14,6 @@ import {
 import { ArrowLeft, ShoppingBag, Trash2 } from "@platter/ui/lib/icons";
 import { toast } from "@platter/ui/components/sonner";
 import { createOrder } from "@/app/actions/create-order";
-import useSocketIO from "@platter/ui/hooks/useSocketIO";
 
 interface OrderSummaryPageProps {
   qrId: string;
@@ -50,10 +50,10 @@ export function OrderSummaryPage({
   const [isLoading, setIsLoading] = useState(false);
   
   // Initialize Socket.IO connection
-  const { socket, isConnected } = useSocketIO({
-    serverUrl: process.env.NEXT_PUBLIC_SOCKET_URL || window.location.origin,
-    autoConnect: true,
-  });
+  // const { socket, isConnected } = useSocketIO({
+  //   serverUrl: process.env.NEXT_PUBLIC_SOCKET_URL || window.location.origin,
+  //   autoConnect: true,
+  // });
 
   useEffect(() => {
     const savedCart = localStorage.getItem(`cart-${qrId}`);
@@ -87,6 +87,7 @@ export function OrderSummaryPage({
     try {
       if (!tableDetails?.id) {
         toast.error("Table details not found");
+        setIsLoading(false);
         return;
       }
 
@@ -106,9 +107,9 @@ export function OrderSummaryPage({
       const result = await createOrder(orderData);
 
       if (result.success && result.orderId) {
-        // Clear the cart
+        // Keep cart in state until redirect completes
+        // We'll only clear localStorage here, but keep the state
         localStorage.removeItem(`cart-${qrId}`);
-        setCart([]);
         
         // Redirect to order status page
         router.push(`/${qrId}/order-status/${result.orderId}`);
@@ -118,13 +119,107 @@ export function OrderSummaryPage({
         toast.error(
           result.error || "Failed to create order. Please try again.",
         );
+        setIsLoading(false); // Only reset loading on error
       }
     } catch (error) {
       console.error("Checkout error:", error);
       toast.error("An unexpected error occurred. Please try again.");
-    } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Only reset loading on error
     }
+  };
+
+  // Render loading state or normal content
+  const renderContent = () => {
+    if (isLoading) {
+      return <ChocoLoader />;
+    }
+
+    return (
+      <>
+        {cart.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-muted-foreground mb-4">Your cart is empty</p>
+            <Button onClick={handleBackToMenu}>Return to Menu</Button>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {cart.map((item) => (
+              <div
+                key={item.id}
+                className="flex items-center justify-between py-2 border-b last:border-0"
+              >
+                {/* Image and Item Details */}
+                <div className="flex items-center gap-4 flex-1">
+                  {/* Image */}
+                  <img
+                    src={item.image} 
+                    alt={item.name}
+                    className="w-16 h-16 object-cover rounded"
+                  />
+
+                  {/* Item Details */}
+                  <div>
+                    <h3 className="font-medium">{item.name}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      ₦{Number(item.price).toFixed(2)} × {item.quantity}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Total Price and Remove Button */}
+                <div className="flex items-center gap-4">
+                  <p className="font-semibold">
+                    ₦{(Number(item.price) * item.quantity).toFixed(2)}
+                  </p>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-destructive hover:text-destructive/90"
+                    onClick={() => handleRemoveItem(item.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+
+            <div className="pt-4 border-t">
+              <div className="flex justify-between items-center text-lg font-bold">
+                <span>Total Amount:</span>
+                <span>₦{calculateTotal().toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+        )}
+      </>
+    );
+  };
+
+  // Render footer buttons only if not loading and cart has items
+  const renderFooter = () => {
+    if (isLoading) return null;
+    
+    if (cart.length > 0) {
+      return (
+        <CardFooter className="flex flex-col sm:flex-row gap-4 p-6 bg-muted/10">
+          <Button
+            variant="outline"
+            className="w-full sm:w-auto"
+            onClick={handleBackToMenu}
+          >
+            Modify Order
+          </Button>
+          <Button
+            className="w-full sm:w-auto"
+            onClick={handleCheckout}
+            disabled={isLoading}
+          >
+            {isLoading ? "Creating Order..." : "Place Order"}
+          </Button>
+        </CardFooter>
+      );
+    }
+    return null;
   };
 
   return (
@@ -133,6 +228,7 @@ export function OrderSummaryPage({
         variant="ghost"
         className="mb-6 hover:bg-transparent"
         onClick={handleBackToHome}
+        disabled={isLoading}
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
         Back to Home
@@ -153,80 +249,9 @@ export function OrderSummaryPage({
             </p>
           </CardHeader>
           <CardContent className="p-6">
-            {cart.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-muted-foreground mb-4">Your cart is empty</p>
-                <Button onClick={handleBackToMenu}>Return to Menu</Button>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                {cart.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center justify-between py-2 border-b last:border-0"
-                  >
-                    {/* Image and Item Details */}
-                    <div className="flex items-center gap-4 flex-1">
-                      {/* Image */}
-                      <img
-                        src={item.image} 
-                        alt={item.name}
-                        className="w-16 h-16 object-cover rounded"
-                      />
-
-                      {/* Item Details */}
-                      <div>
-                        <h3 className="font-medium">{item.name}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          ₦{Number(item.price).toFixed(2)} × {item.quantity}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Total Price and Remove Button */}
-                    <div className="flex items-center gap-4">
-                      <p className="font-semibold">
-                        ₦{(Number(item.price) * item.quantity).toFixed(2)}
-                      </p>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-destructive hover:text-destructive/90"
-                        onClick={() => handleRemoveItem(item.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-
-                <div className="pt-4 border-t">
-                  <div className="flex justify-between items-center text-lg font-bold">
-                    <span>Total Amount:</span>
-                    <span>₦{calculateTotal().toFixed(2)}</span>
-                  </div>
-                </div>
-              </div>
-            )}
+            {renderContent()}
           </CardContent>
-          {cart.length > 0 && (
-            <CardFooter className="flex flex-col sm:flex-row gap-4 p-6 bg-muted/10">
-              <Button
-                variant="outline"
-                className="w-full sm:w-auto"
-                onClick={handleBackToMenu}
-              >
-                Modify Order
-              </Button>
-              <Button
-                className="w-full sm:w-auto"
-                onClick={handleCheckout}
-                disabled={isLoading}
-              >
-                {isLoading ? "Creating Order..." : "Place Order"}
-              </Button>
-            </CardFooter>
-          )}
+          {renderFooter()}
         </Card>
       </div>
     </div>

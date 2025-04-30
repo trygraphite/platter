@@ -17,6 +17,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { PageConfig } from "@/types/qr";
+import resturantLogo from "../../../public/assets/serving-dish.png";
 
 interface QRCodeViewProps {
   qrId: string;
@@ -39,8 +40,8 @@ export function QRCodeView({ qrId, config }: QRCodeViewProps) {
                 />
               </div>
             ) : (
-              <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-                <Building2 className="w-8 h-8 text-primary" />
+              <div className="mx-auto w-16 h-16  rounded-full flex items-center justify-center">
+                <Image src={resturantLogo} alt="resturant-logo" className="w-16 h-16 text-primary" />
               </div>
             )}
             <CardTitle className="text-2xl font-bold">{config.title}</CardTitle>
