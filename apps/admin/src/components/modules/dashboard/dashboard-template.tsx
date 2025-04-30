@@ -4,12 +4,13 @@ import getServerSession from "@/lib/auth/server";
 import db from "@platter/db";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import { Overview } from "@/components/dashboard/dashboard-overview";
-import { RevenueChart } from "@/components/dashboard/revenue-chart";
+import { Overview } from "@/components/modules/dashboard/components/dashboard-overview";
+import { RevenueChart } from "@/components/modules/dashboard/components/revenue-chart";
 import { OrdersByTimeChart } from "@/components/dashboard/orders-by-time";
 import { LiveOrderTracking } from "@/components/dashboard/live-order-tracking";
-import DashboardOrdersTable from "@/components/dashboard/dashboard-order-table";
+import DashboardOrdersTable from "@/components/modules/dashboard/components/dashboard-order-table";
 import Link from "next/link";
+import { MostOrderedItems } from "./components/most-ordered-items-chart";
 
 export const metadata: Metadata = {
   title: "Admin Dashboard | Platter",
@@ -39,27 +40,31 @@ export default async function AdminDashboardPage() {
     );
   }
 
-  const [initialOrders, tables] = await Promise.all([
+const [initialOrders, tables] = await Promise.all([
     db.order.findMany({
-      where: { userId },
-      include: {
-        items: {
-          include: {
-            menuItem: true,
-          },
+        where: { userId },
+        include: {
+            items: {
+                include: {
+                    menuItem: {
+                        include: {
+                            category: true
+                        }
+                    },
+                },
+            },
+            
         },
-        
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
+        orderBy: {
+            createdAt: "desc",
+        },
     }),
     db.table.findMany(),
-  ]);
+]);
 
-  const tableMap = new Map(tables.map((table) => [table.id, table.number]));
+  const tableMap = new Map(tables.map((table: { id: any; number: any; }) => [table.id, table.number]));
 
-const ordersWithTableNumber = initialOrders.map((order) => ({
+const ordersWithTableNumber = initialOrders.map((order: { tableId: unknown; }) => ({
   ...order,
   tableNumber: order.tableId ? tableMap.get(order.tableId) || "Unknown" : "N/A", // Handle null tableId explicitly
 }));
@@ -70,7 +75,7 @@ const ordersWithTableNumber = initialOrders.map((order) => ({
         heading="Dashboard"
         text="Welcome to your Platter admin dashboard."
       />
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid  gap-4 ">
         <Overview orders={ordersWithTableNumber} />
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
@@ -80,16 +85,14 @@ const ordersWithTableNumber = initialOrders.map((order) => ({
           orders={ordersWithTableNumber}
         />
       </div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <LiveOrderTracking
-          className="col-span-3"
-          orders={ordersWithTableNumber}
-        />
-        <div className="col-span-4">
+      <div className="grid  grid-rows-1 grid-cols-1">
+            <MostOrderedItems
+            className="w-full"
+            orders={ordersWithTableNumber}
+            />
+        <div className="col-span-4 mt-4">
           <DashboardOrdersTable
             orders={ordersWithTableNumber}
-            onEditOrder={() => {}}
-            onDeleteOrder={() => {}}
           />
         </div>
       </div>

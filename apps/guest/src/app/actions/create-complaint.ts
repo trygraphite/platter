@@ -10,7 +10,7 @@ const ComplaintSchema = z.object({
     message: "Complaint must be at least 10 characters long.",
   }),
   category: z.enum(
-    ["FOOD", "SERVICE", "CLEANLINESS", "WAIT_TIME", "ATMOSPHERE", "OTHER"],
+    ["FOOD", "SERVICE", "CLEANLINESS", "WAIT TIME", "ATMOSPHERE", "OTHER"],
     {
       errorMap: () => ({ message: "Please select a valid category." }),
     },

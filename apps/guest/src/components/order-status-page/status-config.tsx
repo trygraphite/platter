@@ -6,14 +6,14 @@ import { OrderStatus } from "@prisma/client";
 export const statusConfigs: Record<OrderStatus, StatusConfig> = {
   PENDING: {
     icon: <Clock className="h-8 w-8" />,
-    color: "text-yellow-600",
-    bgColor: "bg-yellow-50",
+    color: "text-gray-600",
+    bgColor: "bg-gray-50",
     text: "Order Pending",
   },
   CONFIRMED: {
     icon: <Clock className="h-8 w-8" />,
-    color: "text-blue-600",
-    bgColor: "bg-blue-50",
+    color: "text-yellow-600",
+    bgColor: "bg-yellow-50",
     text: "Order Confirmed",
   },
   PREPARING: {

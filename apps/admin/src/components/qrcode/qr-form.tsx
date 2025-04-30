@@ -96,11 +96,11 @@ export function QRForm({ onSubmit, isLoading }: QRFormProps) {
                 <SelectContent>
                   <SelectItem value="table">Table QR Code</SelectItem>
                   <SelectItem value="menu">Menu QR Code</SelectItem>
-                  <SelectItem value="location">Location QR Code</SelectItem>
+                  {/* <SelectItem value="location">Location QR Code</SelectItem> */}
                 </SelectContent>
               </Select>
               <FormDescription>
-                Choose whether to create a table, menu, or location QR code
+                Choose whether to create a table or menu 
               </FormDescription>
               <FormMessage />
             </FormItem>

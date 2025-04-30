@@ -23,6 +23,8 @@ export interface OrderStatusPageProps {
   qrId: string;
   table: Table;
   user: User;
+    socketServerUrl?: string;
+
 }
 
 export interface StatusConfig {

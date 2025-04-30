@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { AddCategoryModal } from "@/components/resturant/AddCategoryModel";
 import { CategoryCard } from "@/components/resturant/CategoryCard";
 import { Switch } from "@platter/ui/components/switch";
+import { HourglassLoader } from "@platter/ui/components/timeLoader";
 import { useRestaurant } from "../../../context/resturant-context";
 
 export default function RestaurantContent() {
@@ -22,9 +23,8 @@ export default function RestaurantContent() {
   useEffect(() => {
     fetchUserAndCategories();
   }, [fetchUserAndCategories]);
-  console.log(categories);
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div><HourglassLoader  label="Loading Menu..."/></div>;
   }
 
   if (error || !user) {

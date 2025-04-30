@@ -61,7 +61,7 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
 
   const fetchUserAndCategories = useCallback(async () => {
     if (!session?.user?.id) {
-      toast.error("Not authenticated");
+      toast.error("Loading Menu");
       return;
     }
 

@@ -1,23 +1,22 @@
-import { Pool, neonConfig } from "@neondatabase/serverless";
-import { PrismaNeon } from "@prisma/adapter-neon";
-import { PrismaClient } from "@prisma/client";
-import ws from "ws";
-
-neonConfig.webSocketConstructor = ws;
-
-// for edge functions
-neonConfig.poolQueryViaFetch = true;
-
-const connectionString = `${process.env.DATABASE_URL}`;
-const pool = new Pool({ connectionString });
-const adapter = new PrismaNeon(pool);
+// Use dynamic imports based on environment
+import { withAccelerate } from '@prisma/extension-accelerate'
 
 declare global {
-  var prisma: PrismaClient | undefined;
+  var prisma: ReturnType<typeof prismaClientSingleton> | undefined;
+  var EdgeRuntime: string | undefined;
 }
 
 const prismaClientSingleton = () => {
-  return new PrismaClient({ adapter });
+  // Check if we're in an edge runtime
+  if (typeof EdgeRuntime === 'string' || process.env.NEXT_RUNTIME === 'edge') {
+    // For edge environments
+    const { PrismaClient } = require('@prisma/client/edge')
+    return new PrismaClient().$extends(withAccelerate())
+  } else {
+    // For Node.js environments
+    const { PrismaClient } = require('@prisma/client')
+    return new PrismaClient().$extends(withAccelerate())
+  }
 };
 
 const db = globalThis.prisma ?? prismaClientSingleton();
