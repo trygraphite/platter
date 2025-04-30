@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "Node16",
+    "outDir": "dist",
+    "rootDir": "../../",
+    "esModuleInterop": true,
+    "strict": true,
+    "baseUrl": ".",
+    "moduleResolution": "node16",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@platter/db/*": ["../../packages/db/src/*"]
+    }
+  },
+  "include": ["src"]
+}

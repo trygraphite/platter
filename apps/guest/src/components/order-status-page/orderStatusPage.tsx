@@ -19,18 +19,28 @@ import { OrderDetails } from "./order-details";
 import { OrderActions } from "./order-action";
 import { ReviewModal } from "./review-modal";
 import ErrorCard from "../shared/error-card";
+import useSocketIO from "@platter/ui/hooks/useSocketIO";
 
 export default function OrderStatusPage({
   initialOrder,
   qrId,
   table,
   user,
+  socketServerUrl,
 }: OrderStatusPageProps) {
   const [order, setOrder] = useState<Order | any>(initialOrder);
-  const [error, setError] = useState<string | null>(null);
   const [hasShownModal, setHasShownModal] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const router = useRouter();
+  
+  const serverUrl = socketServerUrl || 
+    (typeof window !== 'undefined' ? window.location.origin : '');
+  
+  // Use the socket hook
+  const { socket, isConnected, error } = useSocketIO({
+    serverUrl,
+    autoConnect: !!serverUrl,
+  });
 
   useEffect(() => {
     // Show review modal only if:
@@ -50,89 +60,61 @@ export default function OrderStatusPage({
   }, [order.status, order.review, order.cancelledAt, hasShownModal]);
 
   useEffect(() => {
-    console.log("Setting up SSE connection");
-    console.log(qrId);
-    console.log("Initial Order ID:", initialOrder.id);
-
-    let eventSource: EventSource | null = null;
-    let retryCount = 0;
-    const maxRetries = 3;
-
-    const connectSSE = () => {
-      if (retryCount >= maxRetries) {
-        setError("Failed to connect after multiple attempts");
-        return;
-      }
-
-      try {
-        // Close existing connection if any
-        if (eventSource) {
-          eventSource.close();
-        }
-
-        const url = `/api/orders/${initialOrder.id}`;
-        console.log("Connecting to SSE at:", url);
-
-        eventSource = new EventSource(url);
-
-        eventSource.onopen = () => {
-          console.log("SSE connection opened successfully");
-          retryCount = 0; // Reset retry count on successful connection
-        };
-
-        eventSource.onmessage = (event) => {
-          console.log("Received SSE message:", event.data);
-          try {
-            const data = JSON.parse(event.data);
-            if (data.error) {
-              console.error("SSE data error:", data.error);
-              setError(data.error);
-              eventSource?.close();
-            } else {
-              setOrder(data);
-              setError(null); // Clear any previous errors
-            }
-          } catch (error) {
-            console.error("Error parsing SSE message:", error);
-          }
-        };
-
-        eventSource.onerror = (error) => {
-          console.error("SSE connection error:", error);
-          eventSource?.close();
-
-          // Attempt to reconnect
-          retryCount++;
-          if (retryCount < maxRetries) {
-            console.log(`Retrying connection (${retryCount}/${maxRetries})...`);
-            setTimeout(connectSSE, 3000 * retryCount); // Exponential backoff
-          } else {
-            setError("Unable to maintain connection to status updates");
-          }
-        };
-      } catch (error) {
-        console.error("Error setting up SSE:", error);
-        setError("Failed to connect to status updates");
+    if (!socket || !isConnected) return;
+    
+    console.log(`Joining order room: ${initialOrder.id}`);
+    socket.emit('joinOrderRoom', initialOrder.id);
+    
+    // Order-specific events
+    const handleOrderUpdate = (updatedOrder: Order) => {
+      console.log('Received order update:', updatedOrder);
+      
+      // Only update if this is our order
+      if (updatedOrder.id === initialOrder.id) {
+        setOrder(updatedOrder);
+        console.log(`Order ${updatedOrder.id} updated to status: ${updatedOrder.status}`);
       }
     };
-
-    // Initial connection
-    connectSSE();
-
-    // Cleanup function
+    
+    const handleOrderDeleted = (deletedId: string) => {
+      console.log('Received order deleted event:', deletedId);
+      
+      if (deletedId === initialOrder.id) {
+        setTimeout(() => {
+          router.push(`/${qrId}`); 
+        }, 3000);
+      }
+    };
+    
+    socket.on('orderUpdate', handleOrderUpdate);
+    socket.on('orderDeleted', handleOrderDeleted);
+    
     return () => {
-      console.log("Cleaning up SSE connection");
-      if (eventSource) {
-        eventSource.close();
-      }
+      socket.off('orderUpdate', handleOrderUpdate);
+      socket.off('orderDeleted', handleOrderDeleted);
     };
-  }, [initialOrder.id]); //
+  }, [socket, isConnected, initialOrder.id, qrId, router]);
+
+  const connectionStatus = isConnected ? (
+    <div className="text-xs text-green-600 absolute top-4 right-4">
+      ● Live
+    </div>
+  ) : (
+    <div className="text-xs text-amber-600 absolute top-4 right-4">
+      ○ Connecting...
+    </div>
+  );
 
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 py-8">
         <div className="container max-w-2xl mx-auto px-4">
           <ErrorCard error={error} />
+          <div className="mt-4 text-center">
+            <Button onClick={() => router.push(`/${qrId}`)}>
+              Return to Menu
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -150,7 +132,8 @@ export default function OrderStatusPage({
           Back to Menu
         </Button>
 
-        <Card className="shadow-lg">
+        <Card className="shadow-lg relative">
+          {connectionStatus}
           <CardHeader>
             <CardTitle className="text-2xl">Order Status</CardTitle>
             <p className="text-sm text-muted-foreground">
@@ -182,6 +165,7 @@ export default function OrderStatusPage({
           qrId={qrId}
           tableId={table.id}
           userId={user.id}
+          // orderId={order.id}
         />
       )}
     </div>

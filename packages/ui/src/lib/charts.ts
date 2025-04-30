@@ -21,5 +21,7 @@ export {
   Pie,
   Bar,
   BarChart,
-  
+  LabelList,
+  AreaChart,
+  Area,
 } from "recharts";

@@ -9,7 +9,11 @@ import {
   HeartCrack,
   BookMarkedIcon,
   PinIcon,
+  ScanQrCode,
+  LucideScanQrCode,
+  BookHeadphones,
 } from "lucide-react";
+import { c } from "node_modules/better-auth/dist/index-4d8GiU4g";
 
 export const items = [
   {
@@ -28,9 +32,21 @@ export const items = [
     icon: PanelTopDashed,
   },
   {
-    name: "Qr Code",
-    url: "/qr",
+    name: "QR Code",
+    url: "/create-qr",
     icon: QrCode,
+    children: [
+      {
+        name: "Create QR Code",
+        url: "/create-qr",
+        icon: ScanQrCode,
+      },
+      {
+        name: "Manage QR Code",
+        url: "/manage-qr",
+        icon: BookHeadphones,
+      },
+    ],
   },
   {
     name: "Location",
@@ -40,6 +56,7 @@ export const items = [
   {
     name: "Feedback",
     icon: Users2,
+    url: "/feedback",
     children: [
       {
         name: "Feedback",

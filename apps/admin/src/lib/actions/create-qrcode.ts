@@ -52,7 +52,7 @@ export async function createQRCodeAction(
 
       // Validate table exists in location
       const tableExists = userLocation.table.some(
-        (t) => t.number === tableNumber.toString(),
+        (t: { number: string; }) => t.number === tableNumber.toString(),
       );
 
       if (!tableExists) {
@@ -145,8 +145,8 @@ export async function createQRCodeAction(
       target === "location"
         ? isProduction
           ? baseUrl
-          : "localhost:3000"
-        : `${restaurant.subdomain}.${isProduction ? baseUrl : "localhost:3000"}`;
+          : "localhost:3001"
+        : `${restaurant.subdomain}.${isProduction ? baseUrl : "localhost:3001"}`;
 
     const path =
       target === "location"

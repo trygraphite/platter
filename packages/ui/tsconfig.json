@@ -9,6 +9,6 @@
       "@platter/ui/*": ["./src/*"]
     }
   },
-  "include": ["."],
+  "include": [".", "../../apps/admin/src/components/custom"],
   "exclude": ["node_modules", "dist"]
 }

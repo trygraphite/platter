@@ -13,6 +13,7 @@ import {
 import { ArrowLeft, ShoppingBag, Trash2 } from "@platter/ui/lib/icons";
 import { toast } from "@platter/ui/components/sonner";
 import { createOrder } from "@/app/actions/create-order";
+import useSocketIO from "@platter/ui/hooks/useSocketIO";
 
 interface OrderSummaryPageProps {
   qrId: string;
@@ -47,6 +48,12 @@ export function OrderSummaryPage({
   const [cart, setCart] = useState<CartItem[]>([]);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Initialize Socket.IO connection
+  const { socket, isConnected } = useSocketIO({
+    serverUrl: process.env.NEXT_PUBLIC_SOCKET_URL || window.location.origin,
+    autoConnect: true,
+  });
 
   useEffect(() => {
     const savedCart = localStorage.getItem(`cart-${qrId}`);
@@ -102,8 +109,11 @@ export function OrderSummaryPage({
         // Clear the cart
         localStorage.removeItem(`cart-${qrId}`);
         setCart([]);
+        
         // Redirect to order status page
         router.push(`/${qrId}/order-status/${result.orderId}`);
+        
+        toast.success("Order placed successfully!");
       } else {
         toast.error(
           result.error || "Failed to create order. Please try again.",
@@ -159,9 +169,9 @@ export function OrderSummaryPage({
                     <div className="flex items-center gap-4 flex-1">
                       {/* Image */}
                       <img
-                        src={item.image} // Replace with the correct path to the item's image
+                        src={item.image} 
                         alt={item.name}
-                        className="w-16 h-16 object-cover rounded" // Adjust size and styling as needed
+                        className="w-16 h-16 object-cover rounded"
                       />
 
                       {/* Item Details */}

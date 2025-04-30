@@ -6,8 +6,6 @@ import { Card } from "@platter/ui/components/card";
 import { Download } from "lucide-react";
 import { useState, useEffect } from "react";
 import { QRCodeCanvas } from "./qrCodeCanvas";
-import { getCurrentUserDetails } from "@/lib/actions/get-user";
-import db from "@platter/db";
 
 interface QRDisplayProps {
   qrCodeUrl: string;

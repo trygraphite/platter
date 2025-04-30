@@ -69,6 +69,7 @@ export default async function OrderPage({ params }: { params: Params }) {
         qrId={qrId}
         table={order.table}
         user={order.user}
+        socketServerUrl={process.env.NEXT_PUBLIC_SOCKET_SERVER_URL || ""}
       />
     );
   } catch (error) {

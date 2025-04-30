@@ -4,7 +4,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@platter/ui/*": ["../../packages/ui/src/*"]
+      "@platter/ui/*": ["../../packages/ui/src/*"],
+      "@platter/db/*": ["../../packages/db/src/*"]
     },
     "plugins": [
       {

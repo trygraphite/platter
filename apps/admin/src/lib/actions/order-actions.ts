@@ -58,8 +58,6 @@ export async function createOrder({
       },
       include: { items: true },
     });
-
-    revalidatePath('/orders');
     return { success: true, orderId: order.id };
   } catch (error) {
     console.error("Error creating order:", error);
@@ -68,27 +66,113 @@ export async function createOrder({
 }
 
 export async function updateOrder(order: any) {
-  const updatedOrder = await db.order.update({
-    where: { id: order.id },
-    data: {
-      status: order.status,
-      tableId: order.tableId,
-      specialNotes: order.specialNotes,
-    },
-    include: {
-      items: {
-        include: {
-          menuItem: true,
-        },
+  console.log("Updating order:", order);
+  try {
+    // Update in database
+    const updatedOrder = await db.order.update({
+      where: { id: order.id },
+      data: {
+        status: order.status,
+        tableId: order.tableId,
+        specialNotes: order.specialNotes,
+        // Add timestamp based on status
+        // ...(order.status === 'CONFIRMED' ? { confirmedAt: new Date() } : {}),
+        // ...(order.status === 'PREPARING' ? { preparingAt: new Date() } : {}),
+        // ...(order.status === 'READY' ? { readyAt: new Date() } : {}),
+        // ...(order.status === 'DELIVERED' ? { deliveredAt: new Date() } : {}),
+        // ...(order.status === 'CANCELLED' ? { cancelledAt: new Date() } : {})
       },
-    },
-  });
+      include: {
+        items: {
+          include: {
+            menuItem: true,
+          },
+        },
+        table: true,
+        user: true,
+      },
+    });
 
-  return updatedOrder;
+    // Calculate metrics if status is DELIVERED
+    // if (order.status === 'DELIVERED') {
+    //   await db.order.update({
+    //     where: { id: order.id },
+    //     data: {
+    //       confirmationTime: updatedOrder.confirmedAt
+    //         ? Math.floor(
+    //             (updatedOrder.confirmedAt.getTime() - updatedOrder.createdAt.getTime()) /
+    //               60000,
+    //           )
+    //         : null,
+    //       preparationTime:
+    //         updatedOrder.readyAt && updatedOrder.confirmedAt
+    //           ? Math.floor(
+    //               (updatedOrder.readyAt.getTime() - updatedOrder.confirmedAt.getTime()) /
+    //                 60000,
+    //             )
+    //           : null,
+    //       deliveryTime:
+    //         updatedOrder.deliveredAt && updatedOrder.readyAt
+    //           ? Math.floor(
+    //               (updatedOrder.deliveredAt.getTime() - updatedOrder.readyAt.getTime()) /
+    //                 60000,
+    //             )
+    //           : null,
+    //       totalTime: updatedOrder.deliveredAt
+    //         ? Math.floor(
+    //             (updatedOrder.deliveredAt.getTime() - updatedOrder.createdAt.getTime()) /
+    //               60000,
+    //           )
+    //         : null,
+    //     },
+    //   });
+    // }
+
+    // Notify socket server about the update
+    try {
+      const socketServerUrl = process.env.NEXT_PUBLIC_SOCKET_SERVER_URL;
+      if (socketServerUrl) {
+        await fetch(`${socketServerUrl}/api/orders/${order.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(updatedOrder)
+        });
+      }
+    } catch (error) {
+      console.error("Error notifying socket server:", error);
+      // Continue even if socket notification fails
+    }
+
+    return updatedOrder;
+  } catch (error) {
+    console.error("Error updating order:", error);
+    throw error;
+  }
 }
 
 export async function deleteOrder(orderId: string) {
-  await db.order.delete({
-    where: { id: orderId },
-  });
+  try {
+    // Delete from database
+    await db.order.delete({
+      where: { id: orderId },
+    });
+
+    // Notify socket server about the deletion
+    try {
+      const socketServerUrl = process.env.NEXT_PUBLIC_SOCKET_SERVER_URL;
+      if (socketServerUrl) {
+        await fetch(`${socketServerUrl}/api/orders/${orderId}`, {
+          method: 'DELETE',
+        });
+      }
+    } catch (error) {
+      console.error("Error notifying socket server:", error);
+      // Continue even if socket notification fails
+    }
+  } catch (error) {
+    console.error("Error deleting order:", error);
+    throw error;
+  }
 }

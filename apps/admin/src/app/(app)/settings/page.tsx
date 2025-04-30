@@ -8,11 +8,6 @@ export default async function EditRestaurantPage() {
 
   const userId = user?.session?.userId;
 
-  // Redirect or return an error if userId is undefined
-  if (!userId) {
-    redirect("/login"); // Redirect to login page
-  }
-
   try {
     const restaurantData = await db.user.findUnique({
       where: { id: userId },

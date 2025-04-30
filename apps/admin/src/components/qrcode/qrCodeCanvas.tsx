@@ -1,6 +1,7 @@
 // components/qrcode/qrcode-canvas.tsx (updated)
 "use client";
 
+import { HourglassLoader } from "@platter/ui/components/timeLoader";
 import React, { useEffect, useState } from "react";
 
 interface QRCodeCanvasProps {
@@ -141,9 +142,7 @@ useEffect(() => {
 
   if (!combinedImageUrl) {
     return (
-      <div className="w-full h-full flex items-center justify-center">
-        Generating QR Code...
-      </div>
+        <div><HourglassLoader label="Generating QR Code..."/></div>
     );
   }
 
