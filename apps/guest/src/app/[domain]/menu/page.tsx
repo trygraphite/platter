@@ -46,7 +46,7 @@ export default async function MenuPage({ params }: { params: Params }) {
 
   return (
     <div className="min-h-screen bg-secondary">
-      <Header restaurantName={user.name ?? "Resturant"} reviewLink="" />
+      <Header restaurantName={user.name ?? "Resturant"} reviewLink={user.googleReviewLink} />
       <MenuHeader userDetails={user.name ?? "Resturant"} />
       <DynamicMenu
         initialCategories={categories}

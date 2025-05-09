@@ -33,6 +33,9 @@ export default function OrderStatusPage({
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const router = useRouter();
   
+  // Extract restaurant userId from the order
+  const restaurantUserId = initialOrder?.userId;
+  
   const serverUrl = socketServerUrl || 
     (typeof window !== 'undefined' ? window.location.origin : '');
   
@@ -96,22 +99,22 @@ export default function OrderStatusPage({
   }, [socket, isConnected, initialOrder.id, qrId, router]);
 
   const connectionStatus = isConnected ? (
-    <div className="text-xs text-green-600 absolute top-4 right-4">
+    <div className="text-xs text-green-600 absolute top-2 right-2">
       ● Live
     </div>
   ) : (
-    <div className="text-xs text-amber-600 absolute top-4 right-4">
+    <div className="text-xs text-amber-600 absolute top-2 right-2">
       ○ Connecting...
     </div>
   );
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 py-8">
-        <div className="container max-w-2xl mx-auto px-4">
+      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 pt-2 pb-4">
+        <div className="container mx-auto px-2 max-w-lg">
           <ErrorCard error={error} />
-          <div className="mt-4 text-center">
-            <Button onClick={() => router.push(`/${qrId}`)}>
+          <div className="mt-3 text-center">
+            <Button size="sm" onClick={() => router.push(`/${qrId}`)}>
               Return to Menu
             </Button>
           </div>
@@ -121,30 +124,31 @@ export default function OrderStatusPage({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 py-8">
-      <div className="container max-w-2xl mx-auto px-4">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 pt-2 pb-6">
+      <div className="container mx-auto px-2  max-w-lg">
         <Button
           variant="ghost"
-          className="mb-6"
+          size="sm"
+          className="mb-2"
           onClick={() => router.push(`/${qrId}`)}
         >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Menu
+          <ArrowLeft className="mr-1 h-3 w-3" />
+          <span className="text-xs">Back to Menu</span>
         </Button>
 
-        <Card className="shadow-lg relative">
+        <Card className=" relative overflow-hidden">
           {connectionStatus}
-          <CardHeader>
-            <CardTitle className="text-2xl">Order Status</CardTitle>
-            <p className="text-sm text-muted-foreground">
+          <CardHeader className="py-3 px-3">
+            <CardTitle className="text-lg font-medium">Order Status</CardTitle>
+            <p className="text-xs text-muted-foreground">
               Order #{order.orderNumber}
             </p>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-3 px-3 py-2">
             <OrderStatusDisplay status={order.status} />
             <OrderDetails table={table} order={order} />
           </CardContent>
-          <CardFooter>
+          <CardFooter className="flex flex-wrap justify-center gap-2 px-3 py-3">
             <OrderActions
               orderId={order.id}
               status={order.status}
@@ -153,6 +157,9 @@ export default function OrderStatusPage({
                 setOrder({ ...order, status: newStatus })
               }
               onNavigate={(path) => router.push(path)}
+              socketServerUrl={socketServerUrl}
+              restaurantUserId={restaurantUserId}
+              order={order}
             />
           </CardFooter>
         </Card>
@@ -165,7 +172,6 @@ export default function OrderStatusPage({
           qrId={qrId}
           tableId={table.id}
           userId={user.id}
-          // orderId={order.id}
         />
       )}
     </div>

@@ -1,4 +1,3 @@
-// app/qr-codes/components/DeleteQRCodeDialog.tsx
 'use client';
 
 import { useState } from 'react';
@@ -16,6 +15,7 @@ import {
 } from '@platter/ui/components//alert-dialog';
 import { Button } from '@platter/ui/components/button';
 import { toast } from '@platter/ui/components/sonner';
+import { deleteQRCode } from '@/lib/actions/delete-qrcode';
 
 type QRCodeWithRelations = QRCode & {
   user?: { name: string; email: string } | null;
@@ -41,13 +41,11 @@ export default function DeleteQRCodeDialog({
     try {
       setIsDeleting(true);
       
-      // In a real implementation, you'd make an API call to delete the QR code
-      const response = await fetch(`/api/qr-codes/${qrCode.id}`, {
-        method: 'DELETE',
-      });
+      // Call the server action to delete the QR code
+      const response = await deleteQRCode({ id: qrCode.id });
       
-      if (!response.ok) {
-        throw new Error('Failed to delete QR code');
+      if (!response.success) {
+        throw new Error(response.error || 'Failed to delete QR code');
       }
       
       toast.success('QR code deleted', {

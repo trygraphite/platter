@@ -92,17 +92,17 @@ export function MenuPage({
     <div className="container mx-auto p-4 pb-32 md:pb-4">
       {/* Restaurant Details Header */}
       <div className="mb-8">
-        {restaurantDetails.image && (
-          <div className="relative w-full h-48 mb-4">
-            <Image
-              src={restaurantDetails.image}
-              alt={restaurantDetails.name}
-              layout="fill"
-              objectFit="cover"
-              className="rounded-lg"
-            />
-          </div>
-        )}
+      {restaurantDetails.image && restaurantDetails.image.startsWith('http') && (
+        <div className="relative w-full h-48 mb-4">
+          <Image
+            src={restaurantDetails.image}
+            alt={restaurantDetails.name}
+            layout="fill"
+            objectFit="cover"
+            className="rounded-lg"
+          />
+        </div>
+)}
         <h1 className="text-3xl font-bold">{restaurantDetails.name}</h1>
         <p className="text-muted-foreground">{restaurantDetails.description}</p>
         <div className="flex gap-4 mt-2 text-sm">

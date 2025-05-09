@@ -11,7 +11,9 @@ export async function updateCategory(
   try {
     const category = await db.category.update({
       where: { id: categoryId, userId },
-      data,
+        data: {
+        ...data,
+      },
     });
     revalidatePath("/categories");
     return { success: true, category };

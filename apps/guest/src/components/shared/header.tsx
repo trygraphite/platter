@@ -56,7 +56,20 @@ function Header({ restaurantName, reviewLink }: HeaderProps) {
                 </Link>
               </li>
 
-              {reviewLink && (
+            
+              <li>
+                <Link
+                  href="/about"
+                  className={buttonVariants({
+                    size: "sm",
+                    variant: "ghost",
+                  })}
+                >
+                  <Info className="mr-1 h-4 w-4" />
+                  About
+                </Link>
+              </li>
+                {reviewLink && (
                 <li>
                   <Link
                     href={reviewLink}
@@ -71,18 +84,6 @@ function Header({ restaurantName, reviewLink }: HeaderProps) {
                   </Link>
                 </li>
               )}
-              <li>
-                <Link
-                  href="/about"
-                  className={buttonVariants({
-                    size: "sm",
-                    variant: "ghost",
-                  })}
-                >
-                  <Info className="mr-1 h-4 w-4" />
-                  About
-                </Link>
-              </li>
             </ul>
 
             <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>

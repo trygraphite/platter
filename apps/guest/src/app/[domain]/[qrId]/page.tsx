@@ -26,9 +26,11 @@ async function Page({ params }: { params: Params }) {
           name: true,
           description: true,
           image: true,
+          icon: true,
           cuisine: true,
           openingHours: true,
           closingHours: true,
+         googleReviewLink: true,
         },
       },
     },
@@ -52,13 +54,14 @@ async function Page({ params }: { params: Params }) {
           : user.name,
     description: user.description || `Welcome to ${user.name}`,
     restaurantInfo: {
+      id: user.id,
       name: user.name,
       cuisine: user.cuisine,
       hours:
         user.openingHours && user.closingHours
           ? `${user.openingHours} - ${user.closingHours}`
           : undefined,
-      image: user.image,
+      icon: user.icon,
     },
     buttons: [
       {
@@ -86,7 +89,7 @@ async function Page({ params }: { params: Params }) {
 
   return (
     <>
-      <Header restaurantName={user.name} reviewLink="" />
+      <Header restaurantName={user.name} reviewLink={user.googleReivewLink} />
       <QRCodeView qrId={qrId} config={pageConfig} />
     </>
   );

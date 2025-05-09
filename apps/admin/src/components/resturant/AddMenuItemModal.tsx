@@ -2,6 +2,7 @@
 
 import { useRestaurant } from "@/context/resturant-context";
 import { Button } from "@platter/ui/components/button";
+import { Checkbox } from "@platter/ui/components/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -29,6 +30,7 @@ export function AddMenuItemModal({
   const [price, setPrice] = useState<string>("");
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isAvailable, setIsAvailable] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const { handleAddMenuItem } = useRestaurant();
 
@@ -51,7 +53,7 @@ export function AddMenuItemModal({
       formData.append("description", description || "");
       formData.append("categoryId", categoryId);
       formData.append("price", price || "0");
-      formData.append("isAvailable", "true");
+      formData.append("isAvailable", isAvailable.toString());
 
       // Only append image if it exists
       if (image) {
@@ -67,6 +69,7 @@ export function AddMenuItemModal({
       setPrice("");
       setImage(null);
       setImagePreview(null);
+      setIsAvailable(true);
       onClose();
     } catch (error) {
       console.error("Error adding menu item:", error);
@@ -126,6 +129,14 @@ export function AddMenuItemModal({
                 className="mt-2 max-w-full h-32 object-cover"
               />
             )}
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox 
+              id="isAvailable" 
+              checked={isAvailable}
+              onCheckedChange={(checked) => setIsAvailable(checked === true)}
+            />
+            <Label htmlFor="isAvailable">Available</Label>
           </div>
           <Button
             type="submit"

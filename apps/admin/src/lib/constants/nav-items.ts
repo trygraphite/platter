@@ -48,11 +48,11 @@ export const items = [
       },
     ],
   },
-  {
-    name: "Location",
-    url: "/location",
-    icon: PinIcon,
-  },
+  // {
+  //   name: "Location",
+  //   url: "/location",
+  //   icon: PinIcon,
+  // },
   {
     name: "Feedback",
     icon: Users2,

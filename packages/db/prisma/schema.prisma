@@ -14,7 +14,9 @@ model User {
   name            String
   email           String      @unique
   website         String?
+  googleReviewLink String?
   image           String?
+  icon            String? 
   phone           String?
   address         String?
   city            String?
@@ -46,6 +48,8 @@ model User {
   locationId String?   // Optional: If the restaurant is part of a location
   location   Location? @relation(fields: [locationId], references: [id])
   joinRequests JoinRequest[]
+
+  CategoryGroup CategoryGroup[]
 }
 
 // Auth tables
@@ -157,19 +161,38 @@ model Table {
   complaint    Complaint[]
 }
 
-model Category {
-  id          String   @id @default(uuid())
+model CategoryGroup {
+  id          String     @id @default(uuid())
   name        String
   description String?
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  position    Int        @default(0)  
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 
   // Relations
-    user        User     @relation(fields: [userId], references: [id])
+  user        User       @relation(fields: [userId], references: [id])
+  userId      String
+  categories  Category[]
 
-  userId String
-  menuItems    MenuItem[]
+  @@unique([userId, name])
+}
+
+model Category {
+  id            String        @id @default(uuid())
+  name          String
+  description   String?
+  position      Int           @default(0)  
+  isActive      Boolean       @default(true)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  image         String?
+  user          User          @relation(fields: [userId], references: [id])
+  userId        String
+  menuItems     MenuItem[]
+  
+  categoryGroup CategoryGroup? @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  groupId       String?
 
   @@unique([userId, name])
 }
@@ -180,17 +203,17 @@ model MenuItem {
   description String
   price       Int
   image       String?
+  position    Int      @default(0)  
   isAvailable Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   // Relations
   user        User     @relation(fields: [userId], references: [id])
-
-  userId String
-  category     Category     @relation(fields: [categoryId], references: [id])
-  categoryId   String
-  orderItems   OrderItem[]
+  userId      String
+  category    Category @relation(fields: [categoryId], references: [id])
+  categoryId  String
+  orderItems  OrderItem[]
 
   @@index([userId, categoryId])
 }

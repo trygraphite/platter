@@ -32,9 +32,6 @@ class SocketManager {
 
     // Emit to the specific room
     this.io.to(room).emit(event, data)
-
-    // Also emit globally for debugging
-    this.io.emit(event, data)
   }
 
   // Emit a new order event
@@ -61,14 +58,41 @@ class SocketManager {
   // Emit an order update event
   emitOrderUpdate(orderId: string, orderData: any) {
     this.emitToRoom(`order:${orderId}`, "orderUpdate", orderData)
+    
+    // If we have userId, also emit to restaurant room
+    if (orderData.userId) {
+      this.emitToRoom(`restaurant:${orderData.userId}`, "orderUpdate", orderData)
+    }
+    
     // Also emit to our internal event system for SSE to pick up
     this.events.emit("orderUpdate", orderData)
   }
 
   // Emit an order deleted event
-  emitOrderDeleted(orderId: string) {
-    this.emitToRoom(`order:${orderId}`, "orderDeleted", { id: orderId })
-    this.events.emit("orderDeleted", orderId)
+  emitOrderDeleted(orderId: string, orderData: any = {}) {
+    this.emitToRoom(`order:${orderId}`, "orderDeleted", { id: orderId, ...orderData })
+    
+    // If we have userId, also emit to restaurant room
+    if (orderData && orderData.userId) {
+      this.emitToRoom(`restaurant:${orderData.userId}`, "orderDeleted", { id: orderId, ...orderData })
+    }
+    
+    this.events.emit("orderDeleted", { id: orderId, ...orderData })
+  }
+
+  // Emit a waiter alert event
+  emitWaiterAlert(userId: string, alertData: any) {
+    const roomName = `restaurant:${userId}`
+    console.log(`Emitting waiterAlert event to room: ${roomName}`, {
+      tableId: alertData.tableId,
+      userId: userId,
+    })
+
+    // Emit to restaurant-specific room
+    this.emitToRoom(roomName, "waiterAlert", alertData)
+
+    // Also emit to internal event system for SSE
+    this.events.emit("waiterAlert", alertData)
   }
 }
 

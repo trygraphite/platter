@@ -1,4 +1,4 @@
-import UpdateRestaurantDetailsForm from "@/components/setting/ProfileForm";
+import UpdateRestaurantDetailsForm from "@/components/modules/setting/ProfileForm";
 import getServerSession from "@/lib/auth/server";
 import db from "@platter/db";
 import { redirect } from "next/navigation";
