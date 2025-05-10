@@ -9,7 +9,6 @@ export default async function OrderPage({ params }: { params: Params }) {
   const { qrId, orderId } = await params;
 
   try {
-    console.log("QR ID HERE", qrId);
 
     const order = await db.order.findUnique({
       where: { id: orderId },

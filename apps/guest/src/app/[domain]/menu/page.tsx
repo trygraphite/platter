@@ -3,7 +3,6 @@ import { MenuHeader } from "@/components/menu-page/menu-header";
 import Header from "@/components/shared/header";
 import type { Params } from "@/types/pages";
 import db from "@platter/db";
-import { PrismaClient } from "@prisma/client";
 import { notFound } from "next/navigation";
 
 export default async function MenuPage({ params }: { params: Params }) {

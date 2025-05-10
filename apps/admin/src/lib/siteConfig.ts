@@ -1,7 +1,7 @@
 export const siteConfig = {
   name: "PlatterNG Admin",
   description:
-    "Admin dashboard for restaurant owners to manage guest orders, menu, reviews, complaints, staff accounts, analytics, and QR code setup.",
+    "Admin dashboard for restaurant owners. Manage orders, menu, staff, and more.",
   url: "https://admin.platterng.com",
   ogImage: "https://admin.platterng.com/og-image.jpg",
   links: {
