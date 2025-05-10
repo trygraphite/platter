@@ -1,6 +1,7 @@
 import type { Metadata, ResolvingMetadata } from "next";
 import "@/styles/guest.css";
 import db from "@platter/db";
+import { siteConfig } from "@/lib/siteConfig";
 
 
 interface SubdomainLayoutProps {
@@ -63,7 +64,7 @@ export async function generateMetadata(
     : `http://${domain}.localhost:3001`;
   
   // Generate the Open Graph image URL
-  const ogImageUrl = `https://localhost:3001/og-image.jpg`;
+  const ogImageUrl = `${siteConfig.ogImage}`;
   
   const metadata = {
     title: {
