@@ -30,10 +30,10 @@ export function QRCodeView({ qrId, config }: QRCodeViewProps) {
       <div className="container mx-auto px-4 py-8">
         <Card className="w-full max-w-md mx-auto backdrop-blur-sm bg-white/90 dark:bg-gray-800/90 shadow-xl">
           <CardHeader className="text-center space-y-2">
-            {config.restaurantInfo.image ? (
+            {config.restaurantInfo.icon ? (
               <div className="mx-auto w-16 h-16 relative rounded-full overflow-hidden">
                 <Image
-                  src={config.restaurantInfo.image}
+                  src={config.restaurantInfo.icon}
                   alt={config.restaurantInfo.name}
                   fill
                   className="object-cover"

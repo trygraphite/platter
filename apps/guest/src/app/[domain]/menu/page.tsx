@@ -3,7 +3,6 @@ import { MenuHeader } from "@/components/menu-page/menu-header";
 import Header from "@/components/shared/header";
 import type { Params } from "@/types/pages";
 import db from "@platter/db";
-import { PrismaClient } from "@prisma/client";
 import { notFound } from "next/navigation";
 
 export default async function MenuPage({ params }: { params: Params }) {
@@ -46,7 +45,7 @@ export default async function MenuPage({ params }: { params: Params }) {
 
   return (
     <div className="min-h-screen bg-secondary">
-      <Header restaurantName={user.name ?? "Resturant"} reviewLink="" />
+      <Header restaurantName={user.name ?? "Resturant"} reviewLink={user.googleReviewLink} />
       <MenuHeader userDetails={user.name ?? "Resturant"} />
       <DynamicMenu
         initialCategories={categories}

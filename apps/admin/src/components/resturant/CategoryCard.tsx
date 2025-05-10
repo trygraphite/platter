@@ -1,136 +1,96 @@
 "use client";
-
+import { useState } from "react";
 import { useRestaurant } from "@/context/resturant-context";
 import { Button } from "@platter/ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@platter/ui/components/card";
-import type { Category, MenuItem } from "@prisma/client";
-import { Pencil, Trash2 } from "lucide-react";
-import { useState } from "react";
-import { AddMenuItemModal } from "./AddMenuItemModal";
+import { Card, CardContent, CardFooter, CardHeader } from "@platter/ui/components/card";
 import { EditCategoryModal } from "./EditCategoryModal";
-import { EditMenuItemModal } from "./EditMenuItemModal";
+import { Trash } from "lucide-react";
+import type { Category, MenuItem } from "@prisma/client";
+import { MenuItemsDialog } from "./MenuItemsDialog";
 
 interface CategoryCardProps {
   category: Category & { menuItems: MenuItem[] };
-  className?: string;
 }
 
-export function CategoryCard({ category, className = "" }: CategoryCardProps) {
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isEditCategoryModalOpen, setIsEditCategoryModalOpen] = useState(false);
-  const [editingMenuItem, setEditingMenuItem] = useState<MenuItem | null>(null);
+export function CategoryCard({ category }: CategoryCardProps) {
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isMenuItemsOpen, setIsMenuItemsOpen] = useState(false);
+  const { handleDeleteCategory, editMode } = useRestaurant();
 
-  const { editMode, handleDeleteCategory, handleDeleteMenuItem } =
-    useRestaurant();
-
-  // Determine the grid span based on the number of menu items
-  const getGridSpan = (itemCount: number) => {
-    if (itemCount <= 1) return "col-span-4 row-span-1";
-    if (itemCount <= 4) return "col-span-4 row-span-1";
-    return "col-span-4 row-span-1";
+  const handleDelete = () => {
+    if (window.confirm(`Are you sure you want to delete category "${category.name}"?`)) {
+      handleDeleteCategory(category.id);
+    }
   };
 
-  const gridSpan = getGridSpan(category.menuItems.length);
-
   return (
-    <Card className={`w-full ${gridSpan}`}>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle>{category.name}</CardTitle>
-          <CardDescription>{category.description}</CardDescription>
-        </div>
-        {editMode && (
-          <div className="flex space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsEditCategoryModalOpen(true)}
-            >
-              <Pencil className="w-4 h-4 mr-2" />
-              Edit
-            </Button>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => handleDeleteCategory(category.id)}
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Delete
-            </Button>
-          </div>
-        )}
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-6">
-          {category.menuItems?.map((item) => (
-            <div key={item.id} className="border-b pb-4">
-              <div className="flex flex-col md:flex-row md:items-center gap-4">
-                {item.image && (
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-full md:w-28 h-28 object-cover rounded-md"
-                  />
-                )}
-                <div className="flex-grow">
-                  <h3 className="font-semibold text-lg">{item.name}</h3>
-                  <p className="text-sm text-gray-600">{item.description}</p>
-                </div>
-                <div className="flex flex-col items-end">
-                  <span className="font-bold text-lg">
-                    ₦{Number(item.price).toFixed(2)}
-                  </span>
-                  {editMode && (
-                    <div className="flex space-x-2 mt-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setEditingMenuItem(item)}
-                      >
-                        <Pencil className="w-4 h-4 mr-2" />
-                        Edit
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleDeleteMenuItem(item.id)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </div>
+    <>
+      <Card className="h-full flex flex-col">
+        {/* Card Image */}
+        <div className="relative w-full h-48 overflow-hidden">
+          {category.image ? (
+            <img
+              src={category.image}
+              alt={category.name}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-muted flex items-center justify-center">
+              <span className="text-muted-foreground">No image</span>
             </div>
-          ))}
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
+            <h3 className="text-xl font-bold text-white p-4">{category.name}</h3>
+          </div>
         </div>
-        <Button onClick={() => setIsAddModalOpen(true)} className="mt-6">
-          Add Menu Item
-        </Button>
-      </CardContent>
-      <AddMenuItemModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        categoryId={category.id}
-      />
+        <CardContent className="flex-grow pt-4">
+          <p className="text-sm text-muted-foreground">
+            {category.description || "No description provided"}
+          </p>
+          <p className="text-sm mt-2">
+            <span className="font-medium">{category.menuItems.length}</span> menu items
+          </p>
+        </CardContent>
+        <CardFooter className="flex justify-between pt-0">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setIsMenuItemsOpen(true)}
+          >
+            View Items
+          </Button>
+          
+          {editMode && (
+            <div className="flex space-x-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setIsEditModalOpen(true)}
+              >
+                Edit
+              </Button>
+              <Button 
+                variant="destructive" 
+                size="sm" 
+                onClick={handleDelete}
+              >
+                <Trash className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+        </CardFooter>
+      </Card>
       <EditCategoryModal
-        isOpen={isEditCategoryModalOpen}
-        onClose={() => setIsEditCategoryModalOpen(false)}
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
         category={category}
       />
-      {editingMenuItem && (
-        <EditMenuItemModal
-          isOpen={!!editingMenuItem}
-          onClose={() => setEditingMenuItem(null)}
-          menuItem={editingMenuItem}
-        />
-      )}
-    </Card>
+      
+      <MenuItemsDialog
+        isOpen={isMenuItemsOpen}
+        onClose={() => setIsMenuItemsOpen(false)}
+        category={category}
+      />
+    </>
   );
 }

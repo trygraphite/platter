@@ -1,8 +1,10 @@
 export interface RestaurantInfo {
+  id: string;
   name: string;
   cuisine?: string | null;
   hours?: string;
   image?: string | null;
+  icon?: string | null;
 }
 
 export interface PageConfig {

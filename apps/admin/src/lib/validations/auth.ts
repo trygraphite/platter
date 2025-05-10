@@ -28,12 +28,18 @@ export const restaurantDetailsSchema = z.object({
   city: z.string().min(2, "City must be at least 2 characters"),
   state: z.string().length(2, "Please select a valid state"),
   zipCode: z.string().min(1, "Invalid ZIP code format"),
-  phone: z.string().regex(/^\+?[1-9]\d{1,14}$/, "Invalid phone number"),
+  phone: z.string().regex(/^\+?[1-9]\d{1,14}$/, "Invalid phone number").or(z.string().length(0)),
   website: z.string().url("Invalid URL").optional().or(z.literal("")),
   cuisine: z.string().min(1, "Please select a cuisine type"),
-  seatingCapacity: z.number().min(1, "Seating capacity is required"),
-  openingHours: z.string().min(1, "Opening hours are required"),
-  closingHours: z.string().min(1, "Closing hours are required"),
+  // Handle all the new fields and fix type issues
+  googleReviewLink: z.string().url("Invalid URL").optional().or(z.literal("")),
+  seatingCapacity: z.coerce.number().min(1, "Seating capacity is required").or(z.literal(0)),
+  openingHours: z.string().min(1, "Opening hours are required").optional(),
+  closingHours: z.string().min(1, "Closing hours are required").optional(),
+  // Add new fields with appropriate validations
+  subdomain: z.string().min(1, "Subdomain is required"),
+  icon: z.any().optional(),
+  image: z.any().optional(),
 });
 
 export type AccountData = z.infer<typeof accountSchema>;

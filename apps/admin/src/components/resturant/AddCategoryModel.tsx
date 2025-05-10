@@ -11,27 +11,66 @@ import {
 import { Input } from "@platter/ui/components/input";
 import { Label } from "@platter/ui/components/label";
 import { Textarea } from "@platter/ui/components/textarea";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@platter/ui/components/select";
 import { useState } from "react";
 
 export function AddCategoryModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const { handleAddCategory } = useRestaurant();
+  const [image, setImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const { handleAddCategory, categoryGroups } = useRestaurant();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setImage(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    handleAddCategory({ name, description });
-    setName("");
-    setDescription("");
-    setIsOpen(false);
+    setIsLoading(true);
+    
+    try {
+      const categoryInput = {
+        name,
+        description,
+        image,
+        groupId: selectedGroupId
+      };
+      
+      await handleAddCategory(categoryInput);
+      
+      // Reset form
+      setName("");
+      setDescription("");
+      setImage(null);
+      setImagePreview(null);
+      setSelectedGroupId(null);
+      setIsOpen(false);
+    } catch (error) {
+      console.error("Error adding category:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <>
-      <Button onClick={() => setIsOpen(true)}>Add Category</Button>
+      <Button onClick={() => setIsOpen(true)} variant="outline">Add Category</Button>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>Add New Category</DialogTitle>
           </DialogHeader>
@@ -53,7 +92,77 @@ export function AddCategoryModal() {
                 onChange={(e) => setDescription(e.target.value)}
               />
             </div>
-            <Button type="submit">Add Category</Button>
+            <div>
+              <Label htmlFor="image">Category Image (Landscape)</Label>
+              <Input
+                id="image"
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+              />
+              {imagePreview && (
+                <div className="mt-2">
+                  <img 
+                    src={imagePreview} 
+                    alt="Preview" 
+                    className="max-w-full h-32 object-cover rounded-md" 
+                  />
+                </div>
+              )}
+              <p className="text-xs text-muted-foreground mt-1">
+                Recommended resolution: 16:9 landscape format
+              </p>
+            </div>
+            <div>
+              <Label htmlFor="categoryGroup">Category Group</Label>
+              <Select 
+                onValueChange={(value) => setSelectedGroupId(value === "none" ? null : value)}
+                defaultValue="none"
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a group" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">None (Ungrouped)</SelectItem>
+                  {categoryGroups.map((group) => (
+                    <SelectItem key={group.id} value={group.id}>{group.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <Button 
+              type="submit"
+              disabled={isLoading}
+              className={isLoading ? "opacity-70 cursor-not-allowed" : ""}
+            >
+              {isLoading ? (
+                <span className="flex items-center gap-2">
+                  <svg
+                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                  Adding...
+                </span>
+              ) : (
+                "Add Category"
+              )}
+            </Button>
           </form>
         </DialogContent>
       </Dialog>

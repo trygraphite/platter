@@ -2,7 +2,7 @@
 
 import db from "@platter/db";
 
-export const runtime = "edge";
+// export const runtime = "edge";
 
 export const readSiteDomain = async (domain: string) => {
   const data = await db.user.findUnique({
@@ -11,6 +11,7 @@ export const readSiteDomain = async (domain: string) => {
     },
     select: {
       subdomain: true,
+      name: true,
     },
   });
   console.log(data)

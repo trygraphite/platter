@@ -2,8 +2,9 @@
 
 // hooks/useAdminOrdersSocket.ts
 import { useState, useEffect, useCallback } from "react"
-import type { Order as PrismaOrder } from "@prisma/client"
+import { Order as PrismaOrder, OrderStatus } from "@prisma/client"
 import useSocketIO from "@platter/ui/hooks/useSocketIO"
+import { toast } from "@platter/ui/components/sonner"
 
 type Order = PrismaOrder & {
   items?: any[] 
@@ -45,6 +46,8 @@ export default function useAdminOrdersSocket({
         return currentOrders.map((order) => (order.id === newOrder.id ? { ...order, ...newOrder } : order))
       } else {
         console.log("Adding new order to state")
+        // Show notification for new orders
+        toast.success(`New order #${newOrder.orderNumber || 'Unknown'} received`)
         return [newOrder, ...currentOrders]
       }
     })
@@ -53,23 +56,46 @@ export default function useAdminOrdersSocket({
   // Handle order update event
   const handleOrderUpdate = useCallback((updatedOrder: Order) => {
     console.log("Order update received:", updatedOrder)
-    setOrders((currentOrders) =>
-      currentOrders.map((order) =>
+    
+    // Get the current order to compare with updated order
+    setOrders((currentOrders) => {
+      const currentOrder = currentOrders.find(order => order.id === updatedOrder.id)
+      
+      // Show notification for status changes, especially cancellations
+      if (currentOrder && currentOrder.status !== updatedOrder.status) {
+        if (updatedOrder.status === OrderStatus.CANCELLED) {
+          toast.warning(`Order #${currentOrder.orderNumber || 'Unknown'} has been cancelled by the customer`)
+        } else {
+          toast.info(`Order #${currentOrder.orderNumber || 'Unknown'} status changed to ${updatedOrder.status.toLowerCase()}`)
+        }
+      }
+      
+      return currentOrders.map((order) =>
         order.id === updatedOrder.id
           ? {
+              ...order,
               ...updatedOrder,
               // Preserve items if they're not included in the update
               items: updatedOrder.items || order.items,
             }
-          : order,
-      ),
-    )
+          : order
+      )
+    })
   }, [])
 
   // Handle order deletion event
   const handleOrderDeleted = useCallback((deletedId: string) => {
     console.log("Order deletion received:", deletedId)
-    setOrders((currentOrders) => currentOrders.filter((order) => order.id !== deletedId))
+    
+    setOrders((currentOrders) => {
+      // Find the order before removing it to show notification
+      const orderToDelete = currentOrders.find(order => order.id === deletedId)
+      if (orderToDelete) {
+        toast.error(`Order #${orderToDelete.orderNumber || 'Unknown'} has been deleted`)
+      }
+      
+      return currentOrders.filter((order) => order.id !== deletedId)
+    })
   }, [])
 
   useEffect(() => {

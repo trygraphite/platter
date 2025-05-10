@@ -37,6 +37,40 @@ const configureSocket = (io: Server<DefaultEventsMap, DefaultEventsMap, DefaultE
       console.log(`Client ${socket.id} left restaurant room: ${roomName} for user: ${userId}`)
     })
 
+    // Handle order updates from clients 
+    socket.on("updateOrder", async (orderData: any) => {
+      try {
+        console.log("Received order update from client:", orderData)
+        
+        // Emit order update to relevant rooms
+        // This will broadcast to all clients viewing this order
+        socketManager.emitOrderUpdate(orderData.id, orderData)
+        
+        console.log(`Order update processed for order: ${orderData.id}, status: ${orderData.status}`)
+      } catch (error) {
+        console.error("Error processing order update:", error)
+      }
+    })
+
+    // Handle waiter alert from clients
+    socket.on("waiterAlert", async (alertData: any) => {
+      try {
+        console.log("Received waiter alert from client:", alertData)
+        
+        if (!alertData.userId) {
+          console.error("Cannot process waiter alert: missing userId", alertData)
+          return
+        }
+        
+        // Emit waiter alert to restaurant room
+        socketManager.emitWaiterAlert(alertData.userId, alertData)
+        
+        console.log(`Waiter alert processed for table: ${alertData.tableId || 'Unknown'}, restaurant: ${alertData.userId}`)
+      } catch (error) {
+        console.error("Error processing waiter alert:", error)
+      }
+    })
+
     // Handle client disconnection
     socket.on("disconnect", () => {
       console.log("Client disconnected:", socket.id)

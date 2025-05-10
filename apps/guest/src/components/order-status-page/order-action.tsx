@@ -16,7 +16,7 @@ import {
 } from "@platter/ui/components/alert-dialog";
 import { toast } from "@platter/ui/components/sonner";
 import { cancelOrder } from "@/app/actions/cancel-order";
-// import { cancelOrder } from "@/actions/cancel-order";
+import useSocketIO from "@platter/ui/hooks/useSocketIO";
 
 interface OrderActionsProps {
   orderId: string;
@@ -24,6 +24,9 @@ interface OrderActionsProps {
   qrId: string;
   onStatusChange: (newStatus: OrderStatus) => void;
   onNavigate: (path: string) => void;
+  socketServerUrl?: string;
+  restaurantUserId?: string; // Add userId for the restaurant owner
+  order: any; // The full order object
 }
 
 export function OrderActions({
@@ -32,15 +35,42 @@ export function OrderActions({
   qrId,
   onStatusChange,
   onNavigate,
+  socketServerUrl,
+  restaurantUserId,
+  order,
 }: OrderActionsProps) {
   const [isCancelling, setIsCancelling] = useState(false);
+  
+  // Get server URL - same approach as in OrderStatusPage
+  const serverUrl = socketServerUrl || 
+    (typeof window !== 'undefined' ? window.location.origin : '');
+  
+  // Use the socket hook
+  const { socket, isConnected } = useSocketIO({
+    serverUrl,
+    autoConnect: !!serverUrl,
+  });
 
   const handleCancelOrder = async () => {
     setIsCancelling(true);
     try {
       const result = await cancelOrder(orderId);
       if (result.success) {
+        // Update local state
         onStatusChange(OrderStatus.CANCELLED);
+        
+        // Emit socket event for order cancellation with restaurant userId
+        if (socket && isConnected) {
+          console.log(`Emitting order cancellation for: ${orderId}`);
+          socket.emit('updateOrder', {
+            id: orderId,
+            status: OrderStatus.CANCELLED,
+            cancelledAt: new Date().toISOString(),
+            userId: restaurantUserId,
+            orderNumber: order.orderNumber, 
+          });
+        }
+        
         toast.success("Order cancelled successfully");
       } else {
         toast.error(result.error || "Failed to cancel order");
@@ -53,7 +83,7 @@ export function OrderActions({
   };
 
   return (
-    <div className="flex justify-between p-6">
+    <div className="flex justify-between gap-2 p-6">
       {(status === OrderStatus.PENDING || status === OrderStatus.CONFIRMED) && (
         <AlertDialog>
           <AlertDialogTrigger asChild>
@@ -90,7 +120,7 @@ export function OrderActions({
           </AlertDialogContent>
         </AlertDialog>
       )}
-      <Button variant="outline" onClick={() => onNavigate(`/${qrId}/menu`)}>
+      <Button className="" variant="outline" onClick={() => onNavigate(`/${qrId}/menu`)}>
         Place Another Order
       </Button>
     </div>
