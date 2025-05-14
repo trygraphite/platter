@@ -57,10 +57,17 @@ export function ReviewPage({
         comment,
       );
 
-      console.log("Review submitted:", response);
-
-      toast.success("Thank you for your valuable feedback!");
-      router.push(`/${qrId}`);
+      // Show the success toast and delay navigation
+      toast.success("Thank you for your valuable feedback!", {
+        duration: 2000,
+        onAutoClose: () => {
+          router.push(`/${qrId}`);
+        }
+      });
+      setTimeout(() => {
+        router.push(`/${qrId}`);
+      });
+      
     } catch (error) {
       console.error("Error submitting review:", error);
       toast.error(
@@ -68,7 +75,6 @@ export function ReviewPage({
           ? error.message
           : "Unable to submit review. Please try again.",
       );
-    } finally {
       setIsSubmitting(false);
     }
   };

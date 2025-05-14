@@ -1,3 +1,4 @@
+import TableNotFound from "@/components/shared/TableNotFound";
 import { OrdersPage } from "@/components/view-orders/view-order";
 import type { Params } from "@/types/pages";
 import { PrismaClient } from "@prisma/client";
@@ -23,18 +24,18 @@ export default async function Page({ params }: { params: Params }) {
     const table = qrCode.table;
 
     if (!table) {
-      return <div>Table not found for this QR code.</div>;
+      return <div><TableNotFound/></div>;
     }
 
     // Step 3: Fetch Orders for this Table
-    // const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
     const initialOrders = await prisma.order.findMany({
       where: {
         tableId: table.id,
-        // createdAt: {
-        //   gte: twentyFourHoursAgo
-        // }
+        createdAt: {
+          gte: twentyFourHoursAgo
+        }
       },
       include: {
         items: {

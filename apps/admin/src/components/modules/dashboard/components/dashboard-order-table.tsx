@@ -92,8 +92,8 @@ export default function DashboardOrdersTable({
         return (
           <Badge 
             variant={
-              status === "CONFIRMED" ? "outline" : 
-              status === "PENDING" ? "secondary" : 
+              status === "CONFIRMED" ? "secondary" : 
+              status === "PENDING" ? "outline" : 
               status === "DELIVERED" ? "default" : 
               "outline"
             }

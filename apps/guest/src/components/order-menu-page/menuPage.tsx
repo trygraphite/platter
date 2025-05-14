@@ -1,270 +1,388 @@
-"use client";
+"use client"
 
-import type {
-  CartItem,
-  MenuCategory,
-  MenuItem,
-  RestaurantDetails,
-} from "@/types/menu";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@platter/ui/components/accordion";
-import { Button } from "@platter/ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@platter/ui/components/card";
-import { MinusCircle, PlusCircle, ShoppingBag } from "@platter/ui/lib/icons";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { CartItem as CartItemType } from "@/types/menu"
+import type { CategoryGroup, MenuCategory, MenuItem, RestaurantDetails } from "@/types/menu"
+import { Card, CardContent, CardHeader, CardTitle } from "@platter/ui/components/card"
+import { ShoppingBag, X } from "@platter/ui/lib/icons"
+import Image from "next/image"
+import { useRouter } from "next/navigation"
+import { useEffect, useState, useCallback, useMemo } from "react"
+import { CategoryNav } from "./category-nav"
+import { DynamicMenu } from "./dynamic-menu"
+import { CartItem } from "./cart-items"
+import { Button } from "@platter/ui/components/button"
 
 interface MenuPageProps {
-  qrId: string;
-  categories: MenuCategory[];
-  restaurantDetails: RestaurantDetails;
+  qrId: string
+  categories: MenuCategory[]
+  restaurantDetails: RestaurantDetails
+  categoryGroups: CategoryGroup[]
 }
 
-const formatPrice = (price: number | string | null | undefined): string => {
-  const numPrice =
-    typeof price === "string" ? Number.parseFloat(price) : Number(price);
-  return Number.isNaN(numPrice) ? "0.00" : numPrice.toFixed(2);
-};
+export const formatPrice = (price: number | string | null | undefined): string => {
+  const numPrice = typeof price === "string" ? Number.parseFloat(price) : Number(price)
 
-export function MenuPage({
-  qrId,
-  categories,
-  restaurantDetails,
-}: MenuPageProps) {
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [activeCategory, setActiveCategory] = useState<string>("");
-  const router = useRouter();
+  if (Number.isNaN(numPrice)) return "0.00"
 
+  // Format with commas after each 3 zeros
+  return numPrice.toLocaleString("en-NG")
+}
+
+export function MenuPage({ qrId, categories = [], categoryGroups = [], restaurantDetails }: MenuPageProps) {
+  const [cart, setCart] = useState<CartItemType[]>([])
+  const [selectedGroup, setSelectedGroup] = useState<string | null>(null)
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [isCartOpen, setIsCartOpen] = useState(false)
+  const router = useRouter()
+
+  // Use useMemo to prevent recreating this function on every render
+  const organizedCategories = useMemo(() => {
+    const grouped: Record<string, MenuCategory[]> = {}
+
+    // Initialize with category groups
+    if (categoryGroups && categoryGroups.length > 0) {
+      categoryGroups.forEach((group) => {
+        grouped[group.id] = []
+      })
+    }
+
+    // Add a special group for ungrouped categories
+    grouped["ungrouped"] = []
+
+    // Organize categories
+    if (categories && categories.length > 0) {
+      categories.forEach((category) => {
+        const groupId = category.groupId || "ungrouped"
+        if (grouped[groupId]) {
+          grouped[groupId].push(category)
+        } else if (grouped["ungrouped"]) {
+          grouped["ungrouped"].push(category)
+        }
+      })
+    }
+
+    return grouped
+  }, [categories, categoryGroups])
+
+  // Using useMemo for currentCategories instead of useState + useEffect
+  // This prevents the infinite loop by making it purely derived state
+  const currentCategories = useMemo(() => {
+    let newCategories: MenuCategory[] = [];
+    
+    // Handle "All Categories" case
+    if (selectedGroup === null && selectedCategory === null) {
+      // If neither group nor category is selected, show all categories
+      return categories;
+    }
+    // Handle specific category selection
+    else if (selectedCategory) {
+      // If a specific category is selected, return only that category
+      const foundCategory = categories.find(cat => cat.id === selectedCategory);
+      newCategories = foundCategory ? [foundCategory] : [];
+    }
+    // Handle group selection
+    else if (selectedGroup && organizedCategories[selectedGroup]) {
+      // If a group is selected but no specific category, return all categories in that group
+      newCategories = organizedCategories[selectedGroup];
+    }
+    // Handle "ungrouped" categories
+    else {
+      // If selection is "ungrouped", return ungrouped categories
+      newCategories = organizedCategories["ungrouped"] || [];
+    }
+    
+    return newCategories;
+  }, [selectedCategory, selectedGroup, categories, organizedCategories]);
+
+  // Load cart from localStorage - only runs once
   useEffect(() => {
-    const savedCart = localStorage.getItem(`cart-${qrId}`);
+    const savedCart = localStorage.getItem(`cart-${qrId}`)
     if (savedCart) {
-      setCart(JSON.parse(savedCart));
+      setCart(JSON.parse(savedCart))
     }
-    if (categories.length > 0 && categories[0]?.id) {
-      setActiveCategory(categories[0].id);
-    }
-  }, [qrId, categories]);
+  }, [qrId])
 
+  // Set initial state - runs only once on component mount
   useEffect(() => {
-    localStorage.setItem(`cart-${qrId}`, JSON.stringify(cart));
-  }, [cart, qrId]);
+    // Using a ref to ensure this only runs once
+    const shouldInitializeCategories = selectedGroup === null && selectedCategory === null;
+    
+    if (shouldInitializeCategories) {
+      // By default, we'll show all categories (keeping both null)
+      // Only set a specific category if there are no category groups
+      if (!categoryGroups?.length && categories?.length > 0 && categories[0]) {
+        setSelectedCategory(categories[0].id);
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // Empty dependency array to ensure this runs only once on mount
 
-  const handleQuantityChange = (item: MenuItem, increment: boolean) => {
+  // Save cart to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem(`cart-${qrId}`, JSON.stringify(cart))
+  }, [cart, qrId])
+
+  // Lock body scroll when cart is open on mobile
+  useEffect(() => {
+    if (isCartOpen) {
+      document.body.style.overflow = "hidden"
+    } else {
+      document.body.style.overflow = ""
+    }
+    return () => {
+      document.body.style.overflow = ""
+    }
+  }, [isCartOpen])
+
+  const handleQuantityChange = useCallback((item: MenuItem, increment: boolean) => {
     setCart((prevCart) => {
-      const existingItem = prevCart.find((cartItem) => cartItem.id === item.id);
+      const existingItem = prevCart.find((cartItem) => cartItem.id === item.id)
       if (existingItem) {
         if (!increment && existingItem.quantity === 1) {
-          return prevCart.filter((cartItem) => cartItem.id !== item.id);
+          return prevCart.filter((cartItem) => cartItem.id !== item.id)
         }
         return prevCart.map((cartItem) =>
           cartItem.id === item.id
             ? {
                 ...cartItem,
-                quantity: increment
-                  ? cartItem.quantity + 1
-                  : cartItem.quantity - 1,
+                quantity: increment ? cartItem.quantity + 1 : cartItem.quantity - 1,
               }
             : cartItem,
-        );
+        )
       }
-      return [...prevCart, { ...item, quantity: 1 }];
-    });
-  };
+      return [...prevCart, { ...item, quantity: 1 }]
+    })
+  }, [])
 
-  const calculateTotal = () => {
-    return cart.reduce(
-      (total, item) => total + Number(item.price) * item.quantity,
-      0,
-    );
-  };
+  const calculateTotal = useCallback(() => {
+    return cart.reduce((total, item) => total + Number(item.price) * item.quantity, 0)
+  }, [cart])
+
+  const totalItems = useMemo(() => {
+    return cart.reduce((total, item) => total + item.quantity, 0)
+  }, [cart])
+
+  // Handle category selection
+  const handleCategorySelect = useCallback((categoryId: string | null) => {
+    // If we're selecting the same category again, do nothing to prevent unnecessary re-renders
+    if (categoryId === selectedCategory) return;
+    
+    setSelectedCategory(categoryId)
+
+    // If a category is selected, find which group it belongs to
+    if (categoryId) {
+      for (const [groupId, groupCategories] of Object.entries(organizedCategories)) {
+        if (groupCategories.some((cat) => cat.id === categoryId)) {
+          if (groupId === "ungrouped") {
+            // Only update if needed to prevent unnecessary re-renders
+            if (selectedGroup !== null) setSelectedGroup(null);
+          } else if (groupId !== selectedGroup) {
+            setSelectedGroup(groupId);
+          }
+          return
+        }
+      }
+    }
+  }, [organizedCategories, selectedCategory, selectedGroup])
+
+  // Handle group selection
+  const handleGroupSelect = useCallback((groupId: string | null) => {
+    // If we're selecting the same group again, do nothing to prevent unnecessary re-renders
+    if (groupId === selectedGroup) return;
+    
+    // Set the selected group
+    setSelectedGroup(groupId)
+    
+    // When selecting a group, clear category selection
+    setSelectedCategory(null)
+  }, [selectedGroup])
 
   return (
-    <div className="container mx-auto p-4 pb-32 md:pb-4">
-      {/* Restaurant Details Header */}
-      <div className="mb-8">
-      {restaurantDetails.image && restaurantDetails.image.startsWith('http') && (
-        <div className="relative w-full h-48 mb-4">
-          <Image
-            src={restaurantDetails.image}
-            alt={restaurantDetails.name}
-            layout="fill"
-            objectFit="cover"
-            className="rounded-lg"
-          />
-        </div>
-)}
-        <h1 className="text-3xl font-bold">{restaurantDetails.name}</h1>
-        <p className="text-muted-foreground">{restaurantDetails.description}</p>
-        <div className="flex gap-4 mt-2 text-sm">
-          <span>{restaurantDetails.cuisine}</span>
-          <span>•</span>
-          <span>
-            {restaurantDetails.openingHours} - {restaurantDetails.closingHours}
-          </span>
+    <div className="min-h-screen bg-gray-50">
+      {/* Restaurant Header */}
+      <div className="relative">
+        {restaurantDetails?.image && restaurantDetails.image.startsWith("http") && (
+          <div className="relative w-full h-48 md:h-64">
+            <Image
+              src={restaurantDetails.image || "/placeholder.svg"}
+              alt={restaurantDetails.name || "Restaurant"}
+              fill
+              className="object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-transparent" />
+          </div>
+        )}
+
+        <div
+          className={`container mx-auto p-4 ${
+            restaurantDetails?.image ? "relative -mt-24 md:-mt-32 z-10 text-white" : ""
+          }`}
+        >
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">{restaurantDetails?.name || "Restaurant Menu"}</h1>
+          <p
+            className={`${
+              restaurantDetails?.image ? "text-white/90" : "text-muted-foreground"
+            } max-w-2xl text-sm md:text-base`}
+          >
+            {restaurantDetails?.description || ""}
+          </p>
+          <div className="flex gap-4 mt-3 text-xs md:text-sm">
+            <span className={restaurantDetails?.image ? "text-white/80" : ""}>{restaurantDetails?.cuisine || ""}</span>
+            {restaurantDetails?.cuisine && restaurantDetails?.openingHours && (
+              <span className={restaurantDetails?.image ? "text-white/80" : ""}>•</span>
+            )}
+            {restaurantDetails?.openingHours && restaurantDetails?.closingHours && (
+              <span className={restaurantDetails?.image ? "text-white/80" : ""}>
+                {restaurantDetails.openingHours} - {restaurantDetails.closingHours}
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-6">
-        {/* Menu Section */}
-        <div className="w-full md:w-2/3">
-          <Accordion
-            type="single"
-            collapsible
-            className="w-full"
-            value={activeCategory}
-            onValueChange={setActiveCategory}
-          >
-            {categories.map((category) => (
-              <AccordionItem
-                key={category.id}
-                value={category.id}
-                className="border rounded-lg mb-4"
-              >
-                <AccordionTrigger className="px-4 py-3 hover:bg-muted/50">
-                  <span className="text-lg font-semibold">{category.name}</span>
-                </AccordionTrigger>
-                <AccordionContent className="px-4 py-2">
-                  <div className="grid gap-4">
-                    {category.menuItems.map((item) => (
-                      <Card
-                        key={item.id}
-                        className="overflow-hidden hover:shadow-lg transition-shadow"
-                      >
-                        <div className="flex flex-row p-4">
-                          <div className="flex-1 pr-4 space-y-4">
-                            <h3 className="text-lg font-semibold mb-2">
-                              {item.name}
-                            </h3>
-                            <p className="text-muted-foreground mb-2">
-                              {item.description}
-                            </p>
-                            <span className="text-lg font-bold">
-                              ₦{formatPrice(Number(item.price))}
-                            </span>
-                          </div>
-                          <div className="flex flex-col items-end justify-between">
-                            {item.image && (
-                              <div className="relative w-[105px] h-24 mb-2">
-                                <Image
-                                  src={item.image}
-                                  alt={item.name}
-                                  layout="fill"
-                                  objectFit="cover"
-                                  className="rounded-md"
-                                />
-                              </div>
-                            )}
-                            {cart.find(
-                              (cartItem) => cartItem.id === item.id,
-                            ) ? (
-                              <div className="flex items-center gap-2">
-                                <Button
-                                  size="icon"
-                                  variant="outline"
-                                  onClick={() =>
-                                    handleQuantityChange(item, false)
-                                  }
-                                >
-                                  <MinusCircle className="h-4 w-4" />
-                                </Button>
-                                <span className="w-8 text-center">
-                                  {
-                                    cart.find(
-                                      (cartItem) => cartItem.id === item.id,
-                                    )?.quantity
-                                  }
-                                </span>
-                                <Button
-                                  size="icon"
-                                  variant="outline"
-                                  onClick={() =>
-                                    handleQuantityChange(item, true)
-                                  }
-                                >
-                                  <PlusCircle className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            ) : (
-                              <Button
-                                onClick={() => handleQuantityChange(item, true)}
-                              >
-                                Add to Cart
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-                      </Card>
-                    ))}
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </div>
+      {/* Category Navigation */}
+      <CategoryNav
+        categories={categories || []}
+        categoryGroups={categoryGroups || []}
+        categoriesByGroup={organizedCategories}
+        selectedGroup={selectedGroup}
+        selectedCategory={selectedCategory}
+        onSelectGroup={handleGroupSelect}
+        onSelectCategory={handleCategorySelect}
+      />
 
-        {/* Cart Section */}
-        <div className="w-full md:w-1/3">
-          <Card className="sticky top-4">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+      <div className="container mx-auto p-4 pb-24 md:pb-4">
+        <div className="flex flex-col md:flex-row gap-6">
+          {/* Menu Section */}
+          <div className="w-full md:w-2/3">
+            <DynamicMenu
+              categories={currentCategories}
+              selectedCategory={selectedCategory}
+              selectedGroup={selectedGroup}
+              categoryGroups={categoryGroups || []}
+              cart={cart}
+              onQuantityChange={handleQuantityChange}
+              formatPrice={formatPrice}
+            />
+          </div>
+
+          {/* Desktop Cart Section */}
+          <div className="hidden md:block w-full md:w-1/3">
+            <Card className="sticky top-4 shadow-md border-0">
+              <CardHeader className="bg-primary text-white rounded-t-lg">
+                <CardTitle className="flex items-center gap-2">
+                  <ShoppingBag className="h-5 w-5" />
+                  Your Cart
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4">
+                {cart.length === 0 ? (
+                  <div className="text-center py-8">
+                    <ShoppingBag className="h-12 w-12 mx-auto text-gray-300 mb-3" />
+                    <p className="text-muted-foreground">Your cart is empty</p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-2">
+                      {cart.map((item) => (
+                        <CartItem
+                          key={item.id}
+                          item={item}
+                          formatPrice={formatPrice}
+                          onQuantityChange={handleQuantityChange}
+                        />
+                      ))}
+                    </div>
+                    <div className="border-t mt-4 pt-4">
+                      <div className="flex justify-between items-center font-bold text-lg">
+                        <span>Total:</span>
+                        <span>₦{formatPrice(calculateTotal())}</span>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={() => router.push(`/${qrId}/order-summary`)}
+                      className="w-full mt-4 bg-primary hover:bg-primary/90"
+                      size="lg"
+                    >
+                      Review Order
+                    </Button>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Cart Button */}
+      {cart.length > 0 && (
+        <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-white shadow-lg z-20">
+          <Button onClick={() => setIsCartOpen(true)} className="w-full bg-primary hover:bg-primary/90 py-6 rounded-lg">
+            <div className="flex items-center justify-between w-full">
+              <div className="flex items-center gap-2">
+                <ShoppingBag className="h-5 w-5" />
+                <span>
+                  {totalItems} item{totalItems !== 1 ? "s" : ""}
+                </span>
+              </div>
+              <span className="font-bold">₦{formatPrice(calculateTotal())}</span>
+            </div>
+          </Button>
+        </div>
+      )}
+
+      {/* Mobile Cart Drawer */}
+      {isCartOpen && (
+        <div className="md:hidden fixed inset-0 bg-black/50 z-50 flex flex-col">
+          <div className="mt-auto bg-white rounded-t-xl max-h-[85vh] flex flex-col">
+            <div className="flex items-center justify-between p-4 border-b">
+              <h2 className="font-bold text-lg flex items-center gap-2">
                 <ShoppingBag className="h-5 w-5" />
                 Your Cart
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
+              </h2>
+              <Button variant="ghost" size="icon" onClick={() => setIsCartOpen(false)}>
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+
+            <div className="overflow-y-auto flex-grow p-4">
               {cart.length === 0 ? (
-                <p className="text-center text-muted-foreground py-4">
-                  Your cart is empty
-                </p>
+                <div className="text-center py-8">
+                  <ShoppingBag className="h-12 w-12 mx-auto text-gray-300 mb-3" />
+                  <p className="text-muted-foreground">Your cart is empty</p>
+                </div>
               ) : (
-                <>
-                  <div className="space-y-4">
-                    {cart.map((item) => (
-                      <div
-                        key={item.id}
-                        className="flex items-center justify-between"
-                      >
-                        <div className="flex-1">
-                          <p className="font-medium">{item.name}</p>
-                          <p className="text-sm text-muted-foreground">
-                            ₦{formatPrice(Number(item.price))} × {item.quantity}
-                          </p>
-                        </div>
-                        <p className="font-semibold">
-                          ₦{formatPrice(Number(item.price) * item.quantity)}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="border-t mt-4 pt-4">
-                    <div className="flex justify-between items-center font-bold text-lg">
-                      <span>Total:</span>
-                      <span>₦{formatPrice(calculateTotal())}</span>
-                    </div>
-                  </div>
-                  <Button
-                    onClick={() => router.push(`/${qrId}/order-summary`)}
-                    className="w-full mt-4"
-                    size="lg"
-                  >
-                    Review Order
-                  </Button>
-                </>
+                <div className="space-y-4">
+                  {cart.map((item) => (
+                    <CartItem
+                      key={item.id}
+                      item={item}
+                      formatPrice={formatPrice}
+                      onQuantityChange={handleQuantityChange}
+                    />
+                  ))}
+                </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+
+            {cart.length > 0 && (
+              <div className="p-4 border-t mt-auto">
+                <div className="flex justify-between items-center font-bold text-lg mb-4">
+                  <span>Total:</span>
+                  <span>₦{formatPrice(calculateTotal())}</span>
+                </div>
+                <Button
+                  onClick={() => router.push(`/${qrId}/order-summary`)}
+                  className="w-full bg-primary hover:bg-primary/90 py-6"
+                  size="lg"
+                >
+                  Review Order
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
-  );
+  )
 }

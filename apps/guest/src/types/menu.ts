@@ -5,12 +5,17 @@ export interface RestaurantDetails {
   cuisine: string | null;
   openingHours: string | null;
   closingHours: string | null;
+  googleReviewLink?: string
+
 }
 
 export interface MenuCategory {
   id: string;
   name: string;
   menuItems: MenuItem[];
+  groupId?: string | null
+  description?: string
+
 }
 
 export interface MenuItem {
@@ -18,10 +23,19 @@ export interface MenuItem {
   name: string;
   description: string;
   price: number;
-  image: string | null;
+  image?: string | null;
   isAvailable: boolean;
+  categoryId: string
+
 }
 
 export interface CartItem extends MenuItem {
   quantity: number;
+}
+
+export interface CategoryGroup {
+  id: string
+  name: string
+  description?: string | null
+  position?: number
 }

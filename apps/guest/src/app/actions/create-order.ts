@@ -73,7 +73,7 @@ export async function createOrder({ tableId, qrId, items, totalAmount }: CreateO
       },
     })
 
-    console.log("Order created:", order)
+    // console.log("Order created:", order)
     revalidatePath(`/${qrId}/order-status`)
 
     // Notify socket server about the new order

@@ -20,21 +20,53 @@ import {
 } from "@platter/ui/components/select";
 import { toast } from "@platter/ui/components/sonner";
 import { Textarea } from "@platter/ui/components/textarea";
-import { Loader2 } from "lucide-react";
+import { Info, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { useEdgeStore } from "@/lib/edgestore/edgestore";
+import ImageUpload from "../modules/setting/settings-image-component";
 
 export default function RestaurantDetailsForm() {
   const { data: session } = useSession();
   const router = useRouter();
+  const { edgestore } = useEdgeStore();
+  const [iconUrl, setIconUrl] = useState<string | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  
   const {
+    control,
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     setValue,
+    watch,
   } = useForm<RestaurantDetailsData>({
     resolver: zodResolver(restaurantDetailsSchema),
+    defaultValues: {
+      seatingCapacity: 0,
+    },
   });
+  
+  // Update the form values when the image URLs change
+  useEffect(() => {
+    setValue("icon", iconUrl);
+    setValue("image", imageUrl);
+  }, [iconUrl, imageUrl, setValue]);
+
+  // Watch the name field to update subdomain
+  const restaurantName = watch("name");
+  
+  // Generate subdomain from restaurant name
+  useEffect(() => {
+    if (restaurantName) {
+      const generatedSubdomain = restaurantName
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "");
+      // Update the subdomain field in the form state without directly controlling the input
+      setValue("subdomain", generatedSubdomain, { shouldDirty: true });
+    }
+  }, [restaurantName, setValue]);
 
   const onSubmit = async (data: RestaurantDetailsData) => {
     if (!session?.user?.id) {
@@ -42,7 +74,14 @@ export default function RestaurantDetailsForm() {
       return;
     }
 
-    const result = await createRestaurantAction(data, session.user.id);
+    // Include the icon and image URLs in the submission data
+    const submissionData = {
+      ...data,
+      icon: iconUrl,
+      image: imageUrl
+    };
+
+    const result = await createRestaurantAction(submissionData, session.user.id);
 
     if (result.success) {
       toast.success("Restaurant details saved!");
@@ -55,6 +94,28 @@ export default function RestaurantDetailsForm() {
   return (
     <div className="w-full max-w-2xl mx-auto">
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+        {/* Restaurant Icon */}
+        <ImageUpload
+          id="restaurant-icon"
+          label="Restaurant Icon"
+          description="This icon will be displayed on the guest app QR scan screen"
+          initialImage={null}
+          imageType="restaurant-icon"
+          isCircular={true}
+          onImageChange={setIconUrl}
+        />
+
+        {/* Restaurant Cover Image */}
+        <ImageUpload
+          id="restaurant-image"
+          label="Restaurant Cover Image"
+          description="This image will be displayed on the QR code home screen"
+          initialImage={null}
+          imageType="restaurant-cover"
+          onImageChange={setImageUrl}
+        />
+        
+        {/* Restaurant Name */}
         <div className="space-y-2">
           <Label htmlFor="name">Restaurant Name</Label>
           <Input id="name" {...register("name")} aria-invalid={!!errors.name} />
@@ -63,6 +124,28 @@ export default function RestaurantDetailsForm() {
           )}
         </div>
 
+        {/* Subdomain (disabled, auto-generated) */}
+        <div className="space-y-2">
+          <Label htmlFor="subdomain">Subdomain</Label>
+          <div className="flex items-center">
+            <Input
+              id="subdomain"
+              {...register("subdomain")}
+              // Don't use value and register together - this causes the controlled/uncontrolled error
+              disabled
+              className="bg-gray-100 rounded-r-none border-r-0"
+              style={{ maxWidth: "150px" }}
+            />
+            <div className="bg-gray-100 border border-l-0 border-input px-3 py-2 h-10 rounded-r-md text-sm text-gray-500 flex items-center">
+              .platterng.com
+            </div>
+          </div>
+          {errors.subdomain && (
+            <p className="text-xs text-red-500">{errors.subdomain.message}</p>
+          )}
+        </div>
+
+        {/* Description */}
         <div className="space-y-2">
           <Label htmlFor="description">Description</Label>
           <Textarea
@@ -75,6 +158,7 @@ export default function RestaurantDetailsForm() {
           )}
         </div>
 
+        {/* Address */}
         <div className="space-y-2">
           <Label htmlFor="address">Address</Label>
           <Input
@@ -87,6 +171,7 @@ export default function RestaurantDetailsForm() {
           )}
         </div>
 
+        {/* City and State */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="city">City</Label>
@@ -101,27 +186,37 @@ export default function RestaurantDetailsForm() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="state">State</Label>
-            <Select onValueChange={(value) => setValue("state", value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select state" />
-              </SelectTrigger>
-              <SelectContent>
-                {states.map((state) => (
-                  <SelectItem
-                    key={state.abbreviation}
-                    value={state.abbreviation}
-                  >
-                    {state.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Controller
+              name="state"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select state" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {states.map((state) => (
+                      <SelectItem
+                        key={state.abbreviation}
+                        value={state.abbreviation}
+                      >
+                        {state.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
             {errors.state && (
               <p className="text-xs text-red-500">{errors.state.message}</p>
             )}
           </div>
         </div>
 
+        {/* ZIP Code */}
         <div className="space-y-2">
           <Label htmlFor="zipCode">ZIP Code</Label>
           <Input
@@ -134,6 +229,7 @@ export default function RestaurantDetailsForm() {
           )}
         </div>
 
+        {/* Phone Number */}
         <div className="space-y-2">
           <Label htmlFor="phone">Phone Number</Label>
           <Input
@@ -147,6 +243,7 @@ export default function RestaurantDetailsForm() {
           )}
         </div>
 
+        {/* Website */}
         <div className="space-y-2">
           <Label htmlFor="website">Website</Label>
           <Input
@@ -160,32 +257,65 @@ export default function RestaurantDetailsForm() {
           )}
         </div>
 
+        {/* Google Review Link */}
+        <div className="space-y-2">
+          <Label htmlFor="googleReviewLink">Google Review Link</Label>
+          <Input
+            id="googleReviewLink"
+            {...register("googleReviewLink")}
+            type="url"
+            aria-invalid={!!errors.googleReviewLink}
+            placeholder="https://g.page/r/..."
+          />
+          {errors.googleReviewLink && (
+            <p className="text-xs text-red-500">{errors.googleReviewLink.message}</p>
+          )}
+          <p className="text-xs text-gray-500 flex items-center gap-1">
+            <Info className="size-3" />
+            This link is your Google Maps listing link, so users can leave a Google review
+          </p>
+        </div>
+
+        {/* Cuisine Type */}
         <div className="space-y-2">
           <Label htmlFor="cuisine">Cuisine Type</Label>
-          <Select onValueChange={(value) => setValue("cuisine", value)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select cuisine type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="italian">Italian</SelectItem>
-              <SelectItem value="chinese">Chinese</SelectItem>
-              <SelectItem value="mexican">Mexican</SelectItem>
-              <SelectItem value="indian">Indian</SelectItem>
-              <SelectItem value="american">American</SelectItem>
-              <SelectItem value="other">Other</SelectItem>
-            </SelectContent>
-          </Select>
+          <Controller
+            name="cuisine"
+            control={control}
+            render={({ field }) => (
+              <Select
+                onValueChange={field.onChange}
+                value={field.value}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select cuisine type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Nigerian">Nigerian</SelectItem>
+                  <SelectItem value="African">African</SelectItem>
+                  <SelectItem value="italian">Italian</SelectItem>
+                  <SelectItem value="chinese">Chinese</SelectItem>
+                  <SelectItem value="mexican">Mexican</SelectItem>
+                  <SelectItem value="indian">Indian</SelectItem>
+                  <SelectItem value="american">American</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          />
           {errors.cuisine && (
             <p className="text-xs text-red-500">{errors.cuisine.message}</p>
           )}
         </div>
 
+        {/* Seating Capacity */}
         <div className="space-y-2">
           <Label htmlFor="seatingCapacity">Seating Capacity</Label>
           <Input
             id="seatingCapacity"
-            {...register("seatingCapacity")}
+            {...register("seatingCapacity", { valueAsNumber: true })}
             type="number"
+            min="0"
             aria-invalid={!!errors.seatingCapacity}
           />
           {errors.seatingCapacity && (
@@ -195,6 +325,7 @@ export default function RestaurantDetailsForm() {
           )}
         </div>
 
+        {/* Hours */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="openingHours">Opening Hours</Label>

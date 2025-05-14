@@ -18,7 +18,7 @@ interface VerifyEmailProps {
   url: string;
 }
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 export const VerifyUserEmail = ({ email, url }: VerifyEmailProps) => {
   const previewText = "Verify your email address";
@@ -32,9 +32,9 @@ export const VerifyUserEmail = ({ email, url }: VerifyEmailProps) => {
           <Container className="border border-solid border-[#eaeaea] rounded my-[40px] mx-auto p-[20px] max-w-[465px]">
             <Section className="mt-[32px]">
               <Img
-                src={`${baseUrl}/logo.png`}
-                width="40"
-                height="37"
+                src={`/og-image.jpg`}
+                width="120"
+                height="60"
                 alt="logo"
                 className="my-0 mx-auto"
               />

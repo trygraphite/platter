@@ -1,49 +1,91 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { MenuItems } from "./menu-Items";
-import { CategoryNav } from "./category-nav";
+import { useState } from "react"
+import { CategoryNav } from "./category-nav"
+import { MenuItems } from "./menu-Items"
+
+interface CategoryGroup {
+  id: string
+  name: string
+  description?: string | null
+  categories: Category[]
+}
 
 interface Category {
-  id: string;
-  name: string;
+  id: string
+  name: string
+  description?: string | null
+  groupId?: string | null
 }
 
 interface MenuItem {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  image: string | null;
-  categoryId: string;
+  id: string
+  name: string
+  description: string
+  price: number
+  image: string | null
+  categoryId: string
   category: {
-    id: string;
-    name: string;
-  };
+    id: string
+    name: string
+    categoryGroup?: {
+      id: string
+      name: string
+    } | null
+  }
 }
 
 interface DynamicMenuProps {
-  initialCategories: Category[];
-  initialMenuItems: MenuItem[];
+  initialCategoryGroups: CategoryGroup[]
+  initialUngroupedCategories: Category[]
+  initialMenuItems: MenuItem[]
 }
 
-export function DynamicMenu({
-  initialCategories,
-  initialMenuItems,
-}: DynamicMenuProps) {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+export function DynamicMenu({ initialCategoryGroups, initialUngroupedCategories, initialMenuItems }: DynamicMenuProps) {
+  const [selectedGroup, setSelectedGroup] = useState<string | null>(null)
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+
+  // Handle category selection
+  const handleCategorySelect = (categoryId: string | null) => {
+    setSelectedCategory(categoryId)
+
+    // If a category is selected, we don't filter by group
+    if (categoryId) {
+      // Find which group this category belongs to
+      for (const group of initialCategoryGroups) {
+        if (group.categories.some((cat) => cat.id === categoryId)) {
+          setSelectedGroup(group.id)
+          return
+        }
+      }
+      // If not found in any group, it's an ungrouped category
+      setSelectedGroup(null)
+    }
+  }
+
+  // Handle group selection
+  const handleGroupSelect = (groupId: string | null) => {
+    setSelectedGroup(groupId)
+    setSelectedCategory(null)
+  }
 
   return (
-    <>
+    <div className="pb-20">
       <CategoryNav
-        categories={initialCategories}
+        categoryGroups={initialCategoryGroups}
+        ungroupedCategories={initialUngroupedCategories}
+        selectedGroup={selectedGroup}
         selectedCategory={selectedCategory}
-        onSelectCategory={setSelectedCategory}
+        onSelectGroup={handleGroupSelect}
+        onSelectCategory={handleCategorySelect}
       />
       <MenuItems
         menuItems={initialMenuItems}
+        categoryGroups={initialCategoryGroups}
+        ungroupedCategories={initialUngroupedCategories}
+        selectedGroup={selectedGroup}
         selectedCategory={selectedCategory}
       />
-    </>
-  );
+    </div>
+  )
 }

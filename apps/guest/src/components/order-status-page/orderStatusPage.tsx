@@ -29,7 +29,6 @@ export default function OrderStatusPage({
   socketServerUrl,
 }: OrderStatusPageProps) {
   const [order, setOrder] = useState<Order | any>(initialOrder);
-  const [hasShownModal, setHasShownModal] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [connectionAttempts, setConnectionAttempts] = useState(0);
   const [connectionFailed, setConnectionFailed] = useState(false);
@@ -68,17 +67,30 @@ export default function OrderStatusPage({
     // 1. Order is delivered
     // 2. No review exists
     // 3. Order wasn't cancelled
-    // 4. Modal hasn't been shown before for this order
+    // 4. Order doesn't have shownReview flag set to true already
     if (
       order.status === "DELIVERED" &&
       !order.review &&
       !order.cancelledAt &&
-      !hasShownModal
+      !order.shownReview
     ) {
       setIsReviewModalOpen(true);
-      setHasShownModal(true); // Mark that we've shown the modal
+      
+      // Update the order's shownReview flag to true via socket
+      if (socket && isConnected) {
+        socket.emit('updateOrder', {
+          id: order.id,
+          shownReview: true
+        });
+      }
+      
+      // Also update locally
+      setOrder((prev: any) => ({
+        ...prev,
+        shownReview: true
+      }));
     }
-  }, [order.status, order.review, order.cancelledAt, hasShownModal]);
+  }, [order.status, order.review, order.cancelledAt, order.shownReview, socket, isConnected]);
 
   useEffect(() => {
     if (!socket || !isConnected) return;
@@ -139,6 +151,11 @@ export default function OrderStatusPage({
         </div>
       );
     }
+  };
+
+  // Handle closing the review modal
+  const handleCloseReviewModal = () => {
+    setIsReviewModalOpen(false);
   };
 
   // Instead of returning an error screen, we'll show the page but with a notification
@@ -207,10 +224,11 @@ export default function OrderStatusPage({
         {isReviewModalOpen && (
           <ReviewModal
             isOpen={isReviewModalOpen}
-            onClose={() => setIsReviewModalOpen(false)}
+            onClose={handleCloseReviewModal}
             qrId={qrId}
             tableId={table.id}
             userId={user.id}
+            orderId={order.id}
           />
         )}
       </div>
@@ -285,10 +303,11 @@ export default function OrderStatusPage({
       {isReviewModalOpen && (
         <ReviewModal
           isOpen={isReviewModalOpen}
-          onClose={() => setIsReviewModalOpen(false)}
+          onClose={handleCloseReviewModal}
           qrId={qrId}
           tableId={table.id}
           userId={user.id}
+          orderId={order.id}
         />
       )}
     </div>

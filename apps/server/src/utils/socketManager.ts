@@ -83,6 +83,7 @@ class SocketManager {
   // Emit a waiter alert event
   emitWaiterAlert(userId: string, alertData: any) {
     const roomName = `restaurant:${userId}`
+    console.log("ALERT DATA HERE",alertData)
     console.log(`Emitting waiterAlert event to room: ${roomName}`, {
       tableId: alertData.tableId,
       userId: userId,

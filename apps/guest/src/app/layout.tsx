@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "@/styles/guest.css";
 import Header from "@/components/shared/header";
 import Footer from "@/components/shared/footer";
+import { Toaster } from "@platter/ui/components/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,6 +30,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+          <Toaster position="top-center" richColors />
         <div className="grid grid-rows-[auto,1fr,auto] min-h-screen">
           <main className="min-h-[calc(100vh-3.5rem)]">{children}</main>
           <Footer />

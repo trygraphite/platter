@@ -1,4 +1,5 @@
 import { ReviewPage } from "@/components/review/review-form";
+import TableNotFound from "@/components/shared/TableNotFound";
 import type { Params } from "@/types/pages";
 import { PrismaClient } from "@prisma/client";
 import { notFound } from "next/navigation";
@@ -38,7 +39,6 @@ export default async function Page({ params }: { params: Params }) {
       />
     );
   } catch (error) {
-    console.error("Error loading review page:", error);
-    return <div>Error loading review page. Please try again later.</div>;
+    return <div><TableNotFound/></div>;
   }
 }

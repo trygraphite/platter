@@ -26,7 +26,7 @@ export const statusConfigs: Record<OrderStatus, StatusConfig> = {
   DELIVERED: {
     icon: <CheckCircle2 className="h-8 w-8" />,
     color: "text-green-600",
-    bgColor: "bg-green-50",
+    bgColor: "bg-green-100",
     text: "Order Delivered",
   },
   CANCELLED: {
