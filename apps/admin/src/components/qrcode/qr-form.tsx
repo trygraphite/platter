@@ -22,28 +22,34 @@ import { Input } from "@platter/ui/components/input";
 import { Button } from "@platter/ui/components/button";
 import { Loader2 } from "lucide-react";
 
-// Define form schema with fixed validation
-const qrFormSchema = z.discriminatedUnion("target", [
-  z.object({
-    target: z.literal("menu"),
-    tableNumber: z.number().nullable().optional(),
-  }),
-  z.object({
-    target: z.literal("table"),
-    tableNumber: z.number().min(1, "Table number is required"),
-  }),
-  z.object({
-    target: z.literal("location"),
-    tableNumber: z.number().min(1, "Table number is required"),
-  }),
-]);
+// Define the base form fields with nullable tableNumber to ensure consistent typing
+const formFields = {
+  target: z.enum(["menu", "table", "location"]),
+  tableNumber: z.number().nullable(),
+};
+
+// Define form schema with validation logic based on target
+const qrFormSchema = z.object(formFields).refine(
+  (data) => {
+    // For table and location, tableNumber must be provided and greater than 0
+    if ((data.target === "table" || data.target === "location") && 
+        (data.tableNumber === null || data.tableNumber < 1)) {
+      return false;
+    }
+    return true;
+  },
+  {
+    message: "Table number is required and must be at least 1",
+    path: ["tableNumber"],
+  }
+);
 
 type QRFormValues = z.infer<typeof qrFormSchema>;
 
 interface QRFormProps {
   onSubmit: (data: {
     target: "table" | "menu" | "location";
-    tableNumber?: number | null;
+    tableNumber: number | null;
   }) => Promise<void>;
   isLoading: boolean;
 }
@@ -52,8 +58,8 @@ export function QRForm({ onSubmit, isLoading }: QRFormProps) {
   const form = useForm<QRFormValues>({
     resolver: zodResolver(qrFormSchema),
     defaultValues: {
-      target: "table",
-      tableNumber: undefined,
+      target: "table" as const,
+      tableNumber: null,
     },
   });
 
@@ -70,7 +76,7 @@ export function QRForm({ onSubmit, isLoading }: QRFormProps) {
   const handleSubmit = (values: QRFormValues) => {
     onSubmit({
       target: values.target,
-      tableNumber: values.target === "menu" ? null : values.tableNumber,
+      tableNumber: values.tableNumber,
     });
   };
 
@@ -100,7 +106,7 @@ export function QRForm({ onSubmit, isLoading }: QRFormProps) {
                 </SelectContent>
               </Select>
               <FormDescription>
-                Choose whether to create a table or menu 
+                Choose whether to create a table or menu QR code
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -118,10 +124,11 @@ export function QRForm({ onSubmit, isLoading }: QRFormProps) {
                   <Input
                     type="number"
                     placeholder="Enter table number"
+                    min="1"
                     {...field}
                     onChange={(e) =>
                       field.onChange(
-                        e.target.value === "" ? null : Number(e.target.value)
+                        e.target.value === "" ? null : Math.max(1, Number(e.target.value))
                       )
                     }
                     value={field.value === null ? "" : field.value}

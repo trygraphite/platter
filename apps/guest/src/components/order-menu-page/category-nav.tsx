@@ -1,23 +1,14 @@
 "use client"
 
-import { ChevronLeft, ChevronRight } from "@platter/ui/lib/icons"
 import { cn } from "@platter/ui/lib/utils"
-import { useState, useRef, useEffect } from "react"
-
-interface Category {
-  id: string
-  name: string
-}
-
-interface CategoryGroup {
-  id: string
-  name: string
-  categories: Category[]
-}
+import { useRef, useEffect, useState } from "react"
+import type { CategoryGroup, MenuCategory } from "@/types/menu"
+import { ChevronLeft, ChevronRight } from "@platter/ui/lib/icons"
 
 interface CategoryNavProps {
+  categories: MenuCategory[]
   categoryGroups: CategoryGroup[]
-  ungroupedCategories: Category[]
+  categoriesByGroup: Record<string, MenuCategory[]>
   selectedGroup: string | null
   selectedCategory: string | null
   onSelectGroup: (groupId: string | null) => void
@@ -25,8 +16,9 @@ interface CategoryNavProps {
 }
 
 export function CategoryNav({
+  categories,
   categoryGroups,
-  ungroupedCategories,
+  categoriesByGroup,
   selectedGroup,
   selectedCategory,
   onSelectGroup,
@@ -40,7 +32,7 @@ export function CategoryNav({
   const [showLeftCategoryScroll, setShowLeftCategoryScroll] = useState(false)
   const [showRightCategoryScroll, setShowRightCategoryScroll] = useState(false)
 
-  // Check if group scroll buttons should be visible
+  // Check if scroll buttons should be visible for groups
   const checkGroupScrollButtons = () => {
     if (groupsScrollContainerRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = groupsScrollContainerRef.current
@@ -49,7 +41,7 @@ export function CategoryNav({
     }
   }
 
-  // Check if category scroll buttons should be visible
+  // Check if scroll buttons should be visible for categories
   const checkCategoryScrollButtons = () => {
     if (categoriesScrollContainerRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = categoriesScrollContainerRef.current
@@ -117,19 +109,6 @@ export function CategoryNav({
     }
   }
 
-  // Handle "All" button click
-  const handleAllClick = () => {
-    onSelectGroup(null)
-    onSelectCategory(null)
-  }
-
-  // Get categories for the selected group
-  const getActiveCategories = () => {
-    if (!selectedGroup) return ungroupedCategories
-    const group = categoryGroups.find((g) => g.id === selectedGroup)
-    return group ? group.categories : []
-  }
-
   // Scroll selected category into view
   useEffect(() => {
     if (selectedCategory && categoriesScrollContainerRef.current) {
@@ -156,20 +135,32 @@ export function CategoryNav({
     }
   }, [selectedGroup])
 
+  // Handle "All" button click
+  const handleAllClick = () => {
+    onSelectGroup(null)
+    onSelectCategory(null)
+  }
+
+  // Get all categories or filtered by group
+  const getDisplayedCategories = () => {
+    if (!selectedGroup) return categories;
+    return categoriesByGroup[selectedGroup] || [];
+  }
+
   return (
     <div className="sticky top-0 z-10 bg-white shadow-md">
-      <div className="container max-w-6xl mx-auto">
+      <div className="container mx-auto">
         {/* Section Label for Groups */}
         <div className="px-4 pt-3 pb-1">
           <h3 className="text-sm font-medium text-gray-500">Collections</h3>
         </div>
 
-        {/* Groups Navigation */}
+        {/* Category Groups Navigation */}
         <div className="relative">
           {showLeftGroupScroll && (
             <button
               onClick={scrollGroupsLeft}
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 rounded-full p-1 shadow-md"
+              className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/90 rounded-full p-1 shadow-md hidden md:block"
               aria-label="Scroll left"
             >
               <ChevronLeft className="h-5 w-5 text-gray-700" />
@@ -178,16 +169,16 @@ export function CategoryNav({
 
           <div
             ref={groupsScrollContainerRef}
-            className="overflow-x-auto flex space-x-2 py-3 px-4 scrollbar-hide"
-            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            className="overflow-x-auto flex space-x-2 py-2 px-2 md:px-4 scrollbar-hide"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}
           >
             <button
               onClick={handleAllClick}
               className={cn(
-                "px-4 py-2 rounded-full whitespace-nowrap transition-colors flex-shrink-0",
-                !selectedGroup && !selectedCategory
+                "px-3 py-1.5 md:px-4 md:py-2 rounded-full whitespace-nowrap transition-colors flex-shrink-0 text-sm",
+                !selectedGroup
                   ? "bg-primary text-white shadow-md"
-                  : "bg-secondary hover:bg-gray-200 text-gray-700",
+                  : "bg-gray-100 hover:bg-gray-200 text-gray-700",
               )}
             >
               All
@@ -199,10 +190,10 @@ export function CategoryNav({
                 data-group-id={group.id}
                 onClick={() => onSelectGroup(group.id)}
                 className={cn(
-                  "px-4 py-2 rounded-full whitespace-nowrap transition-colors flex-shrink-0",
+                  "px-3 py-1.5 md:px-4 md:py-2 rounded-full whitespace-nowrap transition-colors flex-shrink-0 text-sm",
                   selectedGroup === group.id
                     ? "bg-primary text-white shadow-md"
-                    : "bg-secondary hover:bg-gray-200 text-gray-700",
+                    : "bg-gray-100 hover:bg-gray-200 text-gray-700",
                 )}
               >
                 {group.name}
@@ -213,7 +204,7 @@ export function CategoryNav({
           {showRightGroupScroll && (
             <button
               onClick={scrollGroupsRight}
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 rounded-full p-1 shadow-md"
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/90 rounded-full p-1 shadow-md hidden md:block"
               aria-label="Scroll right"
             >
               <ChevronRight className="h-5 w-5 text-gray-700" />
@@ -231,7 +222,7 @@ export function CategoryNav({
           {showLeftCategoryScroll && (
             <button
               onClick={scrollCategoriesLeft}
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 rounded-full p-1 shadow-md"
+              className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/90 rounded-full p-1 shadow-md hidden md:block"
               aria-label="Scroll left"
             >
               <ChevronLeft className="h-5 w-5 text-gray-700" />
@@ -240,31 +231,31 @@ export function CategoryNav({
 
           <div
             ref={categoriesScrollContainerRef}
-            className="overflow-x-auto flex space-x-2 py-3 px-4 scrollbar-hide"
-            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            className="overflow-x-auto flex space-x-2 py-2 px-2 md:px-4 scrollbar-hide"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}
           >
             <button
               onClick={() => onSelectCategory(null)}
               className={cn(
-                "px-4 py-2 rounded-full whitespace-nowrap transition-colors flex-shrink-0",
-                selectedGroup && !selectedCategory
+                "px-3 py-1.5 md:px-4 md:py-2 rounded-full whitespace-nowrap transition-colors flex-shrink-0 text-sm",
+                !selectedCategory
                   ? "bg-primary text-white shadow-md"
-                  : "bg-secondary hover:bg-gray-200 text-gray-700",
+                  : "bg-gray-100 hover:bg-gray-200 text-gray-700",
               )}
             >
               All Varieties
             </button>
 
-            {getActiveCategories().map((category) => (
+            {getDisplayedCategories().map((category) => (
               <button
                 key={category.id}
                 data-category-id={category.id}
                 onClick={() => onSelectCategory(category.id)}
                 className={cn(
-                  "px-4 py-2 rounded-full whitespace-nowrap transition-colors flex-shrink-0",
+                  "px-3 py-1.5 md:px-4 md:py-2 rounded-full whitespace-nowrap transition-colors flex-shrink-0 text-sm",
                   selectedCategory === category.id
                     ? "bg-primary text-white shadow-md"
-                    : "bg-secondary hover:bg-gray-200 text-gray-700",
+                    : "bg-gray-100 hover:bg-gray-200 text-gray-700",
                 )}
               >
                 {category.name}
@@ -275,7 +266,7 @@ export function CategoryNav({
           {showRightCategoryScroll && (
             <button
               onClick={scrollCategoriesRight}
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 rounded-full p-1 shadow-md"
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/90 rounded-full p-1 shadow-md hidden md:block"
               aria-label="Scroll right"
             >
               <ChevronRight className="h-5 w-5 text-gray-700" />

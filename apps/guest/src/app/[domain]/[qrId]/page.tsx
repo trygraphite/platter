@@ -6,7 +6,6 @@ import { notFound } from "next/navigation";
 
 async function Page({ params }: { params: Params }) {
   const { qrId } = await params;
-  // console.log(qrId);
 
   // Use qrId to fetch data from the database
   const restaurantDetails = await db.qRCode.findUnique({
@@ -30,7 +29,15 @@ async function Page({ params }: { params: Params }) {
           cuisine: true,
           openingHours: true,
           closingHours: true,
-         googleReviewLink: true,
+          googleReviewLink: true,
+          address: true,
+          city: true,
+          state: true,
+          zipCode: true,
+          phone: true,
+          email: true,
+          website: true,
+          seatingCapacity: true,
         },
       },
     },
@@ -54,14 +61,24 @@ async function Page({ params }: { params: Params }) {
           : user.name,
     description: user.description || `Welcome to ${user.name}`,
     restaurantInfo: {
-      id: user.id,
       name: user.name,
-      cuisine: user.cuisine,
-      hours:
-        user.openingHours && user.closingHours
-          ? `${user.openingHours} - ${user.closingHours}`
-          : undefined,
       icon: user.icon,
+      cuisine: user.cuisine,
+      openingHours: user.openingHours || undefined,
+      closingHours: user.closingHours || undefined,
+      googleReviewLink: user.googleReviewLink || undefined,
+      address: user.address || undefined,
+      city: user.city || undefined,
+      state: user.state || undefined,
+      zipCode: user.zipCode || undefined,
+      phone: user.phone || undefined,
+      email: user.email || undefined,
+      website: user.website || undefined,
+      seatingCapacity: user.seatingCapacity || undefined,
+      // Additional field for backward compatibility
+      hours: user.openingHours && user.closingHours
+        ? `${user.openingHours} - ${user.closingHours}`
+        : undefined,
     },
     buttons: [
       {
@@ -89,8 +106,8 @@ async function Page({ params }: { params: Params }) {
 
   return (
     <>
-      <Header restaurantName={user.name} reviewLink={user.googleReivewLink} />
-      <QRCodeView qrId={qrId} config={pageConfig} />
+      <Header restaurantName={user.name} reviewLink={user.googleReviewLink} />
+      <QRCodeView qrId={qrId} config={pageConfig} userId={user.id} tableNumber={restaurantDetails.targetNumber} />
     </>
   );
 }

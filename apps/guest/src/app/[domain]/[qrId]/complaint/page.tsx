@@ -1,4 +1,5 @@
 import { ComplaintPage } from "@/components/complaints/complaints-form";
+import TableNotFound from "@/components/shared/TableNotFound";
 import type { Params } from "@/types/pages";
 import { PrismaClient } from "@prisma/client";
 import { notFound } from "next/navigation";
@@ -22,7 +23,7 @@ export default async function Page({ params }: { params: Params }) {
     const user = qrCode.user;
 
     if (!table || !user) {
-      return <div>Table or user not found for this QR code.</div>;
+      return <div><TableNotFound/></div>;
     }
 
     return (

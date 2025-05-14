@@ -26,7 +26,7 @@ function PageContent({ userEmail }: { userEmail: string }) {
     try {
       await authClient.sendVerificationEmail({
         email: email,
-        callbackURL: "/",
+        callbackURL: "/onboarding",
       });
       setStatus("sent");
     } catch (error) {

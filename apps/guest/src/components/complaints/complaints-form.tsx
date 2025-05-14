@@ -48,10 +48,12 @@ export function ComplaintPage({
 }: ComplaintPageProps) {
   const [content, setContent] = useState("");
   const [category, setCategory] = useState<ComplaintCategory | "">("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!content.trim()) {
       toast.error("Please describe your concern before submitting");
       return;
@@ -60,6 +62,9 @@ export function ComplaintPage({
       toast.error("Please select a category for your complaint");
       return;
     }
+
+    setIsSubmitting(true);
+    
     try {
       await createComplaint(qrId, tableId, content, category, userId);
       toast.success(
@@ -69,6 +74,8 @@ export function ComplaintPage({
     } catch (error) {
       console.error("Error submitting complaint:", error);
       toast.error("Unable to submit complaint. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -91,6 +98,7 @@ export function ComplaintPage({
               <Select
                 value={category}
                 onValueChange={(value: ComplaintCategory) => setCategory(value)}
+                disabled={isSubmitting}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select category" />
@@ -118,6 +126,7 @@ export function ComplaintPage({
                 placeholder="Please provide details about the issue you're experiencing..."
                 className="min-h-[150px] resize-none"
                 required
+                disabled={isSubmitting}
               />
             </div>
           </form>
@@ -127,8 +136,35 @@ export function ComplaintPage({
             type="submit"
             onClick={handleSubmit}
             className="w-full h-12 text-lg font-medium transition-all hover:shadow-lg"
+            disabled={isSubmitting}
           >
-            Submit Complaint
+            {isSubmitting ? (
+              <div className="flex items-center justify-center gap-2">
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Submitting...
+              </div>
+            ) : (
+              "Submit Complaint"
+            )}
           </Button>
         </CardFooter>
       </Card>

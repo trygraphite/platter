@@ -12,6 +12,9 @@ import {
   ScanQrCode,
   LucideScanQrCode,
   BookHeadphones,
+  UserPlus2,
+  UserCog2,
+  BookOpenText,
 } from "lucide-react";
 import { c } from "node_modules/better-auth/dist/index-4d8GiU4g";
 
@@ -48,14 +51,31 @@ export const items = [
       },
     ],
   },
+  {
+    name: "Staff Management",
+    // url: "/create-staff",
+    icon: Users2,
+    children: [
+      {
+        name: "Create Staff",
+        url: "/create-staff",
+        icon: UserPlus2,
+      },
+      {
+        name: "Manage Staff",
+        url: "/manage-staff",
+        icon: UserCog2,
+      },
+    ],
+  },
   // {
   //   name: "Location",
   //   url: "/location",
   //   icon: PinIcon,
   // },
   {
-    name: "Feedback",
-    icon: Users2,
+    name: "Reports",
+    icon: BookOpenText,
     url: "/feedback",
     children: [
       {

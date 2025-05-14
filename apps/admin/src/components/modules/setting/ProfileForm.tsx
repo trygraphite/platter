@@ -35,8 +35,31 @@ export default function UpdateRestaurantDetailsForm({ initialData }: any) {
   const { data: session } = useSession();
   const router = useRouter();
   const { edgestore } = useEdgeStore();
-  const [iconUrl, setIconUrl] = useState<string | null>(initialData.icon || null);
-  const [imageUrl, setImageUrl] = useState<string | null>(initialData.image || null);
+  // Initialize state with empty string instead of null
+  const [iconUrl, setIconUrl] = useState<string>(initialData.icon || "");
+  const [imageUrl, setImageUrl] = useState<string>(initialData.image || "");
+  
+  // Ensure initialData has valid defaults to avoid null/undefined issues
+  const defaultValues = {
+    name: initialData.name || "",
+    subdomain: initialData.subdomain || "",
+    description: initialData.description || "",
+    phone: initialData.phone || "",
+    address: initialData.address || "",
+    city: initialData.city || "",
+    state: initialData.state || "",
+    zipCode: initialData.zipCode || "",
+    website: initialData.website || "",
+    googleReviewLink: initialData.googleReviewLink || "",
+    cuisine: initialData.cuisine || "",
+    seatingCapacity: initialData.seatingCapacity 
+      ? Number(initialData.seatingCapacity) 
+      : 0,
+    openingHours: initialData.openingHours || "",
+    closingHours: initialData.closingHours || "",
+    icon: initialData.icon || "",
+    image: initialData.image || "",
+  };
   
   const {
     control,
@@ -48,13 +71,7 @@ export default function UpdateRestaurantDetailsForm({ initialData }: any) {
     watch,
   } = useForm<RestaurantDetailsData>({
     resolver: zodResolver(restaurantDetailsSchema),
-    defaultValues: {
-      ...initialData,
-      // Convert string to number for seatingCapacity if needed
-      seatingCapacity: initialData.seatingCapacity 
-        ? Number(initialData.seatingCapacity) 
-        : 0,
-    },
+    defaultValues,
   });
   
   // Update the form values when the image URLs change
@@ -108,10 +125,10 @@ export default function UpdateRestaurantDetailsForm({ initialData }: any) {
           id="restaurant-icon"
           label="Restaurant Icon"
           description="This icon will be displayed on the guest app QR scan screen"
-          initialImage={initialData.icon}
+          initialImage={initialData.icon || ""}
           imageType="restaurant-icon"
           isCircular={true}
-          onImageChange={setIconUrl}
+          onImageChange={(url) => setIconUrl(url || "")}
         />
 
         {/* Restaurant Cover Image */}
@@ -119,9 +136,9 @@ export default function UpdateRestaurantDetailsForm({ initialData }: any) {
           id="restaurant-image"
           label="Restaurant Cover Image"
           description="This image will be displayed on the QR code home screen"
-          initialImage={initialData.image}
+          initialImage={initialData.image || ""}
           imageType="restaurant-cover"
-          onImageChange={setImageUrl}
+          onImageChange={(url) => setImageUrl(url || "")}
         />
 
         {/* Restaurant Name */}
@@ -130,7 +147,6 @@ export default function UpdateRestaurantDetailsForm({ initialData }: any) {
           <Input
             id="name"
             {...register("name")}
-            defaultValue={initialData.name}
             aria-invalid={!!errors.name}
           />
           {errors.name && (
@@ -149,7 +165,6 @@ export default function UpdateRestaurantDetailsForm({ initialData }: any) {
             <Input
               id="subdomain"
               {...register("subdomain")} 
-              value={watch("subdomain")}
               disabled
               className="bg-gray-100 rounded-r-none border-r-0"
               style={{ maxWidth: "150px" }}
@@ -169,7 +184,6 @@ export default function UpdateRestaurantDetailsForm({ initialData }: any) {
           <Textarea
             id="description"
             {...register("description")}
-            defaultValue={initialData.description}
             aria-invalid={!!errors.description}
           />
           {errors.description && (
@@ -184,7 +198,6 @@ export default function UpdateRestaurantDetailsForm({ initialData }: any) {
             id="phone"
             {...register("phone")}
             type="tel"
-            defaultValue={initialData.phone}
             aria-invalid={!!errors.phone}
           />
           {errors.phone && (
@@ -198,7 +211,6 @@ export default function UpdateRestaurantDetailsForm({ initialData }: any) {
           <Input
             id="address"
             {...register("address")}
-            defaultValue={initialData.address}
             aria-invalid={!!errors.address}
           />
           {errors.address && (
@@ -213,7 +225,6 @@ export default function UpdateRestaurantDetailsForm({ initialData }: any) {
             <Input
               id="city"
               {...register("city")}
-              defaultValue={initialData.city}
               aria-invalid={!!errors.city}
             />
             {errors.city && (
@@ -229,7 +240,7 @@ export default function UpdateRestaurantDetailsForm({ initialData }: any) {
                 <Select
                   {...field}
                   onValueChange={field.onChange}
-                  value={field.value}
+                  defaultValue={field.value || undefined}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select state" />
@@ -259,7 +270,6 @@ export default function UpdateRestaurantDetailsForm({ initialData }: any) {
           <Input
             id="zipCode"
             {...register("zipCode")}
-            defaultValue={initialData.zipCode}
             aria-invalid={!!errors.zipCode}
           />
           {errors.zipCode && (
@@ -274,7 +284,6 @@ export default function UpdateRestaurantDetailsForm({ initialData }: any) {
             id="website"
             {...register("website")}
             type="url"
-            defaultValue={initialData.website}
             aria-invalid={!!errors.website}
           />
           {errors.website && (
@@ -282,14 +291,13 @@ export default function UpdateRestaurantDetailsForm({ initialData }: any) {
           )}
         </div>
 
-    {/* Google Review Link */}
+        {/* Google Review Link */}
         <div className="space-y-2">
           <Label htmlFor="googleReviewLink">Google Review Link</Label>
           <Input
             id="googleReviewLink"
             {...register("googleReviewLink")}
             type="url"
-            defaultValue={initialData.googleReviewLink}
             aria-invalid={!!errors.googleReviewLink}
             placeholder="https://g.page/r/..."
           />
@@ -312,7 +320,7 @@ export default function UpdateRestaurantDetailsForm({ initialData }: any) {
               <Select
                 {...field}
                 onValueChange={field.onChange}
-                value={field.value}
+                defaultValue={field.value || undefined}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select cuisine type" />
@@ -343,7 +351,6 @@ export default function UpdateRestaurantDetailsForm({ initialData }: any) {
             {...register("seatingCapacity", { valueAsNumber: true })}
             type="number"
             min="0"
-            defaultValue={Number(initialData.seatingCapacity) || 0}
             aria-invalid={!!errors.seatingCapacity}
           />
           {errors.seatingCapacity && (
@@ -361,7 +368,6 @@ export default function UpdateRestaurantDetailsForm({ initialData }: any) {
               id="openingHours"
               {...register("openingHours")}
               type="time"
-              defaultValue={initialData.openingHours}
               aria-invalid={!!errors.openingHours}
             />
             {errors.openingHours && (
@@ -376,7 +382,6 @@ export default function UpdateRestaurantDetailsForm({ initialData }: any) {
               id="closingHours"
               {...register("closingHours")}
               type="time"
-              defaultValue={initialData.closingHours}
               aria-invalid={!!errors.closingHours}
             />
             {errors.closingHours && (

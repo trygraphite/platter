@@ -11,14 +11,14 @@ import {
 import { Button } from "@platter/ui/components/button";
 import { Order } from "@prisma/client";
 import { ArrowLeft } from "@platter/ui/lib/icons";
+import { formatPrice } from "../order-menu-page/menuPage";
 
 const statusColors = {
-  PENDING: "bg-yellow-100 dark:bg-yellow-900/30",
-  CONFIRMED: "bg-blue-100 dark:bg-blue-900/30",
-  PREPARING: "bg-blue-50 dark:bg-blue-900/20",
-  READY: "bg-green-100 dark:bg-green-900/30",
-  DELIVERED: "bg-green-50 dark:bg-green-900/20",
-  CANCELLED: "bg-red-100 dark:bg-red-900/30",
+  PENDING: "bg-gray-50 dark:bg-gray-900/30",
+  CONFIRMED: "bg-yellow-50 dark:bg-yellow-900/30",
+  PREPARING: "bg-blue-50 dark:bg-blue-900/30",
+  DELIVERED: "bg-green-50 dark:bg-green-900/30",
+  CANCELLED: "bg-red-50 dark:bg-red-900/30",
 };
 
 interface OrdersPageProps {
@@ -95,7 +95,7 @@ export function OrdersPage({
               <CardContent>
                 <p className="font-semibold mb-2">Status: {order.status}</p>
                 <p className="mb-2">
-                  Total: ₦{Number(order.totalAmount).toFixed(2)}
+                  Total: ₦{formatPrice(Number(order.totalAmount))}
                 </p>
                 {order.specialNotes && (
                   <p className="text-sm text-muted-foreground mb-2">

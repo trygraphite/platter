@@ -258,6 +258,8 @@ export function RevenueChart({ orders, className }: RevenueChartProps) {
                 dataKey="total"
                 strokeWidth={2}
                 activeDot={{ r: 8 }}
+                width={100}
+             
               />
             </LineChart>
           </ResponsiveContainer>

@@ -13,11 +13,28 @@ model User {
   id              String      @id @default(cuid())
   name            String
   email           String      @unique
+  
+  // Common fields
+  phone           String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  isActive        Boolean     @default(true)
+  
+  // Auth relations - needed for all users
+  sessions        Session[]
+  accounts        Account[]
+  
+  // User type and role management
+  userType        UserType    @default(RESTAURANT)
+  role            UserRole?   @default(RESTAURANT)
+  staffRole       StaffRole?  // Used when userType is STAFF
+  restaurantRole  UserRole?   // Used when userType is RESTAURANT
+
+  // Restaurant-specific fields
   website         String?
   googleReviewLink String?
   image           String?
-  icon            String? 
-  phone           String?
+  icon            String?
   address         String?
   city            String?
   subdomain       String?     @unique
@@ -28,15 +45,12 @@ model User {
   cuisine         String?
   openingHours    String?
   closingHours    String?
-  emailVerified   Boolean     
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  emailVerified   Boolean?    
   
-  // Auth relations
-  sessions        Session[]
-  accounts        Account[]
+  // Staff-specific fields
+  // position        String?
   
-  // Restaurant relations moved to User
+  // Restaurant relations (only applicable when userType is RESTAURANT)
   tables          Table[]
   categories      Category[]
   menuItems       MenuItem[]
@@ -44,12 +58,24 @@ model User {
   qrCodes         QRCode[]
   reviews         Review[]   
   complaints      Complaint[] 
-  role            UserRole    @default(RESTAURANT)
-  locationId String?   // Optional: If the restaurant is part of a location
-  location   Location? @relation(fields: [locationId], references: [id])
-  joinRequests JoinRequest[]
-
-  CategoryGroup CategoryGroup[]
+  locationId      String?     // Optional: If the restaurant is part of a location
+  location        Location?   @relation(fields: [locationId], references: [id])
+  joinRequests    JoinRequest[]
+  CategoryGroup   CategoryGroup[]
+  
+  // Staff relations (only applicable when userType is STAFF)
+  restaurantId    String?     // The restaurant this staff member belongs to
+  restaurant      User?       @relation("StaffToRestaurant", fields: [restaurantId], references: [id])
+  staffMembers    User[]      @relation("StaffToRestaurant")
+  
+  // Staff-specific permissions
+  canManageMenu   Boolean?    @default(false)
+  canManageOrders Boolean?    @default(false)
+  canManageTables Boolean?    @default(false)
+  canViewReports  Boolean?    @default(false)
+  
+  @@index([userType])
+  @@index([restaurantId])
 }
 
 // Auth tables
@@ -61,10 +87,12 @@ model Session {
   updatedAt DateTime
   ipAddress String?
   userAgent String?
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role      UserRole?
-
+  
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  staffId   String?
+  
+  role      AuthRole? // Combined role enum for both users and staff
 
   @@unique([token])
   @@map("session")
@@ -74,8 +102,6 @@ model Account {
   id                    String    @id
   accountId             String
   providerId            String
-  userId                String
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   accessToken           String?
   refreshToken          String?
   idToken               String?
@@ -85,6 +111,10 @@ model Account {
   password              String?
   createdAt             DateTime
   updatedAt             DateTime
+
+  userId                String?
+  user                  User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  staffId               String?
 
   @@map("account")
 }
@@ -225,6 +255,8 @@ model Order {
   totalAmount     Int
   specialNotes    String?
 
+  shownReview     Boolean?  @default(false)
+
   // Status timestamps
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
@@ -261,7 +293,7 @@ model OrderItem {
   specialNotes String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-
+  
   // Relations
   order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   orderId    String
@@ -344,4 +376,23 @@ enum ComplaintStatus {
 enum UserRole {
   ADMIN
   RESTAURANT
+}
+
+enum StaffRole {
+  STAFF       // Basic staff access
+  MANAGER     // Manager with more permissions
+  ADMIN       // Full admin access for the restaurant
+}
+
+enum AuthRole {
+  USER_ADMIN
+  USER_RESTAURANT
+  STAFF
+  STAFF_MANAGER
+  STAFF_ADMIN
+}
+
+enum UserType {
+  RESTAURANT
+  STAFF
 }
