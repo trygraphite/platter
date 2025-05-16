@@ -14,6 +14,14 @@ interface CallWaiterBellProps {
 tableNumber: string
 }
 
+const LoadingDots = () => (
+  <span className="flex items-center justify-center space-x-1">
+    <span className="h-1.5 w-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+    <span className="h-1.5 w-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+    <span className="h-1.5 w-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+  </span>
+)
+
 export function CallWaiterBell({ tableId, userId, restaurantName, tableNumber }: CallWaiterBellProps) {
     const [isCalling, setIsCalling] = useState(false)
     const [cooldown, setCooldown] = useState(false)
@@ -21,7 +29,7 @@ export function CallWaiterBell({ tableId, userId, restaurantName, tableNumber }:
   
     // Connect to socket server
     const { socket, isConnected, error } = useSocketIO({
-      serverUrl: process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3002",
+      serverUrl: process.env.NEXT_PUBLIC_SOCKET_SERVER_URL || "http://localhost:3002",
       autoConnect: true,
     })
   
@@ -84,7 +92,7 @@ export function CallWaiterBell({ tableId, userId, restaurantName, tableNumber }:
   
         {/* {error && <p className="text-sm text-red-500 mt-1">Connection error. Please try again later.</p>} */}
   
-        {!isConnected && !error && <p className="text-sm text-muted-foreground mt-1">Connecting...</p>}
+        {!isConnected && !error && <LoadingDots/>}
       </div>
     )
   }

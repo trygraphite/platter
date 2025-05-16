@@ -9,6 +9,7 @@ import { Textarea } from "@platter/ui/components/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@platter/ui/components/dialog";
 import { toast } from "@platter/ui/components/sonner";
 import { orderReview } from "@/app/actions/order-review";
+import { useRouter } from "next/navigation";
 
 interface ReviewModalProps {
   isOpen: boolean;
@@ -19,11 +20,18 @@ interface ReviewModalProps {
   orderId: string;
 }
 
-export function ReviewModal({ isOpen, onClose, qrId, tableId, userId, orderId }: ReviewModalProps) {
+export function ReviewModal({ 
+  isOpen, 
+  onClose, 
+  qrId, 
+  tableId, 
+  userId, 
+  orderId,
+}: ReviewModalProps) {
   const [rating, setRating] = useState<number>(5);
   const [comment, setComment] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  
+  const router = useRouter();
   const handleCommentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setComment(e.target.value);
   };
@@ -50,7 +58,14 @@ export function ReviewModal({ isOpen, onClose, qrId, tableId, userId, orderId }:
         description: "Thank you for your feedback!",
       });
       
+      // Close the modal
       onClose();
+      
+      // Redirect to menu page after a short delay
+      setTimeout(() => {
+        router.push(`/${qrId}`);
+      }, 500); // Small delay to ensure toast is visible
+      
     } catch (error) {
       console.error('Error submitting review:', error);
       toast.error("Error", {
@@ -64,6 +79,11 @@ export function ReviewModal({ isOpen, onClose, qrId, tableId, userId, orderId }:
   const handleSkip = () => {
     // Simply close the modal when user skips
     onClose();
+    
+    // Redirect to menu page after skipping as well
+    setTimeout(() => {
+      router.push(`/${qrId}`);
+    }, 300);
   };
   
   const renderStars = () => {
@@ -86,7 +106,15 @@ export function ReviewModal({ isOpen, onClose, qrId, tableId, userId, orderId }:
   };
   
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+      if (!open) {
+        onClose();
+        // If dialog is closed by clicking outside, still redirect
+        setTimeout(() => {
+          router.push(`/${qrId}`);
+        }, 300);
+      }
+    }}>
       <DialogContent className="sm:max-w-md px-4">
         <DialogHeader>
           <DialogTitle className="text-center text-xl">How was your meal?</DialogTitle>

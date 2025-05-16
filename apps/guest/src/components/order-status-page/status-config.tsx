@@ -1,6 +1,6 @@
-// components/order/StatusConfig.tsx
+// components/order/status-config.tsx
 import { StatusConfig } from "@/types/order-status";
-import { Clock, CheckCircle2, XCircle } from "@platter/ui/lib/icons";
+import { Clock, CheckCircle2, XCircle, Package } from "@platter/ui/lib/icons";
 import { OrderStatus } from "@prisma/client";
 
 export const statusConfigs: Record<OrderStatus, StatusConfig> = {
@@ -22,7 +22,6 @@ export const statusConfigs: Record<OrderStatus, StatusConfig> = {
     bgColor: "bg-blue-50",
     text: "Order Processing",
   },
-
   DELIVERED: {
     icon: <CheckCircle2 className="h-8 w-8" />,
     color: "text-green-600",
@@ -42,7 +41,6 @@ export const getStatusMessage = (status: OrderStatus): string => {
     PENDING: "Your order has been received and is awaiting confirmation.",
     CONFIRMED: "Your order has been confirmed and will be prepared soon.",
     PREPARING: "Your order is being prepared.",
-    READY: "Your order is ready for pickup/delivery!",
     DELIVERED: "Your order has been delivered. Enjoy your meal!",
     CANCELLED: "Your order has been cancelled.",
   };

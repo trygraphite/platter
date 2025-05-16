@@ -1,6 +1,6 @@
 {
   "name": "server",
-  "main": "dist/server.ts",
+  "main": "dist/server.js",
   "scripts": {
     "dev": "nodemon src/server.ts --port:3002",
     "build": "tsc",
