@@ -1,13 +1,23 @@
-// components/order/OrderStatus.tsx
+// components/order/OrderStatusDisplay.tsx
 import { OrderStatus } from "@prisma/client";
 import { getStatusMessage, statusConfigs } from "./status-config";
+import { Clock } from "@platter/ui/lib/icons";
 
 interface OrderStatusDisplayProps {
   status: OrderStatus;
 }
 
 export function OrderStatusDisplay({ status }: OrderStatusDisplayProps) {
-  const statusConfig = statusConfigs[status];
+  // Default config to use as fallback if status is not found in statusConfigs
+  const defaultConfig = {
+    icon: <Clock className="h-8 w-8" />,
+    color: "text-gray-600",
+    bgColor: "bg-gray-50",
+    text: "Order Status",
+  };
+
+  // Use the config for the current status or fall back to default if not found
+  const statusConfig = statusConfigs[status] || defaultConfig;
 
   return (
     <div

@@ -15,7 +15,7 @@ function HomeLink({ user }: { user: any }) {
           <Avatar className="size-8 rounded-[4px]">
             <AvatarImage
               src={
-                user?.avatar || "https://avatar.vercel.sh/platter.svg?text=PL"
+                user?.image || "https://avatar.vercel.sh/platter.svg?text=PL"
               }
               className="rounded-[4px]"
             />
