@@ -6,7 +6,7 @@
     return (
       <section className="relative overflow-hidden bg-white pt-16 md:pt-20 lg:pt-24">
         <div className="container-wide">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center my-4 lg:my-24">
             <div className="flex flex-col gap-6">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-gray-900">
                 Create a Free
@@ -24,7 +24,7 @@
                   </Button>
                 </Link>
                 <p className="text-sm text-gray-500 flex items-center gap-2 mt-2 sm:mt-0">
-                  *No credit card required • Instant setup • Free forever
+                  *No credit card required • Instant setup • One month free!
                 </p>
               </div>
             </div>
