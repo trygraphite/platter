@@ -1,89 +1,84 @@
-"use client";
-import { useState } from "react";
+import { Clock, CreditCard, Smile, Settings, BarChart } from "lucide-react";
 
-import {
-  QrCode,
-  ShoppingCart,
-  MessageSquare,
-  BarChart,
-  Settings,
-  Bell,
-} from "lucide-react";
-import { Button } from "@platter/ui/components/button";
-
-const features = {
-  guests: [
-    {
-      icon: QrCode,
-      title: "Instant Menu Access",
-      description: "Scan and browse the menu instantly on your device",
-    },
-    {
-      icon: ShoppingCart,
-      title: "Easy Ordering",
-      description: "Place orders seamlessly with just a few taps",
-    },
-    {
-      icon: MessageSquare,
-      title: "Quick Feedback",
-      description: "Share your experience effortlessly",
-    },
-  ],
-  admins: [
-    {
-      icon: Bell,
-      title: "Real-time Tracking",
-      description: "Monitor orders and feedback in real-time",
-    },
-    {
-      icon: BarChart,
-      title: "Analytics Dashboard",
-      description: "Gain insights with comprehensive analytics",
-    },
-    {
-      icon: Settings,
-      title: "Easy Management",
-      description: "Manage feedback and complaints efficiently",
-    },
-  ],
-};
-
-export const Features = () => {
-  const [activeTab, setActiveTab] = useState<"guests" | "admins">("guests");
-
+export function Features() {
   return (
-    <section className="py-20 bg-platter-secondary">
-      <div className="container mx-auto px-4">
-        <h2 className="text-4xl font-bold text-center mb-8">Features</h2>
-        <div className="flex justify-center gap-4 mb-12">
-          <Button
-            variant={activeTab === "guests" ? "default" : "outline"}
-            onClick={() => setActiveTab("guests")}
-            className={activeTab === "guests" ? "bg-platter-primary" : ""}
-          >
-            For Guests
-          </Button>
-          <Button
-            variant={activeTab === "admins" ? "default" : "outline"}
-            onClick={() => setActiveTab("admins")}
-            className={activeTab === "admins" ? "bg-platter-primary" : ""}
-          >
-            For Admins
-          </Button>
+    <section className="section bg-gray-50">
+      <div className="container-wide">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            Take more orders in less time!
+          </h2>
+          <p className="mt-4 text-lg text-gray-600">
+            Transform your ordering experience today with our digital QR menu solution.
+          </p>
         </div>
-        <div className="grid md:grid-cols-3 gap-8">
-          {features[activeTab].map((feature, index) => (
-            <div
-              key={index}
-              className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300"
-            >
-              <feature.icon className="w-12 h-12 text-platter-primary mb-4" />
-              <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-              <p className="text-gray-600">{feature.description}</p>
+
+        <div className="mt-12 grid grid-cols-1 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-8">
+          {features.map((feature) => (
+            <div key={feature.name} className="relative bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+              <div className="absolute -top-4 left-4">
+                <div className="inline-flex items-center justify-center rounded-lg bg-primary p-3 shadow-lg">
+                  <feature.icon className="h-6 w-6 text-white" aria-hidden="true" />
+                </div>
+              </div>
+              <h3 className="mt-6 text-xl font-semibold text-gray-900">
+                {feature.name}
+              </h3>
+              <p className="mt-2 text-base text-gray-600">
+                {feature.description}
+              </p>
             </div>
           ))}
+        </div>
+
+        <div className="mt-16 flex flex-col items-center">
+          <p className="text-gray-600 text-lg max-w-2xl text-center">
+            Get started in minutes - create your free QR code menu and watch your business transform. Your customers will thank you for it.
+          </p>
+          <a
+            href="/register"
+            className="mt-8 inline-flex items-center justify-center rounded-md bg-primary px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+          >
+            Create Free QR Code Menu
+          </a>
+          <p className="mt-3 text-sm text-gray-500">
+            No credit card required • Instant setup • Free forever
+          </p>
         </div>
       </div>
     </section>
   );
-};
+}
+
+const features = [
+  {
+    name: 'Take more orders in less time',
+    description: 'Increase table turnover rates by up to 30% with instant QR code ordering. No more waiting for waiters.',
+    icon: Clock,
+  },
+  {
+    name: 'Eliminate frustrating wait times',
+    description: 'Customers can browse and order at their own pace, removing queues and reducing frustration.',
+    icon: Smile,
+  },
+  {
+    name: 'Let customers order at their own pace',
+    description: 'Give customers the freedom to explore the menu and order whenever they\'re ready, no pressure.',
+    icon: Settings,
+  },
+  {
+    name: 'Boost customer satisfaction',
+    description: 'Deliver a modern dining experience with digital menus, leading to higher customer satisfaction scores.',
+    icon: CreditCard,
+  },
+  {
+    name: 'Streamline your operations',
+    description: 'Integrate orders directly to your kitchen display system, reducing errors and improving efficiency.',
+    icon: Settings,
+  },
+  {
+    name: 'Track performance metrics',
+    description: 'Access real-time analytics on your most popular items, revenue, and customer behavior.',
+    icon: BarChart,
+  },
+];
