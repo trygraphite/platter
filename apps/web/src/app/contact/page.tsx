@@ -72,10 +72,10 @@ export default function ContactPage() {
   };
 
   return (
-    <div className=" container-wide bg-background">
+    <div className="  bg-background">
       {/* Hero Section */}
-      <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-background to-muted">
-        <div className="container px-4 md:px-6">
+      <section className="w-full  py-12 md:py-24 lg:py-32 bg-gradient-to-b from-background to-muted">
+        <div className="container container-wide px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
               <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl">Get in Touch</h1>
@@ -88,7 +88,7 @@ export default function ContactPage() {
       </section>
 
       {/* Contact Info and Form */}
-      <section className="w-full py-12 md:py-24">
+      <section className="w-full py-12 container-wide md:py-24">
         <div className="container px-4 md:px-6">
           <div className="grid gap-10 lg:grid-cols-2">
             {/* Contact Information */}
@@ -184,17 +184,6 @@ export default function ContactPage() {
               <h2 className="text-2xl font-bold mb-6">Send us a Message</h2>
               <Card>
                 <CardContent className="p-6">
-                  <Tabs 
-                    defaultValue="inquiry" 
-                    className="w-full mb-8"
-                    onValueChange={(value) => setActiveTab(value)}
-                  >
-                    <TabsList className="grid w-full grid-cols-3">
-                      <TabsTrigger value="inquiry">General Inquiry</TabsTrigger>
-                      <TabsTrigger value="demo">Request Demo</TabsTrigger>
-                      <TabsTrigger value="support">Support</TabsTrigger>
-                    </TabsList>
-                  </Tabs>
 
                   {formStatus.type === 'success' && (
                     <Alert className="mb-6 bg-green-50 border-green-200">
@@ -336,7 +325,7 @@ export default function ContactPage() {
 
       {/* FAQ Section */}
       <section className="w-full py-12 md:py-24 bg-muted/50">
-        <div className="container px-4 md:px-6">
+        <div className="container-wide px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
               <h2 className="text-3xl font-bold tracking-tighter">Common Questions</h2>

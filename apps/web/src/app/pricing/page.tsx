@@ -74,9 +74,9 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="container-wide bg-background">
+    <div className=" bg-background">
       {/* Pricing Section */}
-      <section id="pricing" className="w-full py-12 md:py-24">
+      <section id="pricing" className="w-full container-wide py-12 md:py-24">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
@@ -90,16 +90,7 @@ export default function PricingPage() {
           </div>
           
           <div className="mx-auto w-full max-w-sm sm:max-w-none mt-8">
-            <Tabs defaultValue="monthly" className="w-full mx-auto max-w-sm mb-10">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="monthly" onClick={() => setBillingCycle('monthly')}>
-                  Pay as you go
-                </TabsTrigger>
-                <TabsTrigger value="annual" onClick={() => setBillingCycle('annual')}>
-                  Annual discount
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
+           
             
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
               {pricingPlans.monthly.map((plan, index) => (
@@ -153,7 +144,7 @@ export default function PricingPage() {
 
       {/* Feature Comparison */}
       <section className="w-full py-12 md:py-24 bg-muted/50">
-        <div className="container px-4 md:px-6">
+        <div className="container-wide px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
@@ -250,7 +241,7 @@ export default function PricingPage() {
 
       {/* FAQ Section */}
       <section className="w-full py-12 md:py-24">
-        <div className="container px-4 md:px-6">
+        <div className="container-wide px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">

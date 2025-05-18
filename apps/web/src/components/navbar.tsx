@@ -3,7 +3,12 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@platter/ui/components/button";
-import { Sheet, SheetContent, SheetTrigger } from "@platter/ui/components/sheet";
+import { 
+  Sheet, 
+  SheetContent, 
+  SheetTrigger,
+  SheetTitle 
+} from "@platter/ui/components/sheet";
 import { Menu, X } from "lucide-react";
 import Image from "next/image";
 
@@ -55,12 +60,15 @@ export function Navbar() {
               <Menu className="h-6 w-6" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-            <div className="flex flex-col gap-6 mt-8">
+          <SheetContent side="right" className="w-[300px] sm:w-[400px] ">
+            {/* Added SheetTitle for accessibility */}
+            <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+            
+            <div className="flex flex-col gap-6 ">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center text-white font-bold">P</div>
-                  <span className="font-bold text-xl text-gray-900">Platter</span>
+                <Image src="/logo.png" alt="Platter Logo" width={40} height={40} className="rounded-full bg-primary" />
+                <span className="font-bold text-xl text-gray-900">Platter</span>
                 </div>
                 <Button
                   variant="ghost"
@@ -68,18 +76,12 @@ export function Navbar() {
                   aria-label="Close menu"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  <X className="h-6 w-6" />
+                  <p className="text-md py-1 px-2  ">X</p>
                 </Button>
               </div>
 
               <nav className="flex flex-col gap-4">
-                <Link
-                  href="/features"
-                  className="text-base font-medium text-gray-600 hover:text-primary transition-colors py-2"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Features
-                </Link>
+              
                 <Link
                   href="/pricing"
                   className="text-base font-medium text-gray-600 hover:text-primary transition-colors py-2"
@@ -87,13 +89,7 @@ export function Navbar() {
                 >
                   Pricing
                 </Link>
-                <Link
-                  href="/about"
-                  className="text-base font-medium text-gray-600 hover:text-primary transition-colors py-2"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  About
-                </Link>
+              
                 <Link
                   href="/contact"
                   className="text-base font-medium text-gray-600 hover:text-primary transition-colors py-2"

@@ -1,7 +1,7 @@
 export const siteConfig = {
   name: "PlatterNG",
   description:
-    "PlatterNG is a QR-based ordering system built for in-dining restaurants in Nigeria. Improve service speed, reduce manual order-taking, and give guests an amazing experience from their phones.",
+    "PlatterNG is a QR-based ordering system built for in-dining restaurants in Nigeria.",
   url: "https://www.platterng.com",
   ogImage: "https://www.platterng.com/og-image.jpg",
   links: {

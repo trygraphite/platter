@@ -6,7 +6,7 @@ export function Footer() {
   return (
     <footer className="bg-gray-900 py-12 md:py-16">
       <div className="container-wide">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
+        {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
           <div>
             <h3 className="text-lg font-semibold text-white mb-4">QR Menu Guides</h3>
             <ul className="space-y-3">
@@ -60,7 +60,7 @@ export function Footer() {
           </div>
         </div>
 
-        <Separator className="my-8 bg-gray-800" />
+        <Separator className="my-8 bg-gray-800" /> */}
 
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="flex items-center gap-2 mb-4 md:mb-0">
@@ -80,12 +80,6 @@ export function Footer() {
             </Link>
             <Link href="/terms" className="text-sm text-gray-400 hover:text-white transition-colors">
               Terms of Service
-            </Link>
-            <Link href="/gdpr" className="text-sm text-gray-400 hover:text-white transition-colors">
-              GDPR Compliance
-            </Link>
-            <Link href="/security" className="text-sm text-gray-400 hover:text-white transition-colors">
-              Security
             </Link>
           </div>
         </div>
