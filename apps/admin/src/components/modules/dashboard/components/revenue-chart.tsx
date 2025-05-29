@@ -234,10 +234,10 @@ export function RevenueChart({ orders, className }: RevenueChartProps) {
               color: "hsl(var(--chart-1))",
             },
           }}
-          className="h-64"
+          className="h-64 w-full"
         >
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data}>
+            <LineChart data={data} width={500} height={300}>
               <XAxis
                 dataKey="name"
                 stroke="#888888"
@@ -250,16 +250,18 @@ export function RevenueChart({ orders, className }: RevenueChartProps) {
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
-                tickFormatter={(value) => `$${value}`}
+                tickFormatter={(value) => `${value}`}
               />
               <ChartTooltip content={<ChartTooltipContent />} />
               <Line
                 type="monotone"
                 dataKey="total"
-                strokeWidth={2}
+                strokeWidth={3}
                 activeDot={{ r: 8 }}
-                width={100}
-             
+                dot={{ strokeWidth: 2 }}
+                isAnimationActive={true}
+                animationDuration={1500}
+                connectNulls={true}
               />
             </LineChart>
           </ResponsiveContainer>

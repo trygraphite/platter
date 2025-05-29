@@ -8,12 +8,29 @@ import { updateCategory } from "@/lib/actions/update-category";
 import { updateMenuItem } from "@/lib/actions/update-menu-item";
 import { useSession } from "@/lib/auth/client";
 import { useEdgeStore } from "@/lib/edgestore/edgestore";
+import { MenuItemVarietyInput } from "@/types";
 import { toast } from "@platter/ui/components/sonner";
 import type { Category, CategoryGroup, MenuItem, User } from "@prisma/client";
 import type React from "react";
 import { createContext, useCallback, useContext, useState } from "react";
-
-type CategoryWithMenuItems = Category & { menuItems: MenuItem[] };
+import { useUploadThing } from "utils/uploadThing";
+type MenuItemVariety = {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  position: number;
+  isAvailable: boolean;
+  isDefault: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  menuItemId: string;
+  userId: string;
+};
+type MenuItemWithVarieties = MenuItem & { 
+  varieties: MenuItemVariety[] 
+};
+type CategoryWithMenuItems = Category & { menuItems: MenuItemWithVarieties[] };
 type CategoryGroupWithCategories = CategoryGroup & { categories: CategoryWithMenuItems[] };
 
 type MenuItemInput = Partial<Omit<MenuItem, "image">> & {
@@ -23,6 +40,7 @@ type MenuItemInput = Partial<Omit<MenuItem, "image">> & {
   categoryId: string;
   isAvailable: boolean;
   image: string | null;
+  varieties?: MenuItemVarietyInput[];
 };
 
 type CategoryInput = Partial<Omit<Category, "image">> & {
@@ -81,7 +99,10 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
-  const { edgestore } = useEdgeStore();
+  
+  // UploadThing hooks
+  const { startUpload: startCategoryImageUpload, isUploading: isCategoryImageUploading } = useUploadThing("categoryImageUploader");
+  const { startUpload: startMenuItemImageUpload, isUploading: isMenuItemImageUploading } = useUploadThing("menuItemImageUploader");
 
   const fetchUserAndCategories = useCallback(async () => {
     if (!session?.user?.id) {
@@ -120,139 +141,48 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
     }
   }, [session]);
 
-const handleAddCategory = async (categoryData: CategoryInput) => {
-  if (!session?.user?.id) {
-    toast.error("Not authenticated");
-    return;
-  }
-
-  try {
-    const categoryToCreate: Partial<Category> = {
-      name: categoryData.name,
-      description: categoryData.description || "",
-      groupId: categoryData.groupId || null,
-    };
-
-    // Handle image upload if present
-    const imageFile = categoryData.image;
-    
-    if (imageFile instanceof File) {
-      if (!edgestore?.publicFiles) {
-        throw new Error("EdgeStore not initialized");
-      }
-
-      const res = await edgestore.publicFiles.upload({
-        file: imageFile,
-        input: { type: "Platter-category" },
-      });
-
-      categoryToCreate.image = res.url;
-    }
-
-    await createCategory(session.user.id, categoryToCreate);
-    toast.success("Category added");
-    fetchUserAndCategories();
-  } catch (error) {
-    console.error("Error adding category:", error);
-    toast.error("Failed to add category");
-    throw error; // Re-throw to handle in the component
-  }
-};
-
-  const handleAddMenuItem = async (categoryId: string, formData: FormData) => {
+  const handleAddCategory = async (categoryData: CategoryInput) => {
     if (!session?.user?.id) {
       toast.error("Not authenticated");
       return;
     }
 
     try {
-      // Extract file from FormData
-      const imageFile = formData.get("image") as File | null;
-
-      // Convert FormData to menu item data
-      const menuItemData: MenuItemInput = {
-        name: formData.get("name") as string,
-        description: formData.get("description") as string,
-        price: Number(formData.get("price")),
-        categoryId: formData.get("categoryId") as string,
-        isAvailable: formData.get("isAvailable") === "true",
-        image: null,
+      const categoryToCreate: Partial<Category> = {
+        name: categoryData.name,
+        description: categoryData.description || "",
+        groupId: categoryData.groupId || null,
       };
 
-      console.log("menu items", menuItemData);
-
       // Handle image upload if present
+      const imageFile = categoryData.image;
+      
       if (imageFile instanceof File) {
-        if (!edgestore?.publicFiles) {
-          throw new Error("EdgeStore not initialized");
+        toast.loading("Uploading image...");
+        
+        const uploadResult = await startCategoryImageUpload([imageFile]);
+        
+        if (uploadResult && uploadResult[0]) {
+          categoryToCreate.image = uploadResult[0].ufsUrl;
+          toast.dismiss();
+        } else {
+          throw new Error("Failed to upload image");
         }
-
-        const res = await edgestore.publicFiles.upload({
-          file: imageFile,
-          input: { type: "Platter-menuItem" },
-        });
-
-        menuItemData.image = res.url;
-      } else {
-        menuItemData.image = null;
       }
 
-      // Create menu item
-      await createMenuItem(menuItemData, session.user.id);
+      await createCategory(session.user.id, categoryToCreate);
+      toast.success("Category added");
       fetchUserAndCategories();
-
-      toast.success("Menu item added successfully");
     } catch (error) {
-      console.error("Error adding menu item:", error);
-      toast.error("Failed to add menu item");
-      throw error; // Re-throw to handle in the component
+      console.error("Error adding category:", error);
+      toast.error("Failed to add category");
+      throw error;
     }
   };
 
-const handleUpdateCategory = async (
-  categoryId: string,
-  formData: FormData,
-) => {
-  if (!session?.user?.id) {
-    toast.error("Not authenticated");
-    return;
-  }
 
-  try {
-    const updatedData: Partial<Category> = {
-      name: formData.get("name") as string,
-      description: formData.get("description") as string,
-    };
-
-    // Handle image upload
-    const imageFile = formData.get("image") as File | null;
-    const existingImage = formData.get("existingImage") as string | null;
-
-    if (imageFile instanceof File) {
-      if (!edgestore?.publicFiles) {
-        throw new Error("EdgeStore not initialized");
-      }
-      const res = await edgestore.publicFiles.upload({
-        file: imageFile,
-        input: { type: "Platter-category" },
-      });
-      updatedData.image = res.url;
-    } else if (existingImage) {
-      updatedData.image = existingImage;
-    }
-
-    await updateCategory(session.user.id, categoryId, updatedData);
-    toast.success("Category updated");
-    fetchUserAndCategories();
-  } catch (error) {
-    console.error("Error updating category:", error);
-    toast.error("Failed to update category");
-    throw error; // Re-throw to handle in the component
-  }
-};
- 
-  const handleUpdateMenuItem = async (
-    menuItemId: string,
+  const handleUpdateCategory = async (
+    categoryId: string,
     formData: FormData,
   ) => {
     if (!session?.user?.id) {
@@ -261,37 +191,36 @@ const handleUpdateCategory = async (
     }
 
     try {
-      const updatedData: Partial<MenuItem> = {
+      const updatedData: Partial<Category> = {
         name: formData.get("name") as string,
         description: formData.get("description") as string,
-        price: Number(formData.get("price")),
-        isAvailable: formData.get("isAvailable") === "true",
       };
 
-      // Handle image upload
       const imageFile = formData.get("image") as File | null;
       const existingImage = formData.get("existingImage") as string | null;
 
       if (imageFile instanceof File) {
-        if (!edgestore?.publicFiles) {
-          throw new Error("EdgeStore not initialized");
+        toast.loading("Uploading image...");
+        
+        const uploadResult = await startCategoryImageUpload([imageFile]);
+        
+        if (uploadResult && uploadResult[0]) {
+          updatedData.image = uploadResult[0].ufsUrl;
+          toast.dismiss();
+        } else {
+          throw new Error("Failed to upload image");
         }
-        const res = await edgestore.publicFiles.upload({
-          file: imageFile,
-          input: { type: "Platter-menuItem" },
-        });
-        updatedData.image = res.url;
       } else if (existingImage) {
         updatedData.image = existingImage;
       }
 
-      await updateMenuItem(session.user.id, menuItemId, updatedData);
-      toast.success("Menu item updated");
+      await updateCategory(session.user.id, categoryId, updatedData);
+      toast.success("Category updated");
       fetchUserAndCategories();
     } catch (error) {
-      console.error("Error updating menu item:", error);
-      toast.error("Failed to update menu item");
-      throw error; // Re-throw to handle in the component
+      console.error("Error updating category:", error);
+      toast.error("Failed to update category");
+      throw error;
     }
   };
 
@@ -311,6 +240,161 @@ const handleUpdateCategory = async (
     }
   };
 
+  // Updated client-side functions with variety support
+
+  const handleAddMenuItem = async (categoryId: string, formData: FormData) => {
+    if (!session?.user?.id) {
+      toast.error("Not authenticated");
+      return;
+    }
+  
+    try {
+      const imageFile = formData.get("image") as File | null;
+  
+      const menuItemData: MenuItemInput = {
+        name: formData.get("name") as string,
+        description: formData.get("description") as string,
+        price: Number(formData.get("price")),
+        categoryId: formData.get("categoryId") as string,
+        isAvailable: formData.get("isAvailable") === "true",
+        image: null,
+      };
+  
+      // Extract varieties data from formData
+      const varieties: MenuItemVarietyInput[] = [];
+      const varietyCount = Number(formData.get("varietyCount") || "0");
+      
+      for (let i = 0; i < varietyCount; i++) {
+        const varietyName = formData.get(`variety_${i}_name`) as string;
+        const varietyDescription = formData.get(`variety_${i}_description`) as string;
+        const varietyPrice = Number(formData.get(`variety_${i}_price`));
+        const varietyPosition = Number(formData.get(`variety_${i}_position`) || i);
+        const varietyIsAvailable = formData.get(`variety_${i}_isAvailable`) === "true";
+        const varietyIsDefault = formData.get(`variety_${i}_isDefault`) === "true";
+  
+        if (varietyName && !isNaN(varietyPrice)) {
+          varieties.push({
+            name: varietyName,
+            description: varietyDescription || null,
+            price: varietyPrice,
+            position: varietyPosition,
+            isAvailable: varietyIsAvailable,
+            isDefault: varietyIsDefault,
+          });
+        }
+      }
+  
+      // Transform varieties to match expected type (remove undefined from description)
+      const transformedVarieties = varieties.map(variety => ({
+        name: variety.name,
+        description: variety.description ?? null, // Convert undefined to null
+        price: variety.price,
+        position: variety.position,
+        isAvailable: variety.isAvailable,
+        isDefault: variety.isDefault,
+      }));
+  
+      console.log("menu items", menuItemData);
+      console.log("varieties", transformedVarieties);
+  
+      // Handle image upload if present
+      if (imageFile instanceof File) {
+        toast.loading("Uploading image...");
+        
+        const uploadResult = await startMenuItemImageUpload([imageFile]);
+        
+        if (uploadResult && uploadResult[0]) {
+          menuItemData.image = uploadResult[0].ufsUrl;
+          toast.dismiss();
+        } else {
+          throw new Error("Failed to upload image");
+        }
+      } else {
+        menuItemData.image = null;
+      }
+  
+      await createMenuItem(menuItemData, transformedVarieties, session.user.id);
+      fetchUserAndCategories();
+  
+      toast.success("Menu item added successfully");
+    } catch (error) {
+      console.error("Error adding menu item:", error);
+      toast.error("Failed to add menu item");
+      throw error;
+    }
+  };
+
+  const handleUpdateMenuItem = async (
+    menuItemId: string,
+    formData: FormData,
+  ) => {
+    if (!session?.user?.id) {
+      toast.error("Not authenticated");
+      return;
+    }
+
+    try {
+      const updatedData: Partial<MenuItem> = {
+        name: formData.get("name") as string,
+        description: formData.get("description") as string,
+        price: Number(formData.get("price")),
+        isAvailable: formData.get("isAvailable") === "true",
+      };
+
+      // Extract varieties data from formData
+      const varieties: MenuItemVarietyInput[] = [];
+      const varietyCount = Number(formData.get("varietyCount") || "0");
+      
+      for (let i = 0; i < varietyCount; i++) {
+        const varietyId = formData.get(`variety_${i}_id`) as string;
+        const varietyName = formData.get(`variety_${i}_name`) as string;
+        const varietyDescription = formData.get(`variety_${i}_description`) as string;
+        const varietyPrice = Number(formData.get(`variety_${i}_price`));
+        const varietyPosition = Number(formData.get(`variety_${i}_position`) || i);
+        const varietyIsAvailable = formData.get(`variety_${i}_isAvailable`) === "true";
+        const varietyIsDefault = formData.get(`variety_${i}_isDefault`) === "true";
+
+        if (varietyName && !isNaN(varietyPrice)) {
+          varieties.push({
+            id: varietyId || undefined, // Include ID for existing varieties
+            name: varietyName,
+            description: varietyDescription ? varietyDescription : null,
+            price: varietyPrice,
+            position: varietyPosition,
+            isAvailable: varietyIsAvailable,
+            isDefault: varietyIsDefault,
+          });
+        }
+      }
+
+      const imageFile = formData.get("image") as File | null;
+      const existingImage = formData.get("existingImage") as string | null;
+
+      if (imageFile instanceof File) {
+        toast.loading("Uploading image...");
+        
+        const uploadResult = await startMenuItemImageUpload([imageFile]);
+        
+        if (uploadResult && uploadResult[0]) {
+          updatedData.image = uploadResult[0].ufsUrl;
+          toast.dismiss();
+        } else {
+          throw new Error("Failed to upload image");
+        }
+      } else if (existingImage) {
+        updatedData.image = existingImage;
+      }
+
+      await updateMenuItem(session.user.id, menuItemId, updatedData, varieties);
+      toast.success("Menu item updated");
+      fetchUserAndCategories();
+    } catch (error) {
+      console.error("Error updating menu item:", error);
+      toast.error("Failed to update menu item");
+      throw error;
+    }
+  };
+
   const handleDeleteMenuItem = async (menuItemId: string) => {
     if (!session?.user?.id) {
       toast.error("Not authenticated");
@@ -326,6 +410,7 @@ const handleUpdateCategory = async (
       toast.error("Failed to delete menu item");
     }
   };
+
 
   // Category group methods
   const handleAddCategoryGroup = async (groupData: Partial<CategoryGroup>) => {

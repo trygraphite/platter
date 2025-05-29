@@ -65,6 +65,21 @@ export default async function Page({ params }: { params: Params }) {
           image: true,
           isAvailable: true,
           position: true,
+          varieties: {
+            where: {
+              isAvailable: true,
+            },
+            select: {
+              id: true,
+              name: true,
+              description: true,
+              price: true,
+              position: true,
+              isAvailable: true,
+              isDefault: true,
+            },
+            orderBy: { position: "asc" },
+          },
         },
         orderBy: { position: "asc" },
       },

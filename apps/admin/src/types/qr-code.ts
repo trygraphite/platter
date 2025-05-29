@@ -14,4 +14,5 @@ export interface QRCodeResponse {
   qrCodeUrl?: string;
   locationName? : string;
   error?: string;
+  restaurantName?: string;
 }

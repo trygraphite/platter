@@ -54,6 +54,7 @@ model User {
   tables          Table[]
   categories      Category[]
   menuItems       MenuItem[]
+  menuItemVarieties MenuItemVariety[]
   orders          Order[]
   qrCodes         QRCode[]
   reviews         Review[]   
@@ -231,10 +232,11 @@ model MenuItem {
   id          String   @id @default(uuid())
   name        String
   description String
-  price       Int
+  price       Int      // Base price (can be overridden by varieties)
   image       String?
   position    Int      @default(0)  
   isAvailable Boolean  @default(true)
+  hasVarieties Boolean @default(false) // Flag to indicate if this item has varieties
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -244,8 +246,31 @@ model MenuItem {
   category    Category @relation(fields: [categoryId], references: [id])
   categoryId  String
   orderItems  OrderItem[]
+  varieties   MenuItemVariety[]
 
   @@index([userId, categoryId])
+}
+
+model MenuItemVariety {
+  id          String   @id @default(uuid())
+  name        String   // e.g., "Small", "Medium", "Large"
+  description String?  // Optional description for the variety
+  price       Int      // Price for this specific variety
+  position    Int      @default(0)
+  isAvailable Boolean  @default(true)
+  isDefault   Boolean  @default(false) // Mark one variety as default
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  menuItem    MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+  menuItemId  String
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String
+  orderItems  OrderItem[]
+
+  @@unique([menuItemId, name]) // Ensure unique variety names per menu item
+  @@index([menuItemId])
 }
 
 model Order {
@@ -289,18 +314,19 @@ model Order {
 model OrderItem {
   id           String   @id @default(uuid())
   quantity     Int
-  price        Int  // Price at time of order
+  price        Int      // Price at time of order (from variety or base menu item)
   specialNotes String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   
   // Relations
-  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  orderId    String
-  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
-  menuItemId String
+  order         Order              @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  orderId       String
+  menuItem      MenuItem           @relation(fields: [menuItemId], references: [id])
+  menuItemId    String
+  variety       MenuItemVariety?   @relation(fields: [varietyId], references: [id]) // Optional variety
+  varietyId     String?
 }
-
 model Review {
   id      String  @id @default(uuid())
   rating  Int     @default(5)

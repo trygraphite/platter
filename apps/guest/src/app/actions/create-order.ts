@@ -11,11 +11,19 @@ interface CreateOrderParams {
     quantity: number
     price: number
     name: string
+    selectedVarietyId?: string
   }[]
   totalAmount: number
+  specialNotes?: string
 }
 
-export async function createOrder({ tableId, qrId, items, totalAmount }: CreateOrderParams) {
+export async function createOrder({ 
+  tableId, 
+  qrId, 
+  items, 
+  totalAmount, 
+  specialNotes 
+}: CreateOrderParams) {
   try {
     // Get restaurant ID from QR code
     const qrCode = await db.qRCode.findUnique({
@@ -47,19 +55,21 @@ export async function createOrder({ tableId, qrId, items, totalAmount }: CreateO
     // Determine the next orderNumber
     const orderNumber = lastOrder?.orderNumber ? lastOrder.orderNumber + 1 : 1
 
-    // Create the order with validated userId
+    // Create the order with validated userId and special notes
     const order = await db.order.create({
       data: {
         status: "PENDING",
         orderNumber,
         totalAmount,
-        userId: qrCode.userId, // Now guaranteed to be a string
+        specialNotes: specialNotes || null,
+        userId: qrCode.userId, 
         tableId,
         items: {
           create: items.map((item) => ({
             menuItemId: item.id,
             quantity: item.quantity,
             price: item.price,
+            varietyId: item.selectedVarietyId || null,
           })),
         },
       },
@@ -67,6 +77,7 @@ export async function createOrder({ tableId, qrId, items, totalAmount }: CreateO
         items: {
           include: {
             menuItem: true,
+            variety: true,
           },
         },
         table: true,
@@ -90,6 +101,7 @@ export async function createOrder({ tableId, qrId, items, totalAmount }: CreateO
         const formattedItems = order.items.map((item: any) => ({
           menuItemId: item.menuItemId,
           quantity: item.quantity,
+          selectedVarietyId: item.selectedVarietyId,
         }))
 
         // Use fetch with improved error handling and timeout
@@ -104,7 +116,7 @@ export async function createOrder({ tableId, qrId, items, totalAmount }: CreateO
             },
             body: JSON.stringify({
               userId: qrCode.userId,
-              items: formattedItems, // Include properly formatted items array
+              items: formattedItems,
               order: {
                 ...order,
                 // Transform items to be more client-friendly
@@ -117,8 +129,14 @@ export async function createOrder({ tableId, qrId, items, totalAmount }: CreateO
                     name: item.menuItem.name,
                     price: item.menuItem.price,
                   },
+                  variety: item.variety ? {
+                    id: item.variety.id,
+                    name: item.variety.name,
+                    price: item.variety.price,
+                  } : null,
                 })),
                 tableNumber: order.table?.number || "Unknown",
+                specialNotes: order.specialNotes,
               },
             }),
             signal: controller.signal,

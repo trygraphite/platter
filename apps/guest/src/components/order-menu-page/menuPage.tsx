@@ -1,6 +1,6 @@
 "use client"
 
-import { CartItem as CartItemType } from "@/types/menu"
+import { CartItem as CartItemType, MenuItemVariety } from "@/types/menu"
 import type { CategoryGroup, MenuCategory, MenuItem, RestaurantDetails } from "@/types/menu"
 import { Card, CardContent, CardHeader, CardTitle } from "@platter/ui/components/card"
 import { ShoppingBag, X } from "@platter/ui/lib/icons"
@@ -134,28 +134,62 @@ export function MenuPage({ qrId, categories = [], categoryGroups = [], restauran
     }
   }, [isCartOpen])
 
-  const handleQuantityChange = useCallback((item: MenuItem, increment: boolean) => {
+  // Updated handleQuantityChange to support varieties
+  const handleQuantityChange = useCallback((item: MenuItem, increment: boolean, variety?: MenuItemVariety) => {
     setCart((prevCart) => {
-      const existingItem = prevCart.find((cartItem) => cartItem.id === item.id)
+      // Create a unique identifier for the cart item (item + variety combination)
+      const cartItemId = variety ? `${item.id}-${variety.id}` : item.id
+      
+      const existingItem = prevCart.find((cartItem) => {
+        if (variety) {
+          return cartItem.id === item.id && cartItem.selectedVariety?.id === variety.id
+        }
+        return cartItem.id === item.id && !cartItem.selectedVariety
+      })
+
       if (existingItem) {
         if (!increment && existingItem.quantity === 1) {
-          return prevCart.filter((cartItem) => cartItem.id !== item.id)
+          // Remove item from cart
+          return prevCart.filter((cartItem) => {
+            if (variety) {
+              return !(cartItem.id === item.id && cartItem.selectedVariety?.id === variety.id)
+            }
+            return !(cartItem.id === item.id && !cartItem.selectedVariety)
+          })
         }
-        return prevCart.map((cartItem) =>
-          cartItem.id === item.id
+        // Update quantity
+        return prevCart.map((cartItem) => {
+          const isMatchingItem = variety 
+            ? (cartItem.id === item.id && cartItem.selectedVariety?.id === variety.id)
+            : (cartItem.id === item.id && !cartItem.selectedVariety)
+          
+          return isMatchingItem
             ? {
                 ...cartItem,
                 quantity: increment ? cartItem.quantity + 1 : cartItem.quantity - 1,
               }
-            : cartItem,
-        )
+            : cartItem
+        })
       }
-      return [...prevCart, { ...item, quantity: 1 }]
+      
+      // Add new item to cart
+      const newCartItem: CartItemType = {
+        ...item,
+        quantity: 1,
+        selectedVariety: variety,
+        // Update price to variety price if variety is selected
+        price: variety ? variety.price : item.price
+      }
+      
+      return [...prevCart, newCartItem]
     })
   }, [])
 
   const calculateTotal = useCallback(() => {
-    return cart.reduce((total, item) => total + Number(item.price) * item.quantity, 0)
+    return cart.reduce((total, item) => {
+      const itemPrice = item.selectedVariety ? item.selectedVariety.price : item.price
+      return total + Number(itemPrice) * item.quantity
+    }, 0)
   }, [cart])
 
   const totalItems = useMemo(() => {
@@ -284,9 +318,9 @@ export function MenuPage({ qrId, categories = [], categoryGroups = [], restauran
                 ) : (
                   <>
                     <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-2">
-                      {cart.map((item) => (
+                      {cart.map((item, index) => (
                         <CartItem
-                          key={item.id}
+                          key={`${item.id}-${item.selectedVariety?.id || 'no-variety'}-${index}`}
                           item={item}
                           formatPrice={formatPrice}
                           onQuantityChange={handleQuantityChange}
@@ -353,9 +387,9 @@ export function MenuPage({ qrId, categories = [], categoryGroups = [], restauran
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {cart.map((item) => (
+                  {cart.map((item, index) => (
                     <CartItem
-                      key={item.id}
+                      key={`${item.id}-${item.selectedVariety?.id || 'no-variety'}-${index}`}
                       item={item}
                       formatPrice={formatPrice}
                       onQuantityChange={handleQuantityChange}

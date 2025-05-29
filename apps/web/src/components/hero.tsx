@@ -1,60 +1,58 @@
-import { Button } from "@platter/ui/components/button";
-import { QrCode, ArrowRight } from "lucide-react";
+  import Link from "next/link";
+  import { Button } from "@platter/ui/components/button";
+  import Image from "next/image";
 
-export const Hero = () => {
-  return (
-    <div className="relative min-h-[80vh] flex items-center justify-center bg-gradient-to-br from-platter-secondary to-white overflow-hidden">
-      <div className="absolute inset-0 bg-grid-pattern opacity-5" />
-      <div className="container mx-auto px-4 py-16 relative z-10">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="animate-fade-up">
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-              Transform Guest Experiences with{" "}
-              <span className="text-platter-primary">Platter</span>
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-600 mb-8">
-              A seamless QR-based system for ordering, reviews, and menu
-              exploration
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                size="lg"
-                className="bg-platter-primary hover:bg-platter-primary/90"
-              >
-                Try Platter for Free
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="border-platter-primary text-platter-primary hover:bg-platter-primary/10"
-              >
-                Learn More
-              </Button>
+  export function Hero() {
+    return (
+      <section className="relative overflow-hidden bg-white pt-16 md:pt-20 lg:pt-24">
+        <div className="container-wide">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center my-4 lg:my-24">
+            <div className="flex flex-col gap-6">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-gray-900">
+                Create a Free
+                <span className="block text-primary">QR Code Menu</span>
+                & Waiter App
+              </h1>
+              <p className="text-lg text-gray-600 max-w-xl">
+                Create your digital restaurant menu with QR codes in minutes, no credit card required. Includes
+                ordering system and staff management tools.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 mt-2">
+                <Link href="/request">
+                  <Button size="lg" className="bg-primary hover:bg-primary-600 text-white font-medium px-8">
+                    Create Free QR Menu
+                  </Button>
+                </Link>
+                <p className="text-sm text-gray-500 flex items-center gap-2 mt-2 sm:mt-0">
+                  *No credit card required • Instant setup • One month free!
+                </p>
+              </div>
             </div>
-          </div>
-          <div className="mt-16 animate-fade-in delay-300">
-            <div className="relative mx-auto w-64 h-64 bg-white rounded-2xl shadow-xl p-4 flex items-center justify-center">
-              <QrCode className="w-40 h-40 text-platter-primary animate-pulse" />
-              <div className="absolute -right-4 -bottom-4 bg-platter-accent rounded-full p-3">
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-                  />
-                </svg>
+            <div className="relative lg:-right-16 xl:-right-36 2xl:-right-40 transform lg:scale-110 xl:scale-150">
+              <div className="rounded-lg overflow-hidden shadow-xl">
+                <Image 
+                  src="/assets/dashboard02.png" 
+                  alt="Platter admin dashboard" 
+                  width={2000} 
+                  height={1000}
+                  className="w-full h-auto"
+                  priority
+                />
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  );
-};
+
+        {/* Gradient blur effect */}
+        <div className="absolute top-1/2 right-0 -z-10 -translate-y-1/2 transform-gpu blur-3xl">
+          <div
+            className="aspect-[1108/632] w-[69.25rem] bg-gradient-to-r from-primary-200 to-secondary-200 opacity-20"
+            style={{
+              clipPath:
+                "polygon(73.6% 51.7%, 91.7% 11.8%, 100% 46.4%, 97.4% 82.2%, 92.5% 84.9%, 75.7% 64%, 55.3% 47.5%, 46.5% 49.4%, 45% 62.9%, 50.3% 87.2%, 21.3% 64.1%, 0.1% 100%, 5.4% 51.1%, 21.4% 63.9%, 58.9% 0.2%, 73.6% 51.7%)",
+            }}
+          />
+        </div>
+      </section>
+    );
+  }

@@ -29,8 +29,37 @@ export async function GET(request: NextRequest) {
       include: {
         categories: {
           include: {
-            menuItems: true,
+            menuItems: {
+              select: {
+                id: true,
+                name: true,
+                description: true,
+                price: true,
+                image: true,
+                isAvailable: true,
+                hasVarieties: true,
+                position: true,
+                createdAt: true,
+                updatedAt: true,
+                varieties: {
+                  select: {
+                    id: true,
+                    name: true,
+                    description: true,
+                    price: true,
+                    position: true,
+                    isAvailable: true,
+                    isDefault: true,
+                    createdAt: true,
+                    updatedAt: true,
+                  },
+                  orderBy: { position: "asc" },
+                },
+              },
+              orderBy: { position: "asc" },
+            }
           },
+
         },
       },
       orderBy: {

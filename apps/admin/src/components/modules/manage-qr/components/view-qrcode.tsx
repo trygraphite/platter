@@ -37,7 +37,7 @@ export default function ViewQRCodeDialog({
   const getQRCodeType = (): "table" | "menu" | "location" => {
     if (!qrCode.target) return 'table';
     return qrCode.target.toLowerCase() === 'menu' ? 'menu' : 
-           qrCode.target.toLowerCase() === 'location' ? 'location' : 'table';
+    qrCode.target.toLowerCase() === 'location' ? 'location' : 'table';
   };
 
   const handleShare = () => {

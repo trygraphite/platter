@@ -12,6 +12,23 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "files.edgestore.dev", 
       },
+      // UploadThing domains
+      {
+        protocol: "https",
+        hostname: "utfs.io",
+      },
+      {
+        protocol: "https",
+        hostname: "*.ufs.sh", // UploadThing subdomain pattern
+      },
+      {
+        protocol: "https",
+        hostname: "uploadthing.com",
+      },
+      {
+        protocol: "https",
+        hostname: "*.uploadthing.com",
+      },
     ],
   },
 };

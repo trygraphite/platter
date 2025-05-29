@@ -27,7 +27,6 @@ export async function createQRCodeAction(
     if (!restaurant?.subdomain) {
       return { success: false, error: "Restaurant subdomain not found" };
     }
-
     let userLocation;
     let extractedLocationName = "";
 
@@ -177,6 +176,7 @@ export async function createQRCodeAction(
       success: true,
       qrCodeUrl,
       locationName: extractedLocationName,
+      restaurantName: restaurant.subdomain,
     };
   } catch (error) {
     console.error("QR Code generation error:", error);

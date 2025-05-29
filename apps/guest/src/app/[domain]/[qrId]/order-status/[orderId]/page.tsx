@@ -9,11 +9,15 @@ export default async function OrderPage({ params }: { params: Params }) {
   const { qrId, orderId } = await params;
 
   try {
-
     const order = await db.order.findUnique({
       where: { id: orderId },
       include: {
-        items: { include: { menuItem: true } },
+        items: { 
+          include: { 
+            menuItem: true,
+            variety: true, // Include varieties
+          } 
+        },
         table: true,
         user: true,
       },
