@@ -1,3 +1,4 @@
+// Updated MenuPage component (page.tsx)
 import { DynamicMenu } from "@/components/menu-page/dynamic-menu"
 import { MenuHeader } from "@/components/menu-page/menu-header"
 import Header from "@/components/shared/header"
@@ -47,7 +48,7 @@ export default async function MenuPage({ params }: { params: Params }) {
     orderBy: { position: "asc" },
   })
 
-  // Get menu items that belong to this user's categories
+  // Get menu items with varieties
   const menuItems = await db.menuItem.findMany({
     where: {
       isAvailable: true,
@@ -60,6 +61,16 @@ export default async function MenuPage({ params }: { params: Params }) {
         include: {
           categoryGroup: true,
         },
+      },
+      varieties: {
+        where: {
+          isAvailable: true,
+        },
+        orderBy: [
+          { isDefault: "desc" }, 
+          { position: "asc" },
+          { name: "asc" },
+        ],
       },
     },
     orderBy: [{ category: { position: "asc" } }, { position: "asc" }, { name: "asc" }],

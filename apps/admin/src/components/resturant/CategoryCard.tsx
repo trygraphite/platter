@@ -6,17 +6,16 @@ import { Card, CardContent, CardFooter, CardHeader } from "@platter/ui/component
 import { EditCategoryModal } from "./EditCategoryModal";
 import { Trash } from "lucide-react";
 import type { Category, MenuItem } from "@prisma/client";
-import { MenuItemsDialog } from "./MenuItemsDialog";
+import { MenuItemsDialog, MenuItemWithVarieties } from "./MenuItemsDialog";
 
 interface CategoryCardProps {
-  category: Category & { menuItems: MenuItem[] };
+  category: Category & { menuItems: MenuItemWithVarieties[] };
 }
 
 export function CategoryCard({ category }: CategoryCardProps) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isMenuItemsOpen, setIsMenuItemsOpen] = useState(false);
   const { handleDeleteCategory, editMode } = useRestaurant();
-
   const handleDelete = () => {
     if (window.confirm(`Are you sure you want to delete category "${category.name}"?`)) {
       handleDeleteCategory(category.id);

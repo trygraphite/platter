@@ -10,12 +10,13 @@ export default function QRCodePage() {
   const [qrCode, setQRCode] = useState<string | null>(null);
   const [currentTable, setCurrentTable] = useState<number | null>(null);
   const [locationName, setLocationName] = useState<string>("");
+  const [restaurantName, setRestaurantName] = useState<string>("");
 
   const [currentType, setCurrentType] = useState<"table" | "menu" | "location">(
     "table",
   );
   const [isLoading, setIsLoading] = useState(false);
-
+  console.log(restaurantName, "restaurantName");
   const handleGenerateQR = async (data: {
     target: "table" | "menu" | "location";
     tableNumber?: number | null;
@@ -32,6 +33,7 @@ export default function QRCodePage() {
         setCurrentTable(data.tableNumber ?? null);
         setCurrentType(data.target);
         setLocationName(result.locationName || "");
+        setRestaurantName(result.restaurantName || "");
 
         toast.success("QR Code generated successfully!");
       } else {
@@ -62,6 +64,7 @@ export default function QRCodePage() {
             tableNumber={currentTable}
             type={currentType}
             locationName={locationName}
+            restaurantName={restaurantName}
           />
         )}
       </div>

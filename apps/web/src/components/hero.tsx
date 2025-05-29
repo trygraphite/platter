@@ -14,11 +14,11 @@
                 & Waiter App
               </h1>
               <p className="text-lg text-gray-600 max-w-xl">
-                Create your digital restaurant menu with QR codes in minutes. Free forever, no credit card required. Includes
+                Create your digital restaurant menu with QR codes in minutes, no credit card required. Includes
                 ordering system and staff management tools.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 mt-2">
-                <Link href="/register">
+                <Link href="/request">
                   <Button size="lg" className="bg-primary hover:bg-primary-600 text-white font-medium px-8">
                     Create Free QR Menu
                   </Button>

@@ -1,6 +1,4 @@
 "use server";
-import { Decimal } from "@prisma/client/runtime/library";
-
 import db from "@platter/db";
 import { revalidatePath } from "next/cache";
 
@@ -13,7 +11,18 @@ interface CreateMenuItemData {
   isAvailable?: boolean;
 }
 
-export async function createMenuItem(data: CreateMenuItemData, userId: string) {
+export async function createMenuItem(
+  data: CreateMenuItemData, 
+  varieties: { 
+    name: string;
+    description: string | null | undefined;
+    price: number;
+    position: number;
+    isAvailable: boolean;
+    isDefault: boolean;
+  }[] = [], 
+  userId: string
+) {
   if (!data.categoryId || !userId) {
     throw new Error("Category ID and User ID are required");
   }
@@ -23,7 +32,18 @@ export async function createMenuItem(data: CreateMenuItemData, userId: string) {
     if (!data.name || !data.price) {
       throw new Error("Name and price are required");
     }
-    // Convert price to Decimal
+
+    // Ensure only one variety is marked as default
+    if (varieties.length > 0) {
+      const defaultVarieties = varieties.filter(v => v.isDefault);
+      if (defaultVarieties.length > 1) {
+        throw new Error("Only one variety can be marked as default");
+      }
+      // If no default is set, make the first one default
+      if (defaultVarieties.length === 0 && varieties.length > 0 && varieties[0]) {
+        varieties[0].isDefault = true;
+      }
+    }
 
     const menuItem = await db.menuItem.create({
       data: {
@@ -38,6 +58,21 @@ export async function createMenuItem(data: CreateMenuItemData, userId: string) {
         user: {
           connect: { id: userId },
         },
+        // Create varieties if provided
+        varieties: varieties.length > 0 ? {
+          create: varieties.map(variety => ({
+            name: variety.name,
+            description: variety.description || null,
+            price: variety.price,
+            position: variety.position,
+            isAvailable: variety.isAvailable,
+            isDefault: variety.isDefault,
+            userId: userId,
+          }))
+        } : undefined,
+      },
+      include: {
+        varieties: true,
       },
     });
 

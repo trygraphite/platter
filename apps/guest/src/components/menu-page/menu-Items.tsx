@@ -1,6 +1,8 @@
 "use client"
+import { MenuItemVariety } from "@platter/db/client"
 import { MenuCard } from "./menu-card"
 import { motion, AnimatePresence } from "framer-motion"
+
 
 interface Category {
   id: string
@@ -21,6 +23,7 @@ interface MenuItem {
   price: number
   image: string | null
   categoryId: string
+  varieties: MenuItemVariety[]
   category: {
     id: string
     name: string

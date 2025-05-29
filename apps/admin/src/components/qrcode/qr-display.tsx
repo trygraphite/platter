@@ -12,12 +12,14 @@ interface QRDisplayProps {
   tableNumber?: number | null;
   locationName?: string;
   type: "table" | "menu" | "location";
+  restaurantName?: string;
 }
 
 export function QRDisplay({
   qrCodeUrl,
   tableNumber,
   type,
+  restaurantName,
   locationName,
  }: QRDisplayProps) {
   const [combinedImageUrl, setCombinedImageUrl] = useState<string | null>(null);
@@ -41,7 +43,6 @@ export function QRDisplay({
     if (type === "menu") return "menu-qrcode.png";
     return `table-${tableNumber}-qrcode.png`;
   };
-
   const getTitle = () => {
     if (type === "menu") return "Menu QR Code";
     if (type === "location") return `${locationName} QR Code`;
@@ -60,6 +61,7 @@ export function QRDisplay({
           targetId={tableNumber?.toString() || ""}
           locationName={locationName}
           onImageGenerated={setCombinedImageUrl}
+          restaurantName={restaurantName}
         />
       </div>
       <Button

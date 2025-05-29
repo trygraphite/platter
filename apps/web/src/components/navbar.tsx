@@ -41,14 +41,14 @@ export function Navbar() {
 
         {/* Desktop call-to-action buttons */}
         <div className="hidden md:flex items-center gap-4">
-          <Link href="/login">
+          {/* <Link href="/login">
             <Button variant="ghost" className="text-primary hover:text-primary-600 hover:bg-primary-50">
               Login
             </Button>
-          </Link>
-          <Link href="/register">
+          </Link> */}
+          <Link href="/request">
             <Button className="bg-primary hover:bg-primary-600 text-white">
-              Create Free Account
+              Get Started
             </Button>
           </Link>
         </div>

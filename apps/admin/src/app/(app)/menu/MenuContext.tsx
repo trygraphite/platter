@@ -13,7 +13,7 @@ import { useRestaurant } from "../../../context/resturant-context";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@platter/ui/components/tabs";
 import { MenuIcon } from "lucide-react";
 
-export default function RestaurantContent() {
+export default function MenuPage() {
   const {
     user,
     categories,
@@ -28,7 +28,7 @@ export default function RestaurantContent() {
   useEffect(() => {
     fetchUserAndCategories();
   }, [fetchUserAndCategories]);
-
+// console.log(categories, "categories in menu page");
   if (isLoading) {
     return <div><HourglassLoader label="Loading Menu..." /></div>;
   }
@@ -132,7 +132,7 @@ export default function RestaurantContent() {
         </TabsContent>
         
         {/* Ungrouped Categories Tab */}
-        <TabsContent value="ungrouped">
+        {/* <TabsContent value="ungrouped">
           {ungroupedCategories.length > 0 ? (
             <div>
               <h2 className="text-2xl font-semibold mb-4">Ungrouped Categories</h2>
@@ -151,13 +151,14 @@ export default function RestaurantContent() {
               <AddCategoryModal />
             </div>
           )}
-        </TabsContent>
+        </TabsContent> */}
         
         {/* All Categories Tab */}
         <TabsContent value="all">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {categories.length > 0 ? (
               categories.map((category) => (
+                // console.log(category, "category mapped to menu page"),
                 <CategoryCard key={category.id} category={category} />
               ))
             ) : (

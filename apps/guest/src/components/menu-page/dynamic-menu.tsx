@@ -1,8 +1,23 @@
+// Updated DynamicMenu component with varieties
 "use client"
 
 import { useState } from "react"
 import { CategoryNav } from "./category-nav"
 import { MenuItems } from "./menu-Items"
+
+interface MenuItemVariety {
+  id: string
+  name: string
+  description: string | null
+  price: number
+  position: number
+  isAvailable: boolean
+  isDefault: boolean
+  createdAt: Date
+  updatedAt: Date
+  menuItemId: string
+  userId: string
+}
 
 interface CategoryGroup {
   id: string
@@ -25,6 +40,7 @@ interface MenuItem {
   price: number
   image: string | null
   categoryId: string
+  varieties: MenuItemVariety[]
   category: {
     id: string
     name: string

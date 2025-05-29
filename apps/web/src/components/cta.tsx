@@ -12,7 +12,7 @@ export function CTASection() {
         </p>
         <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
           <Link
-            href="/register"
+            href="/request"
             className="inline-flex items-center justify-center rounded-md bg-white px-6 py-3 text-base font-medium text-primary shadow-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-primary"
           >
             Create Free Account

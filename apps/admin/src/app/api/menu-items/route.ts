@@ -8,8 +8,7 @@ export async function GET(request: Request) {
 
   if (!userId) {
     return NextResponse.json({ error: "User ID is required" }, { status: 400 });
-  }
-  console.log("logged");
+  }  
   try {
     const menuItems = await db.menuItem.findMany({
       where: {
@@ -17,7 +16,27 @@ export async function GET(request: Request) {
         ...(categoryId && { categoryId }),
       },
       include: {
-        category: true,
+        category: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+          },
+        },
+        varieties: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            price: true,
+            position: true,
+            isAvailable: true,
+            isDefault: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+          orderBy: { position: "asc" },
+        },
       },
       orderBy: { createdAt: "desc" },
     });

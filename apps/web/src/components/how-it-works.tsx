@@ -60,13 +60,13 @@ export function HowItWorks() {
         </div>
 
         <div className="mt-16 flex flex-col items-center">
-          <Link href="/register">
+          <Link href="/request">
             <Button size="lg" className="bg-primary hover:bg-primary-600 text-white font-medium px-8">
               Create Free QR Code Menu
             </Button>
           </Link>
           <p className="mt-3 text-sm text-gray-500 text-center">
-            No credit card required • Instant setup • Free forever
+            No credit card required • Instant setup • One month free!
           </p>
         </div>
       </div>

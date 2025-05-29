@@ -1,5 +1,6 @@
 // components/order/OrderDetails.tsx
 
+import { formatNairaWithDecimals } from "@/utils";
 import { Order, Table } from "@platter/db/client";
 
 interface OrderDetailsProps {
@@ -8,6 +9,7 @@ interface OrderDetailsProps {
 }
 
 export function OrderDetails({ order, table }: OrderDetailsProps) {
+  console.log("Order details:", order);
   // Check if order is cancelled
   const isCancelled = order.status === "CANCELLED";
 
@@ -39,22 +41,39 @@ export function OrderDetails({ order, table }: OrderDetailsProps) {
             <div className="space-y-3">
               {order.items.map((item: any) => (
                 <div key={item.id} className="flex justify-between">
-                  <div>
+                  <div className="flex-1">
                     <p className="font-medium">{item.menuItem.name}</p>
+                    
+                    {/* Display variety if it exists */}
+                    {item.variety && (
+                      <p className="text-sm text-blue-600 font-medium">
+                        {item.variety.name}
+                      </p>
+                    )}
+                    
                     <p className="text-sm text-muted-foreground">
-                      ₦{Number(item.price).toFixed(2)} × {item.quantity}
+                      {formatNairaWithDecimals(item.price)} × {item.quantity}
+                    </p>
+                    
+                    {/* Display item-specific special notes if they exist */}
+                    {item.specialNotes && (
+                      <p className="text-sm text-orange-600 italic mt-1">
+                        Note: {item.specialNotes}
+                      </p>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold">
+                      {formatNairaWithDecimals(Number(item.price) * item.quantity)}
                     </p>
                   </div>
-                  <p className="font-semibold">
-                    ₦{(Number(item.price) * item.quantity).toFixed(2)}
-                  </p>
                 </div>
               ))}
             </div>
             <div className="border-t mt-4 pt-4">
               <div className="flex justify-between items-center font-bold">
                 <span>Total:</span>
-                <span>₦{Number(order.totalAmount).toFixed(2)}</span>
+                <span>{formatNairaWithDecimals(order.totalAmount)}</span>
               </div>
             </div>
           </>

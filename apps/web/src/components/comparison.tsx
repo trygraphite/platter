@@ -122,7 +122,7 @@ export function Comparison() {
             Get started in minutes - create your free QR code menu and watch your business transform. Your customers will thank you for it.
           </p>
           <a
-            href="/register"
+            href="/request"
             className="mt-8 inline-flex items-center justify-center rounded-md bg-primary px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
           >
             Create Free QR Code Menu
