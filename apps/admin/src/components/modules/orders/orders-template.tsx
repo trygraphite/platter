@@ -16,7 +16,12 @@ export default async function OrdersTemplate() {
       include: {
         items: {
           include: {
-            menuItem: true,
+            menuItem: {
+              include: {
+                varieties: true, // Include menu item varieties
+              }
+            },
+            variety: true, // Include the selected variety for this order item
           },
         },
       },

@@ -10,77 +10,115 @@ import {
 } from '@platter/ui/components/card';
 import { Button } from '@platter/ui/components/button';
 import { Badge } from '@platter/ui/components/badge';
-import { Check } from 'lucide-react';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@platter/ui/components/tabs';
+import { Check,  X } from 'lucide-react';
+import { Switch } from '@platter/ui/components/switch';
+import Link from 'next/link';
 
 export default function PricingPage() {
-  const [billingCycle, setBillingCycle] = useState('monthly');
+  const [isAnnual, setIsAnnual] = useState(false);
 
-  const pricingPlans = {
-    monthly: [
-      {
-        name: "Monthly",
-        price: "₦50,000",
-        description: "Perfect for restaurants just getting started with digital ordering.",
-        features: [
-          "Unlimited QR table generations",
+  const pricingPlans = [
+    {
+      name: "Free",
+      monthlyPrice: 0,
+      annualPrice: 0,
+      description: "Perfect for small cafes and food trucks getting started.",
+      features: {
+        included: [
+          "Up to 5 QR table generations",
+          "Basic order system",
+          "Simple menu management",
+          "Email support",
+          "Basic order notifications"
+        ],
+        excluded: [
+          "Real-time analytics",
+          "Customer management",
+          "Inventory tracking",
+          "Custom branding",
+          "Phone support"
+        ]
+      },
+      buttonText: "Get Started Free",
+      popular: false,
+      highlight: false
+    },
+    {
+      name: "Pro",
+      monthlyPrice: 50000,
+      annualPrice: 35000, // 30% discount
+      description: "Ideal for growing restaurants with moderate traffic.",
+      features: {
+        included: [
+          "Up to 50 QR table generations",
           "Real-time order system",
           "Order customization",
-          "Basic analytics",
-          "Email support"
+          "Basic analytics & reports",
+          "Customer order history",
+          "Email & phone support",
+          "Basic inventory alerts",
+          "Order status notifications"
         ],
-        buttonText: "Get Started",
-        popular: false
+        excluded: [
+          "Advanced analytics",
+          "Loyalty program",
+          "AI Order recommendations",
+          "Custom branding",
+          "Priority support"
+        ]
       },
-      {
-        name: "Quarterly",
-        price: "₦130,000",
-        pricePerMonth: "₦43,333/mo",
-        description: "Great value for established restaurants with growing needs.",
-        features: [
-          "Everything in Monthly plan",
+      buttonText: "Start Pro Plan",
+      popular: true,
+      highlight: true
+    },
+    {
+      name: "Advanced",
+      monthlyPrice: 80000,
+      annualPrice: 56000, // 30% discount
+      description: "Complete solution for established restaurants and chains.",
+      features: {
+        included: [
+          "Unlimited QR table generations",
+          "Advanced order management",
+          "Complete analytics dashboard",
+          "Customer loyalty program",
           "Advanced inventory management",
-          "Customer loyalty system",
-          "Detailed analytics & reports",
-          "Priority email & phone support",
-          "Custom branding options"
-        ],
-        buttonText: "Get Started",
-        popular: true
-      },
-      {
-        name: "Annual",
-        price: "₦400,000",
-        pricePerMonth: "₦33,333/mo",
-        description: "Best value for serious restaurants committed to digital innovation.",
-        features: [
-          "Everything in Quarterly plan",
-          "Advanced table management",
-          "Integration with POS systems",
+          "Custom branding & themes",
+          "24/7 priority support",
           "AI-powered recommendations",
-          "24/7 premium support",
-          "Custom mobile app",
+          "Multi-location management",
+          "Advanced reporting suite",
+          "Staff management tools",
           "Dedicated account manager"
         ],
-        buttonText: "Get Started",
-        popular: false
-      }
-    ]
+        excluded: []
+      },
+      buttonText: "Go Advanced",
+      popular: false,
+      highlight: false
+    }
+  ];
+
+  const formatPrice = (price: number) => {
+    if (price === 0) return "Free";
+    return `₦${price.toLocaleString()}`;
+  };
+
+  const calculateSavings = (monthlyPrice: number) => {
+    if (monthlyPrice === 0) return 0;
+    const annualTotal = monthlyPrice * 12;
+    const discountedAnnual = (monthlyPrice * 0.7) * 12;
+    return annualTotal - discountedAnnual;
   };
 
   return (
     <div className=" bg-background">
       {/* Pricing Section */}
-      <section id="pricing" className="w-full container-wide py-12 md:py-24">
-        <div className="container px-4 md:px-6">
+      <section id="pricing" className="w-full py-12 md:py-24">
+        <div className="container mx-auto px-4 md:px-6 max-w-7xl">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-foreground">
                 Simple, transparent pricing
               </h2>
               <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
@@ -89,55 +127,108 @@ export default function PricingPage() {
             </div>
           </div>
           
+          {/* Billing Toggle */}
+          <div className="flex justify-center items-center space-x-4 mt-8">
+            <span className={`text-sm font-medium ${!isAnnual ? 'text-foreground' : 'text-muted-foreground'}`}>
+              Monthly
+            </span>
+            <Switch checked={isAnnual} onCheckedChange={setIsAnnual} />
+            <span className={`text-sm font-medium ${isAnnual ? 'text-foreground' : 'text-muted-foreground'}`}>
+              Annual
+            </span>
+            {isAnnual && (
+              <Badge className="ml-2">
+                Save 30%
+              </Badge>
+            )}
+          </div>
+          
           <div className="mx-auto w-full max-w-sm sm:max-w-none mt-8">
-           
-            
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
-              {pricingPlans.monthly.map((plan, index) => (
-                <Card key={index} className={`flex flex-col ${plan.popular ? 'border-primary shadow-lg' : ''}`}>
+            <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-3 lg:gap-8">
+              {pricingPlans.map((plan, index) => (
+                <Card key={index} className={`flex flex-col ${plan.highlight ? 'border-primary shadow-xl ring-1 ring-primary' : 'shadow-sm'} relative`}>
+                  {plan.popular && (
+                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                      <Badge>
+                        Most Popular
+                      </Badge>
+                    </div>
+                  )}
+                  
                   <CardHeader>
                     <div className="flex items-center justify-between">
-                      <CardTitle>{plan.name}</CardTitle>
-                      {plan.popular && (
-                        <Badge variant="default" className="bg-primary text-primary-foreground">
-                          Popular
-                        </Badge>
-                      )}
+                      <CardTitle className="text-gray-900">{plan.name}</CardTitle>
                     </div>
                     <CardDescription>{plan.description}</CardDescription>
                   </CardHeader>
+                  
                   <CardContent className="flex-1">
-                    <div className="flex items-baseline text-2xl font-bold">
-                      {plan.price}
-                      <span className="ml-1 text-sm font-medium text-muted-foreground">
-                        {plan.name === "Monthly" ? "/month" : (plan.name === "Quarterly" ? "/3 months" : "/year")}
+                    <div className="flex items-baseline">
+                      <span className="text-3xl font-bold text-foreground">
+                        {formatPrice(isAnnual ? plan.annualPrice : plan.monthlyPrice)}
                       </span>
+                      {plan.monthlyPrice > 0 && (
+                        <span className="ml-2 text-sm font-medium text-muted-foreground">
+                          /{isAnnual ? 'month' : 'month'}
+                        </span>
+                      )}
                     </div>
-                    {plan.pricePerMonth && (
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {plan.pricePerMonth}
-                      </p>
+                    
+                    {isAnnual && plan.monthlyPrice > 0 && (
+                      <div className="mt-2">
+                        <p className="text-sm text-muted-foreground">
+                          Billed annually (₦{((isAnnual ? plan.annualPrice : plan.monthlyPrice) * 12).toLocaleString()}/year)
+                        </p>
+                        <p className="text-sm text-green-600 font-medium">
+                          Save ₦{calculateSavings(plan.monthlyPrice).toLocaleString()} per year
+                        </p>
+                      </div>
                     )}
-                    <ul className="mt-6 space-y-3">
-                      {plan.features.map((feature, featureIndex) => (
-                        <li key={featureIndex} className="flex items-center">
-                          <Check className="h-4 w-4 text-primary mr-2" />
-                          <span className="text-sm">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
+                    
+                    <div className="mt-6">
+                      <h4 className="text-sm font-medium text-foreground mb-3">What's included:</h4>
+                      <ul className="space-y-2">
+                        {plan.features.included.map((feature, featureIndex) => (
+                          <li key={`included-${featureIndex}`} className="flex items-start">
+                            <Check className="h-4 w-4 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
+                            <span className="text-sm text-foreground">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      
+                      {plan.features.excluded.length > 0 && (
+                        <div className="mt-4">
+                          <ul className="space-y-2">
+                            {plan.features.excluded.slice(0, 3).map((feature, featureIndex) => (
+                              <li key={`excluded-${featureIndex}`} className="flex items-start">
+                                <X className="h-4 w-4 text-muted-foreground mr-3 mt-0.5 flex-shrink-0" />
+                                <span className="text-sm text-muted-foreground">{feature}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
                   </CardContent>
+                  
                   <CardFooter>
+                    <Link href="/request" className="w-full">
                     <Button 
-                      className={`w-full ${plan.popular ? 'bg-primary text-primary-foreground' : ''}`} 
-                      variant={plan.popular ? "default" : "outline"}
+                      variant={plan.highlight ? "default" : (plan.name === "Free" ? "secondary" : "outline")}
                     >
                       {plan.buttonText}
                     </Button>
+                    </Link>
                   </CardFooter>
                 </Card>
               ))}
             </div>
+          </div>
+          
+          <div className="text-center mt-12">
+            <p className="text-sm text-muted-foreground">
+              All plans include a 14-day free trial. No credit card required.
+            </p>
           </div>
         </div>
       </section>
@@ -210,9 +301,9 @@ export default function PricingPage() {
                   <td className="py-4 px-4 text-center"><Check className="h-5 w-5 text-primary mx-auto" /></td>
                 </tr>
                 <tr className="border-b">
-                  <td className="py-4 px-4 font-medium">POS Integration</td>
+                  <td className="py-4 px-4 font-medium">Custom Branding</td>
                   <td className="py-4 px-4 text-center">—</td>
-                  <td className="py-4 px-4 text-center">—</td>
+                  <td className="py-4 px-4 text-center"><Check className="h-5 w-5 text-primary mx-auto" /></td>
                   <td className="py-4 px-4 text-center"><Check className="h-5 w-5 text-primary mx-auto" /></td>
                 </tr>
                 <tr className="border-b">

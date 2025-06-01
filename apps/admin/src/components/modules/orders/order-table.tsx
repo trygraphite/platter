@@ -1,5 +1,5 @@
 import type { Order, OrderStatus } from "@prisma/client";
-import { ChevronDown, ChevronUp, ClipboardIcon, Edit2, PackageIcon, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, ClipboardIcon, Edit2, PackageIcon, Trash2, Tag } from "lucide-react";
 import React, { useState } from "react";
 
 import {
@@ -11,11 +11,6 @@ import {
   TableRow,
 } from "@platter/ui/components/table";
 import { Button } from "@platter/ui/components/button";
-// import {
-//   Collapsible,
-//   CollapsibleContent,
-//   CollapsibleTrigger,
-// } from "@platter/ui/components/collapsible";
 import {
   Dialog,
   DialogContent,
@@ -24,6 +19,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@platter/ui/components/dialog";
+import { formatNaira } from "utils";
 
 interface OrdersTableProps {
   orders: (Order & {
@@ -33,7 +29,21 @@ interface OrdersTableProps {
       menuItem: {
         name: string;
         price: number;
+        varieties?: {
+          id: string;
+          name: string;
+          description?: string;
+          price: number;
+          isDefault: boolean;
+        }[];
       };
+      variety?: {
+        id: string;
+        name: string;
+        description?: string;
+        price: number;
+        isDefault: boolean;
+      } | null;
     }[];
   })[];
   onEditOrder: (order: Order) => void;
@@ -82,11 +92,14 @@ export default function OrdersTable({
     }
   };
 
-  const formatNaira = (amount: number) => {
-    return new Intl.NumberFormat("en-NG", {
-      style: "currency",
-      currency: "NGN",
-    }).format(amount);
+  // Calculate actual item price based on variety or base price
+  const getItemPrice = (item: any) => {
+    return item.variety ? item.variety.price : item.menuItem.price;
+  };
+
+  // Calculate total price for an item (quantity * actual price)
+  const getItemTotal = (item: any) => {
+    return getItemPrice(item) * item.quantity;
   };
 
   return (
@@ -115,17 +128,17 @@ export default function OrdersTable({
                         onClick={() => toggleOrderExpansion(order.id)}
                       >
                         {expandedOrderIds.has(order.id) ? (
-                          <ChevronUp size={16} />
+                          <ChevronUp size={18} />
                         ) : (
-                          <ChevronDown size={16} />
+                          <ChevronDown size={18} />
                         )}
                       </Button>
                     )}
                     <div>
-                      <div className="font-medium">
+                      <div className="font-medium text-lg">
                         Order #{order.orderNumber}
                       </div>
-                      <div className=" text-muted-foreground">
+                      <div className=" text-primary text-md ">
                         {order.orderType === "TABLE"
                           ? `Table: ${order.tableNumber || "N/A"}`
                           : "Pickup Order"}
@@ -143,7 +156,7 @@ export default function OrdersTable({
                 <TableCell className="text-muted-foreground">
                   {new Date(order.createdAt).toLocaleString()}
                 </TableCell>
-                <TableCell className="font-medium">
+                <TableCell className="font-medium text-lg">
                   {formatNaira(order.totalAmount)}
                 </TableCell>
                 <TableCell>
@@ -186,17 +199,30 @@ export default function OrdersTable({
                                 className="flex justify-between items-center p-2 rounded-md bg-muted/30 hover:bg-muted/50 transition-colors"
                               >
                                 <div className="flex items-center gap-3">
-                                  <span className="font-medium text-sm">
+                                  <span className="font-medium text-lg">
                                     {item.quantity}x
                                   </span>
-                                  <span className="text-sm">
-                                    {item.menuItem.name}
-                                  </span>
+                                  <div className="flex flex-col">
+                                    <span className="text-lg">
+                                      {item.menuItem.name}
+                                    </span>
+                                    {item.variety && (
+                                      <div className="flex items-center gap-1 mt-1">
+                                        <Tag size={12} className="text-primary" />
+                                        <span className="text-xs text-primary font-medium">
+                                          {item.variety.name}
+                                        </span>
+                                        {item.variety.description && (
+                                          <span className="text-xs text-muted-foreground">
+                                            • {item.variety.description}
+                                          </span>
+                                        )}
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
-                                <span className="font-medium text-sm">
-                                  {formatNaira(
-                                    item.menuItem.price * item.quantity,
-                                  )}
+                                <span className="font-medium text-lg">
+                                  {formatNaira(getItemTotal(item))}
                                 </span>
                               </div>
                             ))}
