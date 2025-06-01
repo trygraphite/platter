@@ -100,20 +100,13 @@ export function Navbar() {
               </nav>
 
               <div className="flex flex-col gap-2 mt-4">
+             
                 <Link
-                  href="/login"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <Button variant="outline" className="w-full">
-                    Login
-                  </Button>
-                </Link>
-                <Link
-                  href="/register"
+                  href="/request"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <Button className="w-full bg-primary hover:bg-primary-600 text-white">
-                    Create Free Account
+                   Get Started!
                   </Button>
                 </Link>
               </div>

@@ -29,11 +29,12 @@ import {
   SelectValue,
 } from '@platter/ui/components/select';
 import { Alert, AlertDescription, AlertTitle } from '@platter/ui/components/alert';
-import { Phone, Mail, MessageSquare, MapPin, Clock, CheckCircle2 } from 'lucide-react';
+import { Phone, Mail, MessageSquare, MapPin, Clock, CheckCircle2, Loader2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@platter/ui/components/tabs';
 
 export default function ContactPage() {
   const [formStatus, setFormStatus] = useState({ type: '', message: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState('inquiry');
 
   const form = useForm({
@@ -46,41 +47,68 @@ export default function ContactPage() {
     },
   });
 
-  const handleSubmit = (data: any) => {
-    // Here you would typically connect to your API or email service
-    console.log('Form submitted:', data);
-    
-    // Simulate form submission
-    setFormStatus({
-      type: 'success',
-      message: 'Thank you for your message! We will get back to you soon.'
-    });
-    
-    // Reset form
-    form.reset();
-    
-    // Clear success message after 5 seconds
-    setTimeout(() => {
-      setFormStatus({ type: '', message: '' });
-    }, 5000);
+  const handleSubmit = async (data: any) => {
+    setIsSubmitting(true);
+    setFormStatus({ type: '', message: '' });
+
+    try {
+      const response = await fetch('/api/support', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setFormStatus({
+          type: 'success',
+          message: 'Thank you for your message! We will get back to you within 24 hours.'
+        });
+        
+        // Reset form
+        form.reset();
+        
+        // Clear success message after 8 seconds
+        setTimeout(() => {
+          setFormStatus({ type: '', message: '' });
+        }, 8000);
+      } else {
+        throw new Error(result.error || 'Something went wrong');
+      }
+    } catch (error: any) {
+      setFormStatus({
+        type: 'error',
+        message: error.message || 'Failed to send message. Please try again or contact us directly via WhatsApp.'
+      });
+      
+      // Clear error message after 8 seconds
+      setTimeout(() => {
+        setFormStatus({ type: '', message: '' });
+      }, 8000);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const openWhatsApp = () => {
     const phoneNumber = '2348149113328';
-    const message = encodeURIComponent('Hello! I have a question about RestaurantQR.');
+    const message = encodeURIComponent('Hello! I have a question about Platter QR.');
     window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
   };
 
   return (
-    <div className="  bg-background">
+    <div className="bg-background">
       {/* Hero Section */}
-      <section className="w-full  py-12 md:py-24 lg:py-32 bg-gradient-to-b from-background to-muted">
+      <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-background to-muted">
         <div className="container container-wide px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
               <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl">Get in Touch</h1>
               <p className="max-w-[700px] text-muted-foreground md:text-xl">
-                Have questions about our restaurant QR ordering system? We're here to help!
+                Have questions about our Platter QR ordering system? We're here to help!
               </p>
             </div>
           </div>
@@ -140,7 +168,7 @@ export default function ContactPage() {
                     </div>
                   </CardHeader>
                   <CardContent className="p-4 pt-0">
-                    <p className="font-medium">support@restaurantqr.com</p>
+                    <p className="font-medium">support@platterng.com</p>
                     <p className="text-sm text-muted-foreground mt-1">
                       We aim to respond within 24 hours
                     </p>
@@ -218,6 +246,7 @@ export default function ContactPage() {
                                   placeholder="Your name"
                                   {...field}
                                   required
+                                  disabled={isSubmitting}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -237,6 +266,7 @@ export default function ContactPage() {
                                   placeholder="your.email@example.com"
                                   {...field}
                                   required
+                                  disabled={isSubmitting}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -257,6 +287,7 @@ export default function ContactPage() {
                                   type="tel"
                                   placeholder="+234 000 0000000"
                                   {...field}
+                                  disabled={isSubmitting}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -273,6 +304,7 @@ export default function ContactPage() {
                               <Select
                                 onValueChange={field.onChange}
                                 defaultValue={field.value}
+                                disabled={isSubmitting}
                               >
                                 <FormControl>
                                   <SelectTrigger>
@@ -306,6 +338,7 @@ export default function ContactPage() {
                                 className="min-h-32"
                                 {...field}
                                 required
+                                disabled={isSubmitting}
                               />
                             </FormControl>
                             <FormMessage />
@@ -313,7 +346,16 @@ export default function ContactPage() {
                         )}
                       />
 
-                      <Button type="submit" className="w-full">Send Message</Button>
+                      <Button type="submit" className="w-full" disabled={isSubmitting}>
+                        {isSubmitting ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Sending Message...
+                          </>
+                        ) : (
+                          'Send Message'
+                        )}
+                      </Button>
                     </form>
                   </Form>
                 </CardContent>
