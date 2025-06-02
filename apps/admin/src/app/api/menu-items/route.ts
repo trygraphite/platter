@@ -1,3 +1,4 @@
+// File: /app/api/menu-items/route.ts
 import db from "@platter/db";
 import { NextResponse } from "next/server";
 
@@ -9,11 +10,18 @@ export async function GET(request: Request) {
   if (!userId) {
     return NextResponse.json({ error: "User ID is required" }, { status: 400 });
   }  
+  
   try {
     const menuItems = await db.menuItem.findMany({
       where: {
         userId,
-        ...(categoryId && { categoryId }),
+        deletedAt: null, // Only get non-deleted menu items
+        ...(categoryId && { 
+          categoryId,
+          category: {
+            deletedAt: null, // Ensure the category is also not deleted
+          }
+        }),
       },
       include: {
         category: {
@@ -24,6 +32,9 @@ export async function GET(request: Request) {
           },
         },
         varieties: {
+          where: {
+            deletedAt: null, // Only get non-deleted varieties
+          },
           select: {
             id: true,
             name: true,

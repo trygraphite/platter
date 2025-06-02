@@ -10,23 +10,11 @@ import { useSession } from "@/lib/auth/client";
 import { useEdgeStore } from "@/lib/edgestore/edgestore";
 import { MenuItemVarietyInput } from "@/types";
 import { toast } from "@platter/ui/components/sonner";
-import type { Category, CategoryGroup, MenuItem, User } from "@prisma/client";
+import type { Category, CategoryGroup, MenuItem, MenuItemVariety, User } from "@prisma/client";
 import type React from "react";
 import { createContext, useCallback, useContext, useState } from "react";
 import { useUploadThing } from "utils/uploadThing";
-type MenuItemVariety = {
-  id: string;
-  name: string;
-  description: string | null;
-  price: number;
-  position: number;
-  isAvailable: boolean;
-  isDefault: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-  menuItemId: string;
-  userId: string;
-};
+
 type MenuItemWithVarieties = MenuItem & { 
   varieties: MenuItemVariety[] 
 };
@@ -103,7 +91,7 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
   // UploadThing hooks
   const { startUpload: startCategoryImageUpload, isUploading: isCategoryImageUploading } = useUploadThing("categoryImageUploader");
   const { startUpload: startMenuItemImageUpload, isUploading: isMenuItemImageUploading } = useUploadThing("menuItemImageUploader");
-
+  
   const fetchUserAndCategories = useCallback(async () => {
     if (!session?.user?.id) {
       toast.error("Loading Menu");
@@ -302,7 +290,7 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
         toast.loading("Uploading image...");
         
         const uploadResult = await startMenuItemImageUpload([imageFile]);
-        
+        console.log("uploadResult", uploadResult);
         if (uploadResult && uploadResult[0]) {
           menuItemData.image = uploadResult[0].ufsUrl;
           toast.dismiss();

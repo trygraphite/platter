@@ -160,7 +160,7 @@ export default function OrderPageClient({
                 <SelectContent>
                   <SelectItem value="all">All Status</SelectItem>
                   <SelectItem value="PENDING">Pending</SelectItem>
-                  <SelectItem value="CONFIRMED">Confirmed</SelectItem>
+                  {/* <SelectItem value="CONFIRMED">Confirmed</SelectItem> */}
                   <SelectItem value="PREPARING">Preparing</SelectItem>
                   <SelectItem value="DELIVERED">Delivered</SelectItem>
                   <SelectItem value="CANCELLED">Cancelled</SelectItem>

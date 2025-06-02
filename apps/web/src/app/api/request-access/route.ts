@@ -1,43 +1,9 @@
 // app/api/request-access/route.ts
 import { Resend } from 'resend';
 import { NextRequest, NextResponse } from 'next/server';
+import { getRateLimitKey, isRateLimited, RATE_LIMIT } from '@/app/lib/rateLimit';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-
-// In-memory rate limiting store (consider Redis for production)
-const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
-
-// Rate limiting configuration
-const RATE_LIMIT = {
-  maxRequests: 3, // Max requests per window
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  maxPerEmail: 1, // Max requests per email per day
-  emailWindowMs: 24 * 60 * 60 * 1000, // 24 hours
-};
-
-function getRateLimitKey(ip: string, type: 'ip' | 'email', identifier?: string): string {
-  return type === 'ip' ? `ip:${ip}` : `email:${identifier}`;
-}
-
-function isRateLimited(key: string, maxRequests: number, windowMs: number): boolean {
-  const now = Date.now();
-  const record = rateLimitStore.get(key);
-  
-  if (!record || now > record.resetTime) {
-    // Reset or create new record
-    rateLimitStore.set(key, { count: 1, resetTime: now + windowMs });
-    return false;
-  }
-  
-  if (record.count >= maxRequests) {
-    return true;
-  }
-  
-  // Increment count
-  record.count++;
-  rateLimitStore.set(key, record);
-  return false;
-}
 
 function getClientIP(request: NextRequest): string {
   // Check various headers for the real IP
@@ -45,7 +11,6 @@ function getClientIP(request: NextRequest): string {
   const realIP = request.headers.get('x-real-ip');
   const cfConnectingIP = request.headers.get('cf-connecting-ip');
   
-
   return realIP || cfConnectingIP || 'unknown';
 }
 
@@ -139,15 +104,5 @@ export async function POST(request: NextRequest) {
       { error: 'Failed to send request. Please try again later.' }, 
       { status: 500 }
     );
-  }
-}
-
-// Optional: Cleanup function to remove old entries (call periodically)
-export function cleanupRateLimit() {
-  const now = Date.now();
-  for (const [key, record] of rateLimitStore.entries()) {
-    if (now > record.resetTime) {
-      rateLimitStore.delete(key);
-    }
   }
 }

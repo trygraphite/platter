@@ -14,7 +14,9 @@ import { Label } from "@platter/ui/components/label";
 import { Textarea } from "@platter/ui/components/textarea";
 import type { MenuItem } from "@prisma/client";
 import { Plus, Trash2, MoveUp, MoveDown } from "lucide-react";
-import { useEffect, useState } from "react";
+import Image from "next/image";
+import { Suspense, useEffect, useState } from "react";
+import { ImageLoadingPlaceholder } from "utils";
 
 interface MenuItemVariety {
   id?: string;
@@ -220,11 +222,15 @@ export function EditMenuItemModal({
               onChange={handleImageChange}
             />
             {imagePreview && (
-              <img
-                src={imagePreview}
-                alt="Preview"
-                className="mt-2 max-w-full h-32 object-cover"
+              <Suspense fallback={<ImageLoadingPlaceholder />}>
+               <Image 
+              src={imagePreview}
+              alt={`Image for ${name}`}
+              width={142}
+                height={142}
+               className={`w-full md:w-28 h-28 rounded-lg object-cover transition-opacity duration-200}`}
               />
+             </Suspense>
             )}
           </div>
           <div className="flex items-center space-x-2">

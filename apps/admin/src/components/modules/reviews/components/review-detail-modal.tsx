@@ -27,12 +27,12 @@ export function ReviewDetailsModal({
 }: ReviewDetailsModalProps) {
   // Get the source information
   const getSourceInfo = () => {
-    if (review.order) {
-      return `Order #${review.order.orderNumber}`;
+    if (review.table) {
+      return `Table #${review.table.number}`;
     } else if (review.qrCode) {
       return `QR Code: ${review.qrCode.code}`;
-    } else if (review.table) {
-      return `Table #${review.table.number}`;
+    } else if (review.order) {
+      return `Order #${review.order.orderNumber}`;
     }
     return "Unknown source";
   };

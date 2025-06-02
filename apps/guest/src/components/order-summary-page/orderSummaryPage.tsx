@@ -248,7 +248,7 @@ export function OrderSummaryPage({
                             {/* Variety Information */}
                             {item.selectedVariety && (
                               <div className="mb-2">
-                                <div className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-sm rounded-md font-medium">
+                                <div className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary border-red-500 text-sm rounded-md font-medium">
                                   <span>{item.selectedVariety.name}</span>
                                 </div>
                                 {item.selectedVariety.description && (

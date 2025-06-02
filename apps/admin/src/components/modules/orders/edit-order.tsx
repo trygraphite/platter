@@ -30,7 +30,7 @@ interface EditOrderModalProps {
 
 const ORDER_STATUSES: OrderStatus[] = [
   "PENDING",
-  "CONFIRMED",
+  // "CONFIRMED",
   "PREPARING",
   "DELIVERED",
   "CANCELLED",
@@ -77,12 +77,12 @@ export default function EditOrderModal({
               value={status}
               onValueChange={(value: OrderStatus) => setStatus(value)}
             >
-              <SelectTrigger className="col-span-3">
+              <SelectTrigger className="col-span-3 uppercase">
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
               <SelectContent>
                 {ORDER_STATUSES.map((orderStatus) => (
-                  <SelectItem key={orderStatus} value={orderStatus}>
+                  <SelectItem key={orderStatus} value={orderStatus} className="uppercase">
                     {orderStatus.charAt(0) + orderStatus.slice(1).toLowerCase()}
                   </SelectItem>
                 ))}

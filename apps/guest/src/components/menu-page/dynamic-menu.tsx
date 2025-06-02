@@ -4,20 +4,7 @@
 import { useState } from "react"
 import { CategoryNav } from "./category-nav"
 import { MenuItems } from "./menu-Items"
-
-interface MenuItemVariety {
-  id: string
-  name: string
-  description: string | null
-  price: number
-  position: number
-  isAvailable: boolean
-  isDefault: boolean
-  createdAt: Date
-  updatedAt: Date
-  menuItemId: string
-  userId: string
-}
+import { MenuItemVariety } from "@platter/db/client"
 
 interface CategoryGroup {
   id: string
@@ -65,16 +52,13 @@ export function DynamicMenu({ initialCategoryGroups, initialUngroupedCategories,
   const handleCategorySelect = (categoryId: string | null) => {
     setSelectedCategory(categoryId)
 
-    // If a category is selected, we don't filter by group
     if (categoryId) {
-      // Find which group this category belongs to
       for (const group of initialCategoryGroups) {
         if (group.categories.some((cat) => cat.id === categoryId)) {
           setSelectedGroup(group.id)
           return
         }
       }
-      // If not found in any group, it's an ungrouped category
       setSelectedGroup(null)
     }
   }

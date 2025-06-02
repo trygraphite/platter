@@ -77,12 +77,13 @@ export function ReviewsTable({ reviews }: ReviewsTableProps) {
       accessorKey: "source",
       header: "Source",
       cell: ({ row }) => {
-        if (row.original.order) {
-          return `Order #${row.original.order.orderNumber}`;
+        console.log(row.original)
+        if (row.original.table) {
+          return `Table #${row.original.table.number}`;
         } else if (row.original.qrCode) {
           return `QR Code: ${row.original.qrCode.code}`;
-        } else if (row.original.table) {
-          return `Table #${row.original.table.number}`;
+        } else if (row.original.order) {
+          return `Order #${row.original.order.orderNumber}`;
         }
         return "Unknown";
       },
