@@ -25,11 +25,18 @@ export async function GET(request: NextRequest) {
     const categoryGroups = await db.categoryGroup.findMany({
       where: {
         userId,
+        deletedAt: null, // Only get non-deleted category groups
       },
       include: {
         categories: {
+          where: {
+            deletedAt: null, // Only get non-deleted categories
+          },
           include: {
             menuItems: {
+              where: {
+                deletedAt: null, // Only get non-deleted menu items
+              },
               select: {
                 id: true,
                 name: true,
@@ -42,6 +49,9 @@ export async function GET(request: NextRequest) {
                 createdAt: true,
                 updatedAt: true,
                 varieties: {
+                  where: {
+                    deletedAt: null, // Only get non-deleted varieties
+                  },
                   select: {
                     id: true,
                     name: true,
@@ -59,7 +69,7 @@ export async function GET(request: NextRequest) {
               orderBy: { position: "asc" },
             }
           },
-
+          orderBy: { position: "asc" },
         },
       },
       orderBy: {

@@ -1,17 +1,20 @@
 "use client";
 
 import { Button } from "@platter/ui/components/button";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { AddCategoryModal } from "@/components/resturant/AddCategoryModel";
 import { AddCategoryGroupModal } from "@/components/resturant/AddCategoryGroupModal";
-import { CategoryGroupManager } from "@/components/resturant/CategoryGroupManager";
+
 import { CategoryCard } from "@/components/resturant/CategoryCard";
+import { EditCategoryModal } from "@/components/resturant/EditCategoryModal";
 import { Switch } from "@platter/ui/components/switch";
 import { HourglassLoader } from "@platter/ui/components/timeLoader";
 import { useRestaurant } from "../../../context/resturant-context";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@platter/ui/components/tabs";
 import { MenuIcon } from "lucide-react";
+import type { Category } from "@prisma/client";
+import { CategoryGroupManagerModal } from "@/components/resturant/CategoryGroupManager";
 
 export default function MenuPage() {
   const {
@@ -25,10 +28,40 @@ export default function MenuPage() {
     fetchUserAndCategories,
   } = useRestaurant();
 
+  // State to control which tab is active
+  const [activeTab, setActiveTab] = useState("grouped");
+  // State for edit category modal
+  const [editCategoryModal, setEditCategoryModal] = useState<{
+    isOpen: boolean;
+    category: Category | null;
+  }>({ isOpen: false, category: null });
+  // State for category group manager modal
+  const [isGroupManagerModalOpen, setIsGroupManagerModalOpen] = useState(false);
+
   useEffect(() => {
     fetchUserAndCategories();
   }, [fetchUserAndCategories]);
-// console.log(categories, "categories in menu page");
+
+  // Function to handle opening edit category modal
+  const openEditCategoryModal = (category: Category) => {
+    setEditCategoryModal({ isOpen: true, category });
+  };
+
+  // Function to close edit category modal
+  const closeEditCategoryModal = () => {
+    setEditCategoryModal({ isOpen: false, category: null });
+  };
+
+  // Function to handle opening group manager modal
+  const openGroupManagerModal = () => {
+    setIsGroupManagerModalOpen(true);
+  };
+
+  // Function to close group manager modal
+  const closeGroupManagerModal = () => {
+    setIsGroupManagerModalOpen(false);
+  };
+
   if (isLoading) {
     return <div><HourglassLoader label="Loading Menu..." /></div>;
   }
@@ -44,12 +77,6 @@ export default function MenuPage() {
       </div>
     );
   }
-
-  // Get categories without groups for ungrouped view
-  const ungroupedCategories = categories.filter(category => !category.groupId);
-  
-  // Get categories with groups
-  const groupedCategories = categories.filter(category => category.groupId);
 
   return (
     <div className="max-w-[1200px] mx-auto p-4">
@@ -76,10 +103,8 @@ export default function MenuPage() {
       </header>
 
       {/* Tabs for different views */}
-      <Tabs defaultValue="grouped" className="mb-6">
-        {/* <TabsList className="mb-6">
-          <TabsTrigger value="grouped">Grouped Categories</TabsTrigger>
-        </TabsList> */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
+     
         
         {/* Grouped Categories Tab */}
         <TabsContent value="grouped">
@@ -98,10 +123,7 @@ export default function MenuPage() {
                       <Button 
                         variant="outline" 
                         size="sm"
-                        onClick={() => {
-                          // This would open an edit group modal. You can implement this later.
-                          alert(`Edit group: ${group.name}`);
-                        }}
+                        onClick={openGroupManagerModal}
                       >
                         Edit Group
                       </Button>
@@ -111,7 +133,9 @@ export default function MenuPage() {
                   {group.categories.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {group.categories.map((category) => (
-                        <CategoryCard key={category.id} category={category} />
+                        <div key={category.id} className="relative">
+                          <CategoryCard category={category} />                         
+                        </div>
                       ))}
                     </div>
                   ) : (
@@ -131,35 +155,24 @@ export default function MenuPage() {
           )}
         </TabsContent>
         
-        {/* Ungrouped Categories Tab */}
-        {/* <TabsContent value="ungrouped">
-          {ungroupedCategories.length > 0 ? (
-            <div>
-              <h2 className="text-2xl font-semibold mb-4">Ungrouped Categories</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {ungroupedCategories.map((category) => (
-                  <CategoryCard key={category.id} category={category} />
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="text-center py-12 border rounded-lg">
-              <h3 className="text-xl font-semibold mb-2">No Ungrouped Categories</h3>
-              <p className="text-muted-foreground mb-4">
-                All your categories are assigned to groups
-              </p>
-              <AddCategoryModal />
-            </div>
-          )}
-        </TabsContent> */}
-        
         {/* All Categories Tab */}
         <TabsContent value="all">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {categories.length > 0 ? (
               categories.map((category) => (
-                // console.log(category, "category mapped to menu page"),
-                <CategoryCard key={category.id} category={category} />
+                <div key={category.id} className="relative">
+                  <CategoryCard category={category} />
+                  {editMode && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="absolute top-2 right-2 z-10"
+                      onClick={() => openEditCategoryModal(category)}
+                    >
+                      Edit
+                    </Button>
+                  )}
+                </div>
               ))
             ) : (
               <div className="col-span-3 text-center py-12 border rounded-lg">
@@ -172,12 +185,22 @@ export default function MenuPage() {
             )}
           </div>
         </TabsContent>
-        
-        {/* Manage Groups Tab */}
-        {/* <TabsContent value="manage">
-          <CategoryGroupManager />
-        </TabsContent> */}
       </Tabs>
+
+      {/* Edit Category Modal */}
+      {editCategoryModal.category && (
+        <EditCategoryModal
+          isOpen={editCategoryModal.isOpen}
+          onClose={closeEditCategoryModal}
+          category={editCategoryModal.category}
+        />
+      )}
+
+      {/* Category Group Manager Modal */}
+      <CategoryGroupManagerModal
+        isOpen={isGroupManagerModalOpen}
+        onClose={closeGroupManagerModal}
+      />
     </div>
   );
 }

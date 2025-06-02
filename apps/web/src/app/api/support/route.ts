@@ -1,42 +1,13 @@
 // app/api/support/route.ts
 import { Resend } from 'resend';
 import { NextRequest, NextResponse } from 'next/server';
+import { cleanupRateLimit, isRateLimited, RATE_LIMIT } from '@/app/lib/rateLimit';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// In-memory rate limiting store (consider Redis for production)
-const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
-
-// Rate limiting configuration for support requests
-const RATE_LIMIT = {
-  maxRequests: 5, // Max requests per window (more generous for support)
-  windowMs: 30 * 60 * 1000, // 30 minutes
-  maxPerEmail: 3, // Max requests per email per day
-  emailWindowMs: 24 * 60 * 60 * 1000, // 24 hours
-};
-
-function getRateLimitKey(ip: string, type: 'ip' | 'email', identifier?: string): string {
+// Support-specific rate limit key function with prefix
+function getSupportRateLimitKey(ip: string, type: 'ip' | 'email', identifier?: string): string {
   return type === 'ip' ? `support:ip:${ip}` : `support:email:${identifier}`;
-}
-
-function isRateLimited(key: string, maxRequests: number, windowMs: number): boolean {
-  const now = Date.now();
-  const record = rateLimitStore.get(key);
-  
-  if (!record || now > record.resetTime) {
-    // Reset or create new record
-    rateLimitStore.set(key, { count: 1, resetTime: now + windowMs });
-    return false;
-  }
-  
-  if (record.count >= maxRequests) {
-    return true;
-  }
-  
-  // Increment count
-  record.count++;
-  rateLimitStore.set(key, record);
-  return false;
 }
 
 function getClientIP(request: NextRequest): string {
@@ -45,7 +16,6 @@ function getClientIP(request: NextRequest): string {
   const realIP = request.headers.get('x-real-ip');
   const cfConnectingIP = request.headers.get('cf-connecting-ip');
   
-
   return realIP || cfConnectingIP || 'unknown';
 }
 
@@ -69,7 +39,7 @@ export async function POST(request: NextRequest) {
     const clientIP = getClientIP(request);
     
     // Rate limit by IP
-    const ipKey = getRateLimitKey(clientIP, 'ip');
+    const ipKey = getSupportRateLimitKey(clientIP, 'ip');
     if (isRateLimited(ipKey, RATE_LIMIT.maxRequests, RATE_LIMIT.windowMs)) {
       return NextResponse.json(
         { 
@@ -127,12 +97,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Rate limit by email (prevent same email from spamming)
-    const emailKey = getRateLimitKey(clientIP, 'email', sanitizedEmail);
+    // Rate limit by email
+    const emailKey = getSupportRateLimitKey(clientIP, 'email', sanitizedEmail);
     if (isRateLimited(emailKey, RATE_LIMIT.maxPerEmail, RATE_LIMIT.emailWindowMs)) {
       return NextResponse.json(
         { 
-          error: 'This email has already submitted multiple support requests recently. Please try again tomorrow.',
+          error: 'This email has already submitted a support request recently. Please try again tomorrow.',
           retryAfter: Math.ceil(RATE_LIMIT.emailWindowMs / 1000 / 60 / 60) // hours
         }, 
         { status: 429 }
@@ -142,7 +112,7 @@ export async function POST(request: NextRequest) {
     // Send email to support team
     await resend.emails.send({
       from: 'noreply@platterng.com',
-      to: 'ibrahimdoba55@gmail.com', // Your support email
+      to: 'ibrahimdoba55@gmail.com',
       subject: `Support Request: ${sanitizedSubject || 'General Inquiry'}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -219,6 +189,9 @@ export async function POST(request: NextRequest) {
         </div>
       `
     });
+
+    // Clean up old rate limit entries (now calls internal function)
+    cleanupRateLimit();
     
     return NextResponse.json({ 
       success: true,
@@ -231,15 +204,5 @@ export async function POST(request: NextRequest) {
       { error: 'Failed to send support request. Please try again or contact us directly.' }, 
       { status: 500 }
     );
-  }
-}
-
-// Optional: Cleanup function to remove old entries (call periodically)
-export function cleanupRateLimit() {
-  const now = Date.now();
-  for (const [key, record] of rateLimitStore.entries()) {
-    if (now > record.resetTime) {
-      rateLimitStore.delete(key);
-    }
   }
 }

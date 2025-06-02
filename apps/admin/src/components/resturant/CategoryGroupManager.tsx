@@ -10,7 +10,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@platter/ui/co
 import { ArrowUp, ArrowDown, Edit, Trash, Plus } from "lucide-react";
 import { useState } from "react";
 
-export function CategoryGroupManager() {
+interface CategoryGroupManagerModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export function CategoryGroupManagerModal({ isOpen, onClose }: CategoryGroupManagerModalProps) {
   const { 
     categoryGroups, 
     handleUpdateCategoryGroupPosition,
@@ -58,79 +63,89 @@ export function CategoryGroupManager() {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Manage Category Groups</h2>
-        <Button onClick={() => {
-          setFormData({ name: "", description: "" });
-          setIsAddModalOpen(true);
-        }}>
-          <Plus className="w-4 h-4 mr-2" />
-          Add New Group
-        </Button>
-      </div>
+    <>
+      {/* Main Group Manager Modal */}
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Manage Category Groups</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="flex justify-end">
+              <Button onClick={() => {
+                setFormData({ name: "", description: "" });
+                setIsAddModalOpen(true);
+              }}>
+                <Plus className="w-4 h-4 mr-2" />
+                Add New Group
+              </Button>
+            </div>
 
-      {categoryGroups.length === 0 ? (
-        <div className="text-center py-12 border rounded-lg">
-          <p className="text-muted-foreground">No category groups yet</p>
-        </div>
-      ) : (
-        <div className="grid gap-4">
-          {categoryGroups.map((group) => (
-            <Card key={group.id} className="relative">
-              <div className="absolute right-2 top-2 flex flex-col space-y-1">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => moveGroup(group.id, "up")}
-                  title="Move up"
-                >
-                  <ArrowUp className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => moveGroup(group.id, "down")}
-                  title="Move down"
-                >
-                  <ArrowDown className="h-4 w-4" />
-                </Button>
+            {categoryGroups.length === 0 ? (
+              <div className="text-center py-12 border rounded-lg">
+                <p className="text-muted-foreground">No category groups yet</p>
               </div>
-              
-              <CardHeader>
-                <h3 className="text-xl font-semibold">{group.name}</h3>
-                {group.description && (
-                  <p className="text-sm text-muted-foreground">{group.description}</p>
-                )}
-              </CardHeader>
-              <CardContent>
-                <p>
-                  <span className="font-medium">{group.categories?.length || 0}</span> categories
-                </p>
-              </CardContent>
-              <CardFooter className="flex justify-end space-x-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => handleEditGroup(group.id)}
-                >
-                  <Edit className="w-4 h-4 mr-2" />
-                  Edit
-                </Button>
-                <Button 
-                  variant="destructive" 
-                  size="sm" 
-                  onClick={() => handleDeleteGroup(group.id)}
-                >
-                  <Trash className="w-4 h-4" />
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-      )}
+            ) : (
+              <div className="grid gap-4">
+                {categoryGroups.map((group) => (
+                  <Card key={group.id} className="relative">
+                    {/* <div className="absolute right-2 top-2 flex flex-col space-y-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => moveGroup(group.id, "up")}
+                        title="Move up"
+                      >
+                        <ArrowUp className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => moveGroup(group.id, "down")}
+                        title="Move down"
+                      >
+                        <ArrowDown className="h-4 w-4" />
+                      </Button>
+                    </div> */}
+                    
+                    <CardHeader>
+                      <h3 className="text-xl font-semibold">{group.name}</h3>
+                      {group.description && (
+                        <p className="text-sm text-muted-foreground">{group.description}</p>
+                      )}
+                    </CardHeader>
+                    <CardContent>
+                      <p>
+                        <span className="font-medium">{group.categories?.length || 0}</span> categories
+                      </p>
+                    </CardContent>
+                    <CardFooter className="flex justify-end space-x-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => handleEditGroup(group.id)}
+                      >
+                        <Edit className="w-4 h-4 mr-2" />
+                        Edit
+                      </Button>
+                      <Button 
+                        variant="destructive" 
+                        size="sm" 
+                        onClick={() => handleDeleteGroup(group.id)}
+                      >
+                        <Trash className="w-4 h-4" />
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Edit Group Dialog */}
       <Dialog open={!!editGroupId} onOpenChange={(open) => !open && setEditGroupId(null)}>
@@ -205,6 +220,6 @@ export function CategoryGroupManager() {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

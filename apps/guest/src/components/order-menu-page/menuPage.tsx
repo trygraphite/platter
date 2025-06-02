@@ -231,6 +231,13 @@ export function MenuPage({ qrId, categories = [], categoryGroups = [], restauran
     setSelectedCategory(null)
   }, [selectedGroup])
 
+  // Function to handle cart click - direct redirect to order summary
+  const handleCartClick = useCallback(() => {
+    if (cart.length > 0) {
+      router.push(`/${qrId}/order-summary`)
+    }
+  }, [cart.length, router, qrId])
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Restaurant Header */}
@@ -334,7 +341,7 @@ export function MenuPage({ qrId, categories = [], categoryGroups = [], restauran
                       </div>
                     </div>
                     <Button
-                      onClick={() => router.push(`/${qrId}/order-summary`)}
+                      onClick={handleCartClick}
                       className="w-full mt-4 bg-primary hover:bg-primary/90"
                       size="lg"
                     >
@@ -348,10 +355,10 @@ export function MenuPage({ qrId, categories = [], categoryGroups = [], restauran
         </div>
       </div>
 
-      {/* Mobile Cart Button */}
+      {/* Mobile Cart Button - Now directly redirects to order summary */}
       {cart.length > 0 && (
         <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-white shadow-lg z-20">
-          <Button onClick={() => setIsCartOpen(true)} className="w-full bg-primary hover:bg-primary/90 py-6 rounded-lg">
+          <Button onClick={handleCartClick} className="w-full bg-primary hover:bg-primary/90 py-6 rounded-lg">
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center gap-2">
                 <ShoppingBag className="h-5 w-5" />
@@ -365,7 +372,7 @@ export function MenuPage({ qrId, categories = [], categoryGroups = [], restauran
         </div>
       )}
 
-      {/* Mobile Cart Drawer */}
+      {/* Mobile Cart Drawer - Kept for potential future use or if needed for other interactions */}
       {isCartOpen && (
         <div className="md:hidden fixed inset-0 bg-black/50 z-50 flex flex-col">
           <div className="mt-auto bg-white rounded-t-xl max-h-[85vh] flex flex-col">
@@ -406,7 +413,7 @@ export function MenuPage({ qrId, categories = [], categoryGroups = [], restauran
                   <span>₦{formatPrice(calculateTotal())}</span>
                 </div>
                 <Button
-                  onClick={() => router.push(`/${qrId}/order-summary`)}
+                  onClick={handleCartClick}
                   className="w-full bg-primary hover:bg-primary/90 py-6"
                   size="lg"
                 >

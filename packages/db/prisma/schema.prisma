@@ -198,6 +198,7 @@ model CategoryGroup {
   description String?
   position    Int        @default(0)  
   isActive    Boolean    @default(true)
+  deletedAt   DateTime?  // Soft delete field
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
@@ -207,6 +208,7 @@ model CategoryGroup {
   categories  Category[]
 
   @@unique([userId, name])
+  @@index([deletedAt]) // Index for efficient querying of non-deleted items
 }
 
 model Category {
@@ -215,6 +217,7 @@ model Category {
   description   String?
   position      Int           @default(0)  
   isActive      Boolean       @default(true)
+  deletedAt     DateTime?     // Soft delete field
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
   image         String?
@@ -226,29 +229,31 @@ model Category {
   groupId       String?
 
   @@unique([userId, name])
+  @@index([deletedAt]) // Index for efficient querying of non-deleted items
 }
 
 model MenuItem {
   id          String   @id @default(uuid())
   name        String
   description String
-  price       Int      // Base price (can be overridden by varieties)
+  price       Int
   image       String?
   position    Int      @default(0)  
   isAvailable Boolean  @default(true)
-  hasVarieties Boolean @default(false) // Flag to indicate if this item has varieties
+  hasVarieties Boolean @default(false)
+  deletedAt   DateTime? // Soft delete field
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  // Relations
   user        User     @relation(fields: [userId], references: [id])
   userId      String
-  category    Category @relation(fields: [categoryId], references: [id])
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade) 
   categoryId  String
   orderItems  OrderItem[]
   varieties   MenuItemVariety[]
 
   @@index([userId, categoryId])
+  @@index([deletedAt]) // Index for efficient querying of non-deleted items
 }
 
 model MenuItemVariety {
@@ -259,6 +264,7 @@ model MenuItemVariety {
   position    Int      @default(0)
   isAvailable Boolean  @default(true)
   isDefault   Boolean  @default(false) // Mark one variety as default
+  deletedAt   DateTime? // Soft delete field
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -271,6 +277,7 @@ model MenuItemVariety {
 
   @@unique([menuItemId, name]) // Ensure unique variety names per menu item
   @@index([menuItemId])
+  @@index([deletedAt]) // Index for efficient querying of non-deleted items
 }
 
 model Order {
@@ -297,7 +304,7 @@ model Order {
   deliveryTime     Int?       // Time between ready and delivered
   totalTime        Int?       // Total time from creation to delivery
 
-  // Relations
+  // Relationsc
   orderType       OrderType   @default(TABLE)
   user            User        @relation(fields: [userId], references: [id])
   userId          String
@@ -322,9 +329,9 @@ model OrderItem {
   // Relations
   order         Order              @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   orderId       String
-  menuItem      MenuItem           @relation(fields: [menuItemId], references: [id])
+  menuItem      MenuItem           @relation(fields: [menuItemId], references: [id], onDelete: Restrict)
   menuItemId    String
-  variety       MenuItemVariety?   @relation(fields: [varietyId], references: [id]) // Optional variety
+  variety       MenuItemVariety?   @relation(fields: [varietyId], references: [id], onDelete: Restrict) // Optional variety
   varietyId     String?
 }
 model Review {

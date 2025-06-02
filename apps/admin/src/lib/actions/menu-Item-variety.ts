@@ -99,12 +99,39 @@ export async function updateMenuItemVariety(
 
 export async function deleteMenuItemVariety(userId: string, varietyId: string) {
   try {
-    await db.menuItemVariety.delete({
+    // Check if there are any order items using this variety
+    const orderItemsCount = await db.orderItem.count({
+      where: { varietyId }
+    });
+
+    if (orderItemsCount > 0) {
+      // Soft delete: set deletedAt timestamp and mark as unavailable
+      await db.menuItemVariety.update({
+        where: { id: varietyId, userId },
+        data: { 
+          deletedAt: new Date(),
+          isAvailable: false 
+        }
+      });
+      
+      revalidatePath("/menu-items");
+      return { 
+        success: true, 
+        message: "Variety has been archived because it has existing orders. It will no longer appear for new orders." 
+      };
+    }
+
+    // If no order items exist, proceed with soft deletion anyway for consistency
+    await db.menuItemVariety.update({
       where: { id: varietyId, userId },
+      data: { 
+        deletedAt: new Date(),
+        isAvailable: false 
+      }
     });
     
     revalidatePath("/menu-items");
-    return { success: true };
+    return { success: true, message: "Variety deleted successfully." };
   } catch (error) {
     console.error("Failed to delete variety:", error);
     return { success: false, error: "Failed to delete variety" };
@@ -117,6 +144,7 @@ export async function getMenuItemVarieties(userId: string, menuItemId: string) {
       where: {
         menuItemId,
         userId,
+        deletedAt: null, // Only get non-deleted varieties
       },
       orderBy: { position: "asc" },
     });
@@ -175,6 +203,25 @@ export async function updateMenuItemVarietyPosition(
     return { success: true };
   } catch (error) {
     console.error("Error updating variety position:", error);
+    throw error;
+  }
+}
+
+
+// Helper function to get all varieties including deleted ones (for admin purposes)
+export async function getAllMenuItemVarieties(userId: string, menuItemId: string) {
+  try {
+    const varieties = await db.menuItemVariety.findMany({
+      where: {
+        menuItemId,
+        userId,
+      },
+      orderBy: { position: "asc" },
+    });
+
+    return varieties;
+  } catch (error) {
+    console.error("Error fetching all menu item varieties:", error);
     throw error;
   }
 }

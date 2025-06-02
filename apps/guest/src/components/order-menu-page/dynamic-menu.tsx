@@ -1,8 +1,8 @@
 "use client"
 import { motion, AnimatePresence } from "framer-motion"
-import type { CartItem, CategoryGroup, MenuCategory, MenuItem } from "@/types/menu"
-import { MenuItemCard } from "./menu-item-card"
+import type { CartItem, CategoryGroup, MenuCategory, MenuItem, MenuItemVariety } from "@/types/menu"
 import { useEffect } from "react"
+import { MenuCard } from "./menu-item-card"
 
 interface DynamicMenuProps {
   categories: MenuCategory[]
@@ -10,7 +10,7 @@ interface DynamicMenuProps {
   selectedGroup: string | null
   categoryGroups: CategoryGroup[]
   cart: CartItem[]
-  onQuantityChange: (item: MenuItem, increment: boolean) => void
+  onQuantityChange: (item: MenuItem, increment: boolean, variety?: MenuItemVariety) => void
   formatPrice: (price: number | string | null | undefined) => string
 }
 
@@ -82,17 +82,21 @@ export function DynamicMenu({
               
               {category.menuItems && category.menuItems.length > 0 ? (
                 <div className="grid grid-cols-1 gap-3 md:gap-4">
-                  {category.menuItems.map((item) => (
-                    <motion.div key={item.id} variants={itemVariants}>
-                      <MenuItemCard
-                        item={item}
-                        inCart={cart.some((cartItem) => cartItem.id === item.id)}
-                        quantity={cart.find((cartItem) => cartItem.id === item.id)?.quantity || 0}
-                        onQuantityChange={onQuantityChange}
-                        formatPrice={formatPrice}
-                      />
-                    </motion.div>
-                  ))}
+                  {category.menuItems.map((item) => {
+                    const cartItem = cart.find((cartItem) => cartItem.id === item.id)
+                    return (
+                      <motion.div key={item.id} variants={itemVariants}>
+                        <MenuCard
+                          item={item}
+                          inCart={Boolean(cartItem)}
+                          quantity={cartItem?.quantity || 0}
+                          cartItem={cartItem}
+                          onQuantityChange={onQuantityChange}
+                          formatPrice={formatPrice}
+                        />
+                      </motion.div>
+                    )
+                  })}
                 </div>
               ) : (
                 <p className="text-gray-500 italic">No items in this category</p>

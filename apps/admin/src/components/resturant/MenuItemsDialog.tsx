@@ -12,7 +12,7 @@ import { useState, Suspense } from "react";
 import Image from "next/image";
 import { AddMenuItemModal } from "./AddMenuItemModal";
 import { EditMenuItemModal } from "./EditMenuItemModal";
-import { ImageLoadingPlaceholder, NoImagePlaceholder, OptimizedMenuItemImage } from "utils";
+import { ImageLoadingPlaceholder, NoImagePlaceholder } from "utils";
 
 export interface MenuItemWithVarieties extends MenuItem {
   varieties?: MenuItemVariety[];
@@ -136,10 +136,12 @@ export function MenuItemsDialog({ isOpen, onClose, category }: MenuItemsDialogPr
                       <div className="flex flex-col md:flex-row md:items-center gap-4">
                         {item.image ? (
                           <Suspense fallback={<ImageLoadingPlaceholder />}>
-                            <OptimizedMenuItemImage 
+                            <Image 
                               src={item.image}
                               alt={item.name}
-                              isAvailable={item.isAvailable}
+                              width={142}
+                              height={142}
+                              className={`w-full md:w-28 h-28 rounded-lg object-cover transition-opacity duration-200 ${!item.isAvailable ? 'opacity-60' : ''}`}
                             />
                           </Suspense>
                         ) : (

@@ -1,10 +1,11 @@
-// File: /app/api/categories/route.ts
+// File: /app/api/admin/categories/route.ts (optional)
 import db from "@platter/db";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const userId = searchParams.get("userId");
+  const includeDeleted = searchParams.get("includeDeleted") === "true";
 
   if (!userId) {
     return NextResponse.json({ error: "User ID is required" }, { status: 400 });
@@ -14,7 +15,7 @@ export async function GET(request: Request) {
     const categories = await db.category.findMany({
       where: { 
         userId,
-        deletedAt: null, // Only get non-deleted categories
+        ...(includeDeleted ? {} : { deletedAt: null }), // Include deleted if requested
       },
       orderBy: { createdAt: "desc" },
       select: {
@@ -23,10 +24,10 @@ export async function GET(request: Request) {
         description: true,
         createdAt: true,
         updatedAt: true,
+        deletedAt: true, // Include deletedAt for admin view
+        isActive: true,
         menuItems: {
-          where: {
-            deletedAt: null, // Only get non-deleted menu items
-          },
+          where: includeDeleted ? {} : { deletedAt: null },
           select: {
             id: true,
             name: true,
@@ -38,10 +39,9 @@ export async function GET(request: Request) {
             position: true,
             createdAt: true,
             updatedAt: true,
+            deletedAt: true, // Include deletedAt for admin view
             varieties: {
-              where: {
-                deletedAt: null, // Only get non-deleted varieties
-              },
+              where: includeDeleted ? {} : { deletedAt: null },
               select: {
                 id: true,
                 name: true,
@@ -52,6 +52,7 @@ export async function GET(request: Request) {
                 isDefault: true,
                 createdAt: true,
                 updatedAt: true,
+                deletedAt: true, // Include deletedAt for admin view
               },
               orderBy: { position: "asc" },
             },
