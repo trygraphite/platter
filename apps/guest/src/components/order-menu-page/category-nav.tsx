@@ -243,7 +243,7 @@ export function CategoryNav({
                   : "bg-gray-100 hover:bg-gray-200 text-gray-700",
               )}
             >
-              All Varieties
+              All Categories
             </button>
 
             {getDisplayedCategories().map((category) => (
