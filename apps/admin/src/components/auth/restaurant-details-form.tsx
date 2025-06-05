@@ -73,10 +73,10 @@ export default function RestaurantDetailsForm() {
       toast.error("Not authenticated");
       return;
     }
-
     // Include the icon and image URLs in the submission data
     const submissionData = {
       ...data,
+      hasCompletedOnboarding: true,
       icon: iconUrl,
       image: imageUrl
     };

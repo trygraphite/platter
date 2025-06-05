@@ -11,6 +11,14 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
+  user: {
+    additionalFields: {
+      hasCompletedOnboarding: {
+        type: "boolean",
+        defaultValue: false,
+      },
+    },
+  },
   emailVerification: {
     async sendVerificationEmail({ user, url }) {
       await sendVerificationEmailAction({

@@ -17,6 +17,7 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const isPublicRoute =
     path.startsWith("/login") || path.startsWith("/register");
+  const isOnboardingRoute = path.startsWith("/onboarding");
 
   // Not logged in, redirect to login except for public routes
   if (!session) {
@@ -31,6 +32,25 @@ export async function middleware(request: NextRequest) {
   // Logged in but not verified, force verify except on verify page
   if (!session.user.emailVerified && path !== "/verify") {
     return NextResponse.redirect(new URL("/verify", request.url));
+  }
+
+  // Logged in and verified but hasn't completed onboarding
+  if (
+    session.user.emailVerified &&
+    !session.user.hasCompletedOnboarding &&
+    !isOnboardingRoute &&
+    path !== "/verify"
+  ) {
+    return NextResponse.redirect(new URL("/onboarding", request.url));
+  }
+
+  // Prevent accessing onboarding page if already completed
+  if (
+    session.user.emailVerified &&
+    session.user.hasCompletedOnboarding &&
+    isOnboardingRoute
+  ) {
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   // Prevent accessing public routes or verify page when logged in and verified

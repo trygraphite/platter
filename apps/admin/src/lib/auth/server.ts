@@ -6,6 +6,7 @@ async function getServerSession() {
     const session = await auth.api.getSession({
       headers: await headers(),
     });
+    console.log(session)
     return session;
   } catch (error) {
     return null;

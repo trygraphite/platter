@@ -46,7 +46,8 @@ model User {
   openingHours    String?
   closingHours    String?
   emailVerified   Boolean?    
-  
+  hasCompletedOnboarding Boolean @default(false)
+
   // Staff-specific fields
   // position        String?
   
