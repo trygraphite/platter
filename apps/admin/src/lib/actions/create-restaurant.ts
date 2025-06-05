@@ -32,6 +32,7 @@ export async function createRestaurantAction(
         ...validatedData,
         seatingCapacity: Number(validatedData.seatingCapacity),
         subdomain: validatedData.name.toLowerCase().replace(/\s/g, "-"),
+        hasCompletedOnboarding: true,
       },
     });
 

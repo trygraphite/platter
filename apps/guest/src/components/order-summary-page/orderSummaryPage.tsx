@@ -25,6 +25,7 @@ import {
 import { toast } from "@platter/ui/components/sonner";
 import { createOrder } from "@/app/actions/create-order";
 import { formatNaira } from "@/utils";
+import Image from "next/image";
 
 interface OrderSummaryPageProps {
   qrId: string;
@@ -226,7 +227,7 @@ export function OrderSummaryPage({
                     <div className="flex items-start gap-4">
                       {/* Image */}
                       <div className="flex-shrink-0">
-                        <img
+                        <Image
                           src={item.image || "/placeholder-food.jpg"} 
                           alt={item.name}
                           className="w-20 h-20 object-cover rounded-lg border"
