@@ -3,6 +3,7 @@
 import { AppSidebar } from "@/components/navigation/app-sidebar";
 import DynamicBreadcrumb from "@/components/navigation/dynamic-breadcrumb";
 import { NotificationCenter } from "@/components/navigation/notification-alert";
+import GlobalLoading from "@/components/shared/global-loader";
 import { ToastProvider } from "@/context/toast-context";
 import { useSession } from "@/lib/auth/client";
 import { Separator } from "@platter/ui/components/separator";
@@ -46,7 +47,10 @@ export default function AppLayout({
               </div>
             </div>
           </header>
-          <main className="p-4">{children}</main>
+          <main className="p-4">
+          <GlobalLoading />
+          {children}
+          </main>
         </SidebarInset>
       </SidebarProvider>
     </ToastProvider>

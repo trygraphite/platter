@@ -16,7 +16,6 @@ export default function QRCodePage() {
     "table",
   );
   const [isLoading, setIsLoading] = useState(false);
-  console.log(restaurantName, "restaurantName");
   const handleGenerateQR = async (data: {
     target: "table" | "menu" | "location";
     tableNumber?: number | null;

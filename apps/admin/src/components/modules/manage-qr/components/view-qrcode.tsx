@@ -19,6 +19,7 @@ type QRCodeWithRelations = QRCode & {
   user?: { name: string; email: string } | null;
   table?: { name: string; number: string } | null;
   location?: { name: string } | null;
+  restaurant?: { name: string } | null;
 };
 
 interface ViewQRCodeDialogProps {
@@ -33,16 +34,16 @@ export default function ViewQRCodeDialog({
   onClose,
 }: ViewQRCodeDialogProps) {
   const [isLoading,] = useState(false);
-
   const getQRCodeType = (): "table" | "menu" | "location" => {
     if (!qrCode.target) return 'table';
     return qrCode.target.toLowerCase() === 'menu' ? 'menu' : 
     qrCode.target.toLowerCase() === 'location' ? 'location' : 'table';
   };
+  
 
   const handleShare = () => {
     // Implement share functionality
-    console.log('Sharing QR code:', qrCode.id);
+    // console.log('Sharing QR code:', qrCode.id);
   };
 
   return (
@@ -62,6 +63,7 @@ export default function ViewQRCodeDialog({
               tableNumber={qrCode.targetNumber ? parseInt(qrCode.targetNumber) : null}
               type={getQRCodeType()}
               locationName={qrCode.location?.name || ''}
+              restaurantName={qrCode.user?.name || ''}
             />
           ) : (
             <div className="text-center p-8 bg-gray-100 rounded-md w-full">

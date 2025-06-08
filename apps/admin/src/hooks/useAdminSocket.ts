@@ -34,18 +34,13 @@ export default function useAdminOrdersSocket({
   })
 
   // Handle new order event
-  const handleNewOrder = useCallback((newOrder: Order) => {
-    console.log("New order received:", newOrder)
-    console.log("Order items:", newOrder.items)
-
+  const handleNewOrder = useCallback((newOrder: Order) => { 
     // Check if this order already exists in our state
     setOrders((currentOrders) => {
       const exists = currentOrders.some((order) => order.id === newOrder.id)
       if (exists) {
-        console.log("Order already exists in state, updating it")
         return currentOrders.map((order) => (order.id === newOrder.id ? { ...order, ...newOrder } : order))
       } else {
-        console.log("Adding new order to state")
         // Show notification for new orders
         toast.success(`New order #${newOrder.orderNumber || 'Unknown'} received`)
         return [newOrder, ...currentOrders]
@@ -54,9 +49,7 @@ export default function useAdminOrdersSocket({
   }, [])
 
   // Handle order update event
-  const handleOrderUpdate = useCallback((updatedOrder: Order) => {
-    console.log("Order update received:", updatedOrder)
-    
+  const handleOrderUpdate = useCallback((updatedOrder: Order) => {    
     // Get the current order to compare with updated order
     setOrders((currentOrders) => {
       const currentOrder = currentOrders.find(order => order.id === updatedOrder.id)
@@ -84,9 +77,7 @@ export default function useAdminOrdersSocket({
   }, [])
 
   // Handle order deletion event
-  const handleOrderDeleted = useCallback((deletedId: string) => {
-    console.log("Order deletion received:", deletedId)
-    
+  const handleOrderDeleted = useCallback((deletedId: string) => {    
     setOrders((currentOrders) => {
       // Find the order before removing it to show notification
       const orderToDelete = currentOrders.find(order => order.id === deletedId)
@@ -100,14 +91,10 @@ export default function useAdminOrdersSocket({
 
   useEffect(() => {
     if (!socket || !isConnected) return
-
-    console.log("Socket connected, setting up event listeners")
-
     // Join restaurant-specific room if userId is provided
     if (userId) {
       const roomName = `restaurant:${userId}`
       socket.emit("joinRestaurantRoom", userId)
-      console.log(`Joined restaurant room: ${roomName} for user: ${userId}`)
     }
 
     // Set up event listeners
@@ -117,7 +104,6 @@ export default function useAdminOrdersSocket({
 
     // Clean up event listeners
     return () => {
-      console.log("Cleaning up socket event listeners")
       socket.off("newOrder", handleNewOrder)
       socket.off("orderUpdate", handleOrderUpdate)
       socket.off("orderDeleted", handleOrderDeleted)

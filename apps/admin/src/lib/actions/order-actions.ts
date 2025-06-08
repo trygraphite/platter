@@ -66,7 +66,6 @@ export async function createOrder({
 }
 
 export async function updateOrder(order: any) {
-  console.log("Updating order:", order);
   try {
     // Update in database
     const updatedOrder = await db.order.update({

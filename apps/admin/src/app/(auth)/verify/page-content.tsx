@@ -19,7 +19,7 @@ function PageContent({ userEmail }: { userEmail: string }) {
     "pending",
   );
 
-  console.log(userEmail);
+  // console.log(userEmail);
 
   const handleEmailVerification = async (email: string) => {
     setSending(true);

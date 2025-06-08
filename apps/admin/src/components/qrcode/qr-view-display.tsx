@@ -13,6 +13,7 @@ interface QRDisplayProps {
   tableNumber?: number | null;
   locationName?: string;
   type: "table" | "menu" | "location";
+  restaurantName?: string;
 }
 
 export function QRViewDisplay({
@@ -20,6 +21,7 @@ export function QRViewDisplay({
   tableNumber,
   type,
   locationName,
+  restaurantName
  }: QRDisplayProps) {
   const [combinedImageUrl, setCombinedImageUrl] = useState<string | null>(null);
 
@@ -61,6 +63,7 @@ export function QRViewDisplay({
           targetId={tableNumber?.toString() || ""}
           locationName={locationName}
           onImageGenerated={setCombinedImageUrl}
+          restaurantName={restaurantName}
         />
       </div>
       <Button
