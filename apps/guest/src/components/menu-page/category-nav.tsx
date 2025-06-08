@@ -161,7 +161,7 @@ export function CategoryNav({
       <div className="container max-w-6xl mx-auto">
         {/* Section Label for Groups */}
         <div className="px-4 pt-3 pb-1">
-          <h3 className="text-sm font-medium text-gray-500">Collections</h3>
+          <h3 className="text-sm font-medium text-gray-500">Groups</h3>
         </div>
 
         {/* Groups Navigation */}
@@ -223,7 +223,7 @@ export function CategoryNav({
 
         {/* Section Label for Categories */}
         <div className="px-4 pt-3 pb-1 border-t mt-1">
-          <h3 className="text-sm font-medium text-gray-500">Varieties</h3>
+          <h3 className="text-sm font-medium text-gray-500">Categories</h3>
         </div>
 
         {/* Categories Navigation */}
@@ -252,7 +252,7 @@ export function CategoryNav({
                   : "bg-secondary hover:bg-gray-200 text-gray-700",
               )}
             >
-              All Varieties
+              All Categories
             </button>
 
             {getActiveCategories().map((category) => (

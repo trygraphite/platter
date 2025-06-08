@@ -9,7 +9,6 @@ interface OrderDetailsProps {
 }
 
 export function OrderDetails({ order, table }: OrderDetailsProps) {
-  console.log("Order details:", order);
   // Check if order is cancelled
   const isCancelled = order.status === "CANCELLED";
 

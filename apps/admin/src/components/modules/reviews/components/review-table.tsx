@@ -77,7 +77,7 @@ export function ReviewsTable({ reviews }: ReviewsTableProps) {
       accessorKey: "source",
       header: "Source",
       cell: ({ row }) => {
-        console.log(row.original)
+        // console.log(row.original)
         if (row.original.table) {
           return `Table #${row.original.table.number}`;
         } else if (row.original.qrCode) {

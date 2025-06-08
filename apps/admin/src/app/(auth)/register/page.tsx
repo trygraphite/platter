@@ -20,7 +20,7 @@ function RegisterPage() {
       <p className="text-muted-foreground px-8 text-center text-xs mt-8 ">
         By signing up, you agree to our{" "}
         <Link
-          href="https://platterweb.vercel.app/terms"
+          href="https://platterng.com/terms"
           target="_blank"
           className="hover:text-primary underline underline-offset-4"
         >
@@ -28,7 +28,7 @@ function RegisterPage() {
         </Link>{" "}
         and{" "}
         <Link
-          href="https://platterweb.vercel.app/privacy"
+          href="https://platterng.com/privacy"
           target="_blank"
           className="hover:text-primary underline underline-offset-4"
         >

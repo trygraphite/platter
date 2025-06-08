@@ -14,6 +14,5 @@ export const readSiteDomain = async (domain: string) => {
       name: true,
     },
   });
-  console.log(data)
   return data;
 };

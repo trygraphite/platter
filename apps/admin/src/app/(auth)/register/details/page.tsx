@@ -8,10 +8,6 @@ export const metadata: Metadata = {
 };
 
 async function DetailsPage() {
-  const session = await getServerSession();
-  if (!session) {
-    redirect("/login");
-  }
 
   return (
     <div className="container max-w-3xl py-10">

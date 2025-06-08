@@ -29,7 +29,6 @@ export async function sendVerificationEmailAction({
     );
   }
 
-  console.log("called verification email");
   try {
     const response = await resend.emails.send({
       from: "Platter Verifications <emails@platterng.com>",
@@ -41,7 +40,6 @@ export async function sendVerificationEmailAction({
       }),
     });
 
-    console.log("Email sent successfully:", response);
     return NextResponse.json(
       { message: "Email sent successfully" },
       { status: 200 },

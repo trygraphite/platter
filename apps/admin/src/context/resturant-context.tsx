@@ -118,8 +118,6 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
       setUser(userData);
       setCategories(categoriesData || []);
       setCategoryGroups(categoryGroupsData || []);
-      console.log("categoriesData", categoriesData);
-      console.log("categoryGroupsData", categoryGroupsData);
     } catch (error) {
       console.error("Error fetching data:", error);
       setError("Failed to load user data. Please try again.");
@@ -282,15 +280,11 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
         isDefault: variety.isDefault,
       }));
   
-      console.log("menu items", menuItemData);
-      console.log("varieties", transformedVarieties);
-  
       // Handle image upload if present
       if (imageFile instanceof File) {
         toast.loading("Uploading image...");
         
         const uploadResult = await startMenuItemImageUpload([imageFile]);
-        console.log("uploadResult", uploadResult);
         if (uploadResult && uploadResult[0]) {
           menuItemData.image = uploadResult[0].ufsUrl;
           toast.dismiss();

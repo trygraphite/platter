@@ -91,12 +91,6 @@ export async function createOrder({
     try {
       const socketServerUrl = process.env.NEXT_PUBLIC_SOCKET_SERVER_URL || process.env.SOCKET_SERVER_URL
       if (socketServerUrl) {
-        console.log("Notifying socket server about new order:", {
-          orderId: order.id,
-          userId: qrCode.userId,
-          socketUrl: socketServerUrl,
-        })
-
         // Format the order items correctly for the socket server
         const formattedItems = order.items.map((item: any) => ({
           menuItemId: item.menuItemId,

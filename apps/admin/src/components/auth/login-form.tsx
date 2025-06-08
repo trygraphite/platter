@@ -13,17 +13,20 @@ import {
   CardTitle,
 } from "@platter/ui/components/card";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Input } from "@platter/ui/components/input";
 import { Label } from "@platter/ui/components/label";
 import { toast } from "@platter/ui/components/sonner";
-import { EyeClosedIcon, EyeIcon, Loader2, Lock, Mail } from "lucide-react";
+import { EyeClosedIcon, EyeIcon, Loader2, Lock, Mail, CheckCircle2 } from "lucide-react";
+import AuthLoading from "@/app/(auth)/loading";
 
 function LoginForm() {
   const router = useRouter();
   const [type, setType] = useState<"text" | "password">("password");
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const {
     register,
@@ -43,19 +46,37 @@ function LoginForm() {
         {
           onSuccess: () => {
             toast.success("Login Successful");
-            router.push("/");
+            setIsRedirecting(true);
+            
+            // Use startTransition to handle the navigation
+            startTransition(() => {
+              router.push("/");
+              // Also try router.refresh() if needed
+              router.refresh();
+            });
           },
           onError: () => {
             toast.error("Invalid Password Or Email");
+            setIsRedirecting(false);
           },
         },
       );
     } catch (error) {
       toast.error("Request failed. Please try again.");
+      setIsRedirecting(false);
     }
   };
 
+  // Show loading overlay when redirecting or transition is pending
+  const showLoading = isRedirecting || isPending;
+
   return (
+    <>
+      {/* Loading Overlay */}
+      {showLoading && (
+        <AuthLoading/>
+      )}
+      
       <Card className="w-full max-w-md border-none shadow-lg">
         <CardHeader className="space-y-1 text-center pb-2">
           <div className="mx-auto bg-primary/10 p-2 rounded-full mb-3">
@@ -77,6 +98,7 @@ function LoginForm() {
                   type="email" 
                   placeholder="name@example.com"
                   className="pl-10 bg-muted/30 border-muted focus:bg-background transition-colors" 
+                  disabled={isSubmitting || showLoading}
                 />
               </div>
               {errors.email && (
@@ -86,12 +108,6 @@ function LoginForm() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password" className="text-sm font-medium">Password</Label>
-                <Link
-                  href="/forgot"
-                  className="text-xs text-primary hover:text-primary/80 font-medium"
-                >
-                  Forgot password?
-                </Link>
               </div>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
@@ -100,12 +116,14 @@ function LoginForm() {
                   type={type} 
                   placeholder="••••••••" 
                   className="pl-10 pr-10 bg-muted/30 border-muted focus:bg-background transition-colors" 
+                  disabled={isSubmitting || showLoading}
                 />
                 <button
                   type="button"
                   title="toggle password visibility"
                   onClick={() => setType(type === "password" ? "text" : "password")}
-                  className="absolute top-1/2 right-3 transform -translate-y-1/2 p-1 rounded-md hover:bg-muted/50"
+                  className="absolute top-1/2 right-3 transform -translate-y-1/2 p-1 rounded-md hover:bg-muted/50 disabled:cursor-not-allowed"
+                  disabled={isSubmitting || showLoading}
                 >
                   {type === "password" ? (
                     <EyeClosedIcon className="size-4 text-muted-foreground" />
@@ -123,12 +141,17 @@ function LoginForm() {
             <Button
               type="submit"
               className="w-full py-5 font-medium text-sm shadow-sm hover:shadow transition-all"
-              disabled={isSubmitting}
+              disabled={isSubmitting || showLoading}
             >
               {isSubmitting ? (
                 <>
                   <Loader2 className="size-4 mr-2 animate-spin" />
                   Signing in...
+                </>
+              ) : showLoading ? (
+                <>
+                  <CheckCircle2 className="size-4 mr-2 text-green-500" />
+                  Redirecting...
                 </>
               ) : (
                 "Sign in"
@@ -155,6 +178,7 @@ function LoginForm() {
           </CardFooter>
         </form>
       </Card>
+    </>
   );
 }
 

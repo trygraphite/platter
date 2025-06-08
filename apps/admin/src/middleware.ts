@@ -3,59 +3,60 @@ import type { NextRequest } from "next/server";
 import type { Session } from "./lib/auth/types";
 
 export async function middleware(request: NextRequest) {
-  const sessionRes = await fetch(
-    `${request.nextUrl.origin}/api/auth/get-session`,
-    {
-      headers: {
-        cookie: request.headers.get("cookie") || "",
-      },
-    },
-  );
-
-  const session: Session = sessionRes.ok ? await sessionRes.json() : null;
-
   const path = request.nextUrl.pathname;
-  const isPublicRoute =
-    path.startsWith("/login") || path.startsWith("/register");
+  const publicRoutes = ["/login", "/register"];
+  
+  const isPublicRoute = publicRoutes.some(route => path.startsWith(route));
   const isOnboardingRoute = path.startsWith("/onboarding");
+  const isVerifyRoute = path === "/verify";
+  
+  let session: Session | null = null;
 
-  // Not logged in, redirect to login except for public routes
-  if (!session) {
-    if (isPublicRoute) return NextResponse.next();
-
-    const callbackUrl = encodeURIComponent(request.nextUrl.pathname);
-    return NextResponse.redirect(
-      new URL(`/login?from=${callbackUrl}`, request.url),
+  try {
+    const sessionRes = await fetch(
+      `${request.nextUrl.origin}/api/auth/get-session`,
+      {
+        headers: {
+          cookie: request.headers.get("cookie") || "",
+        },
+        signal: AbortSignal.timeout(5000),
+      },
     );
+    session = sessionRes.ok ? await sessionRes.json() : null;
+  } catch (error) {
+    console.error("Middleware - Session fetch error:", error);
+    if (!isPublicRoute) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+    return NextResponse.next();
   }
 
-  // Logged in but not verified, force verify except on verify page
-  if (!session.user.emailVerified && path !== "/verify") {
+  if (!session) {
+    if (isPublicRoute) {
+      return NextResponse.next();
+    }
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  if (!session.user.emailVerified) {
+    if (isVerifyRoute || isPublicRoute) {
+      return NextResponse.next();
+    }
     return NextResponse.redirect(new URL("/verify", request.url));
   }
 
-  // Logged in and verified but hasn't completed onboarding
-  if (
-    session.user.emailVerified &&
-    !session.user.hasCompletedOnboarding &&
-    !isOnboardingRoute &&
-    path !== "/verify"
-  ) {
+  if (session.user.emailVerified && !session.user.hasCompletedOnboarding) {
+    if (isOnboardingRoute || isPublicRoute) {
+      return NextResponse.next();
+    }
     return NextResponse.redirect(new URL("/onboarding", request.url));
   }
 
-  // Prevent accessing onboarding page if already completed
-  if (
-    session.user.emailVerified &&
-    session.user.hasCompletedOnboarding &&
-    isOnboardingRoute
-  ) {
-    return NextResponse.redirect(new URL("/", request.url));
-  }
-
-  // Prevent accessing public routes or verify page when logged in and verified
-  if (isPublicRoute || (session.user.emailVerified && path === "/verify")) {
-    return NextResponse.redirect(new URL("/", request.url));
+  if (session.user.emailVerified && session.user.hasCompletedOnboarding) {
+    if (isOnboardingRoute || isVerifyRoute || isPublicRoute) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+    return NextResponse.next();
   }
 
   return NextResponse.next();

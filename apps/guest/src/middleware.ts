@@ -12,7 +12,7 @@ export default async function middleware(req: NextRequest) {
   }
 
   // Log hostname for debugging
-  console.log("Hostname:", hostname);
+  // console.log("Hostname:", hostname);
 
   // Extract subdomain
   let currentHost = null;
@@ -39,7 +39,7 @@ export default async function middleware(req: NextRequest) {
   }
 
   // Log currentHost for debugging
-  console.log("Current Host:", currentHost);
+  // console.log("Current Host:", currentHost);
 
   // Special handling for root domain or www
   if (!currentHost || currentHost === "www" || currentHost === "app") {
@@ -53,7 +53,7 @@ export default async function middleware(req: NextRequest) {
     const response = await readSiteDomain(currentHost);
 
     // Log response for debugging
-    console.log("Response from readSiteDomain:", response);
+    // console.log("Response from readSiteDomain:", response);
 
     // If no matching domain is found, redirect to marketing site
     if (!response) {

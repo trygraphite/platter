@@ -26,8 +26,8 @@ export const ourFileRouter: FileRouter = {
       return { userId: user.id, type: "category" };
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      console.log("Category image upload complete for userId:", metadata.userId);
-      console.log("file url", file.url);
+      // console.log("Category image upload complete for userId:", metadata.userId);
+      // console.log("file url", file.url);
       return { uploadedBy: metadata.userId, fileUrl: file.url };
     }),
 
@@ -44,8 +44,8 @@ export const ourFileRouter: FileRouter = {
       return { userId: user.id, type: "menuItem" };
     })
     .onUploadComplete(async ({ metadata, file }) => {
-      console.log("Menu item image upload complete for userId:", metadata.userId);
-      console.log("file url", file.url);
+      // console.log("Menu item image upload complete for userId:", metadata.userId);
+      // console.log("file url", file.url);
       return { uploadedBy: metadata.userId, fileUrl: file.url };
     }),
 } satisfies FileRouter;
