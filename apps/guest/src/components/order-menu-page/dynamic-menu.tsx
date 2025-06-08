@@ -18,16 +18,12 @@ export function DynamicMenu({
   categories,
   selectedCategory,
   selectedGroup,
-  categoryGroups,
   cart,
   onQuantityChange,
   formatPrice
 }: DynamicMenuProps) {
   // Log for debugging
   useEffect(() => {
-    console.log("Categories received:", categories);
-    console.log("Selected category:", selectedCategory);
-    console.log("Selected group:", selectedGroup);
   }, [categories, selectedCategory, selectedGroup]);
   
   // Animation variants

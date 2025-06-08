@@ -61,7 +61,6 @@ export function OrderActions({
         
         // Emit socket event for order cancellation with restaurant userId
         if (socket && isConnected) {
-          console.log(`Emitting order cancellation for: ${orderId}`);
           socket.emit('updateOrder', {
             id: orderId,
             status: OrderStatus.CANCELLED,

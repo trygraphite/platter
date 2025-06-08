@@ -162,8 +162,6 @@ export function OrderSummaryPage({
         totalAmount: calculateTotal(),
         specialNotes: specialNotes.trim() || undefined,
       };
-
-      console.log("Client-side order data:", orderData);
       const result = await createOrder(orderData);
 
       if (result.success && result.orderId) {
