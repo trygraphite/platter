@@ -48,7 +48,7 @@ export default function AppLayout({
             </div>
           </header>
           <main className="p-4">
-          <GlobalLoading />
+          {/* <GlobalLoading /> */}
           {children}
           </main>
         </SidebarInset>
