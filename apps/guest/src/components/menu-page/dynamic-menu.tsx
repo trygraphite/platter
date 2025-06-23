@@ -44,7 +44,7 @@ interface DynamicMenuProps {
   initialMenuItems: MenuItem[]
 }
 
-export function DynamicMenu({ initialCategoryGroups, initialUngroupedCategories, initialMenuItems }: DynamicMenuProps) {
+export const DynamicMenu: React.FC<DynamicMenuProps> = ({ initialCategoryGroups, initialUngroupedCategories, initialMenuItems }) => {
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 

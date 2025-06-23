@@ -15,7 +15,7 @@ interface CategoryNavProps {
   onSelectCategory: (categoryId: string | null) => void
 }
 
-export function CategoryNav({
+export const CategoryNav: React.FC<CategoryNavProps> = ({
   categories,
   categoryGroups,
   categoriesByGroup,
@@ -23,7 +23,7 @@ export function CategoryNav({
   selectedCategory,
   onSelectGroup,
   onSelectCategory,
-}: CategoryNavProps) {
+}) => {
   const groupsScrollContainerRef = useRef<HTMLDivElement>(null)
   const categoriesScrollContainerRef = useRef<HTMLDivElement>(null)
   

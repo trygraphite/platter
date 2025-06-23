@@ -4,7 +4,7 @@ import type { RestaurantDetails, MenuCategory, CategoryGroup } from "@/types/men
 import db from "@platter/db";
 import { notFound } from "next/navigation";
 
-export default async function Page({ params }: { params: Params }) {
+export default async function Page({ params }: { params: Params }): Promise<JSX.Element> {
   const { qrId, domain } = await params;
 
   // Get restaurant details

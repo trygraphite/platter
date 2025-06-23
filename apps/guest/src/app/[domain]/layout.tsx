@@ -110,12 +110,12 @@ export async function generateMetadata(
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
   params: {
     domain?: string;
   };
-}>) {
+}): React.ReactElement {
   
   return (
    <main>{children}</main>

@@ -6,7 +6,7 @@ import type { Params } from "@/types/pages"
 import db from "@platter/db"
 import { notFound } from "next/navigation"
 
-export default async function MenuPage({ params }: { params: Params }) {
+export default async function MenuPage({ params }: { params: Params }): Promise<JSX.Element> {
   const domain = await params
   const { domain: domainName } = domain
 

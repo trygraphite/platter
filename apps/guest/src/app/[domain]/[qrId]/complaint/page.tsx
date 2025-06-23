@@ -6,7 +6,7 @@ import { notFound } from "next/navigation";
 
 const prisma = new PrismaClient();
 
-export default async function Page({ params }: { params: Params }) {
+export default async function Page({ params }: { params: Params }): Promise<JSX.Element> {
   const { qrId } = await params;
 
   try {

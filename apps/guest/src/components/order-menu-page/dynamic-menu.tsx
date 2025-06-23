@@ -14,14 +14,14 @@ interface DynamicMenuProps {
   formatPrice: (price: number | string | null | undefined) => string
 }
 
-export function DynamicMenu({
+export const DynamicMenu: React.FC<DynamicMenuProps> = ({
   categories,
   selectedCategory,
   selectedGroup,
   cart,
   onQuantityChange,
   formatPrice
-}: DynamicMenuProps) {
+}) => {
   // Log for debugging
   useEffect(() => {
   }, [categories, selectedCategory, selectedGroup]);

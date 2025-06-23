@@ -11,7 +11,7 @@ interface CartItemProps {
   onQuantityChange: (item: MenuItem, increment: boolean, variety?: MenuItemVariety) => void
 }
 
-export function CartItem({ item, formatPrice, onQuantityChange }: CartItemProps) {
+export const CartItem: React.FC<CartItemProps> = ({ item, formatPrice, onQuantityChange }) => {
   const handleQuantityChange = (increment: boolean) => {
     // Pass the selected variety if it exists
     if (item.selectedVariety) {

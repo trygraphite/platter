@@ -5,7 +5,7 @@ import db from "@platter/db";
 import { OrderStatus } from "@prisma/client";
 import { notFound } from "next/navigation";
 
-export default async function OrderPage({ params }: { params: Params }) {
+export default async function OrderPage({ params }: { params: Params }): Promise<JSX.Element> {
   const { qrId, orderId } = await params;
 
   try {

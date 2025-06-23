@@ -15,14 +15,14 @@ interface MenuCardProps {
   formatPrice: (price: number | string | null | undefined) => string
 }
 
-export function MenuCard({ 
+export const MenuCard: React.FC<MenuCardProps> = ({ 
   item, 
   inCart = false, 
   quantity = 0, 
   cartItem,
   onQuantityChange,
   formatPrice 
-}: MenuCardProps) {
+}) => {
   const [showVarieties, setShowVarieties] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedVariety, setSelectedVariety] = useState<MenuItemVariety | null>(

@@ -48,7 +48,7 @@ export function MenuItems({
   ungroupedCategories,
   selectedGroup,
   selectedCategory,
-}: MenuItemsProps) {
+}: MenuItemsProps): React.JSX.Element {
   // Filter items based on selection
   const filteredItems = menuItems.filter((item) => {
     if (selectedCategory) {

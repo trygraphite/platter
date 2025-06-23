@@ -110,7 +110,7 @@ export async function generateMetadata(
   return metadata;
 }
 
-async function Page({ params }: { params: Params }) {
+async function Page({ params }: { params: Params }): Promise<JSX.Element> {
     const domain = await params;
   const { domain: domainName } = domain;
   

@@ -4,7 +4,7 @@ import type { Params } from "@/types/pages";
 import db from "@platter/db";
 import { notFound } from "next/navigation";
 
-async function Page({ params }: { params: Params }) {
+async function Page({ params }: { params: Params }): Promise<JSX.Element> {
   const { qrId } = await params;
 
   // Use qrId to fetch data from the database
