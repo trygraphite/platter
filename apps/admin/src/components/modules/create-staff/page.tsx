@@ -12,6 +12,7 @@ import { Label } from '@platter/ui/components/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@platter/ui/components/select'
 import { Switch } from '@platter/ui/components/switch'
 import { toast } from '@platter/ui/components/sonner'
+import { createStaff, CreateStaffFormData } from '@/lib/actions/create-staff'
 
 const staffSchema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
@@ -82,30 +83,30 @@ export default function CreateStaffPage({ params }: { params: { restaurantId: st
     }
   }
 
-  // const onSubmit = async (data: FormData) => {
-  //   try {
-  //     setLoading(true)
+  const onSubmit = async (data: FormData) => {
+    try {
+      setLoading(true)
       
-  //     // Remove confirmPassword before sending to server action
-  //     const { confirmPassword, ...staffData } = data
+      // Remove confirmPassword before sending to server action
+      const { confirmPassword, ...staffData } = data
       
-  //     const result = await createStaff(params.restaurantId, staffData as CreateStaffFormData)
+      const result = await createStaff(params.restaurantId, staffData as CreateStaffFormData)
       
-  //     if (result.error) {
-  //       toast.error(result.error)
-  //       return
-  //     }
+      if (result.error) {
+        toast.error(result.error)
+        return
+      }
       
-  //     toast.success('Staff member created successfully')
-  //     router.push('/manage-staff')
-  //     router.refresh()
-  //   } catch (error) {
-  //     console.error(error)
-  //     toast.error('Something went wrong')
-  //   } finally {
-  //     setLoading(false)
-  //   }
-  // }
+      toast.success('Staff member created successfully')
+      router.push('/manage-staff')
+      router.refresh()
+    } catch (error) {
+      console.error(error)
+      toast.error('Something went wrong')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="container mx-auto py-10">
@@ -116,8 +117,8 @@ export default function CreateStaffPage({ params }: { params: { restaurantId: st
             Add a new staff member with login credentials
           </CardDescription>
         </CardHeader>
-        {/* <form onSubmit={handleSubmit(onSubmit)}> */}
-        <form>
+        {/* <form */}
+        <form  onSubmit={handleSubmit(onSubmit)}>
           <CardContent className="space-y-6">
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

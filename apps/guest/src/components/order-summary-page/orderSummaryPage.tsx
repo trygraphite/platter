@@ -228,6 +228,8 @@ export function OrderSummaryPage({
                         <Image
                           src={item.image || "/placeholder-food.jpg"} 
                           alt={item.name}
+                          width={80}
+                          height={80}
                           className="w-20 h-20 object-cover rounded-lg border"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;

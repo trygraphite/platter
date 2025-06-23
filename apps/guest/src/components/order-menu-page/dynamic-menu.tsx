@@ -77,7 +77,7 @@ export function DynamicMenu({
               </div>
               
               {category.menuItems && category.menuItems.length > 0 ? (
-                <div className="grid grid-cols-1 gap-3 md:gap-4">
+                <div className="grid grid-cols-2 gap-3 md:gap-4">
                   {category.menuItems.map((item) => {
                     const cartItem = cart.find((cartItem) => cartItem.id === item.id)
                     return (
