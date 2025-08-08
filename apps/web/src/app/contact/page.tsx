@@ -1,6 +1,10 @@
 "use client";
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@platter/ui/components/alert";
+import { Button } from "@platter/ui/components/button";
 import {
   Card,
   CardContent,
@@ -8,10 +12,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@platter/ui/components/card';
-import { Button } from '@platter/ui/components/button';
-import { Input } from '@platter/ui/components/input';
-import { Textarea } from '@platter/ui/components/textarea';
+} from "@platter/ui/components/card";
 import {
   Form,
   FormControl,
@@ -20,42 +21,75 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@platter/ui/components/form';
+} from "@platter/ui/components/form";
+import { Input } from "@platter/ui/components/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@platter/ui/components/select';
-import { Alert, AlertDescription, AlertTitle } from '@platter/ui/components/alert';
-import { Phone, Mail, MessageSquare, MapPin, Clock, CheckCircle2, Loader2 } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@platter/ui/components/tabs';
+} from "@platter/ui/components/select";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@platter/ui/components/tabs";
+import { Textarea } from "@platter/ui/components/textarea";
+import {
+  CheckCircle2,
+  Clock,
+  Loader2,
+  Mail,
+  MessageSquare,
+  Phone,
+  PhoneIcon,
+} from "lucide-react";
+import type { LucideProps } from "lucide-react";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+
+interface ContactFormData {
+  name: string;
+  email: string;
+  phone: string;
+  subject: string;
+  message: string;
+}
+
+interface FormStatus {
+  type: "success" | "error" | "";
+  message: string;
+}
 
 export default function ContactPage() {
-  const [formStatus, setFormStatus] = useState({ type: '', message: '' });
+  const [formStatus, setFormStatus] = useState<FormStatus>({
+    type: "",
+    message: "",
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [activeTab, setActiveTab] = useState('inquiry');
+  const [activeTab, setActiveTab] = useState("inquiry");
 
-  const form = useForm({
+  const form = useForm<ContactFormData>({
     defaultValues: {
-      name: '',
-      email: '',
-      phone: '',
-      subject: '',
-      message: '',
+      name: "",
+      email: "",
+      phone: "",
+      subject: "",
+      message: "",
     },
   });
 
-  const handleSubmit = async (data: any) => {
+  const handleSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true);
-    setFormStatus({ type: '', message: '' });
+    setFormStatus({ type: "", message: "" });
 
     try {
-      const response = await fetch('/api/support', {
-        method: 'POST',
+      const response = await fetch("/api/support", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
       });
@@ -64,29 +98,34 @@ export default function ContactPage() {
 
       if (response.ok) {
         setFormStatus({
-          type: 'success',
-          message: 'Thank you for your message! We will get back to you within 24 hours.'
+          type: "success",
+          message:
+            "Thank you for your message! We will get back to you within 24 hours.",
         });
-        
+
         // Reset form
         form.reset();
-        
+
         // Clear success message after 8 seconds
         setTimeout(() => {
-          setFormStatus({ type: '', message: '' });
+          setFormStatus({ type: "", message: "" });
         }, 8000);
       } else {
-        throw new Error(result.error || 'Something went wrong');
+        throw new Error(result.error || "Something went wrong");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to send message. Please try again or contact us directly via WhatsApp.";
       setFormStatus({
-        type: 'error',
-        message: error.message || 'Failed to send message. Please try again or contact us directly via WhatsApp.'
+        type: "error",
+        message: errorMessage,
       });
-      
+
       // Clear error message after 8 seconds
       setTimeout(() => {
-        setFormStatus({ type: '', message: '' });
+        setFormStatus({ type: "", message: "" });
       }, 8000);
     } finally {
       setIsSubmitting(false);
@@ -94,9 +133,11 @@ export default function ContactPage() {
   };
 
   const openWhatsApp = () => {
-    const phoneNumber = '2348149113328';
-    const message = encodeURIComponent('Hello! I have a question about Platter QR.');
-    window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
+    const phoneNumber = "2348149113328";
+    const message = encodeURIComponent(
+      "Hello! I have a question about Platter QR.",
+    );
+    window.open(`https://wa.me/${phoneNumber}?text=${message}`, "_blank");
   };
 
   return (
@@ -106,9 +147,12 @@ export default function ContactPage() {
         <div className="container container-wide px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl">Get in Touch</h1>
+              <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl">
+                Get in Touch
+              </h1>
               <p className="max-w-[700px] text-muted-foreground md:text-xl">
-                Have questions about our Platter QR ordering system? We're here to help!
+                Have questions about our Platter QR ordering system? We're here
+                to help!
               </p>
             </div>
           </div>
@@ -124,8 +168,8 @@ export default function ContactPage() {
               <div>
                 <h2 className="text-2xl font-bold mb-6">Contact Information</h2>
                 <p className="text-muted-foreground mb-8">
-                  Reach out to us using any of the following methods. For faster response, 
-                  we recommend contacting us via WhatsApp.
+                  Reach out to us using any of the following methods. For faster
+                  response, we recommend contacting us via WhatsApp.
                 </p>
               </div>
 
@@ -134,18 +178,22 @@ export default function ContactPage() {
                   <CardHeader className="p-4">
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                        <Phone className="h-5 w-5 text-primary" />
+                        <PhoneIcon className="h-5 w-5 text-primary" />
                       </div>
                       <div>
-                        <CardTitle className="text-lg">WhatsApp (Faster Response)</CardTitle>
-                        <CardDescription>Message us for immediate assistance</CardDescription>
+                        <CardTitle className="text-lg">
+                          WhatsApp (Faster Response)
+                        </CardTitle>
+                        <CardDescription>
+                          Message us for immediate assistance
+                        </CardDescription>
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent className="p-4 pt-0">
                     <p className="font-medium">+234 81 49113328</p>
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       className="mt-3 w-full sm:w-auto"
                       onClick={openWhatsApp}
                     >
@@ -163,7 +211,9 @@ export default function ContactPage() {
                       </div>
                       <div>
                         <CardTitle className="text-lg">Email</CardTitle>
-                        <CardDescription>Send us a message anytime</CardDescription>
+                        <CardDescription>
+                          Send us a message anytime
+                        </CardDescription>
                       </div>
                     </div>
                   </CardHeader>
@@ -182,8 +232,12 @@ export default function ContactPage() {
                         <Clock className="h-5 w-5 text-primary" />
                       </div>
                       <div>
-                        <CardTitle className="text-lg">Business Hours</CardTitle>
-                        <CardDescription>When you can reach our support team</CardDescription>
+                        <CardTitle className="text-lg">
+                          Business Hours
+                        </CardTitle>
+                        <CardDescription>
+                          When you can reach our support team
+                        </CardDescription>
                       </div>
                     </div>
                   </CardHeader>
@@ -191,11 +245,15 @@ export default function ContactPage() {
                     <div className="grid grid-cols-2 gap-2">
                       <div>
                         <p className="font-medium">Monday - Friday</p>
-                        <p className="text-sm text-muted-foreground">9:00 AM - 6:00 PM</p>
+                        <p className="text-sm text-muted-foreground">
+                          9:00 AM - 6:00 PM
+                        </p>
                       </div>
                       <div>
                         <p className="font-medium">Saturday</p>
-                        <p className="text-sm text-muted-foreground">10:00 AM - 4:00 PM</p>
+                        <p className="text-sm text-muted-foreground">
+                          10:00 AM - 4:00 PM
+                        </p>
                       </div>
                       <div className="col-span-2 mt-2">
                         <p className="font-medium">Sunday</p>
@@ -212,28 +270,29 @@ export default function ContactPage() {
               <h2 className="text-2xl font-bold mb-6">Send us a Message</h2>
               <Card>
                 <CardContent className="p-6">
-
-                  {formStatus.type === 'success' && (
+                  {formStatus.type === "success" && (
                     <Alert className="mb-6 bg-green-50 border-green-200">
                       <CheckCircle2 className="h-4 w-4 text-green-600" />
                       <AlertTitle>Success!</AlertTitle>
-                      <AlertDescription>
-                        {formStatus.message}
-                      </AlertDescription>
+                      <AlertDescription>{formStatus.message}</AlertDescription>
                     </Alert>
                   )}
 
-                  {formStatus.type === 'error' && (
-                    <Alert className="mb-6 bg-red-50 border-red-200" variant="destructive">
+                  {formStatus.type === "error" && (
+                    <Alert
+                      className="mb-6 bg-red-50 border-red-200"
+                      variant="destructive"
+                    >
                       <AlertTitle>Error</AlertTitle>
-                      <AlertDescription>
-                        {formStatus.message}
-                      </AlertDescription>
+                      <AlertDescription>{formStatus.message}</AlertDescription>
                     </Alert>
                   )}
 
                   <Form {...form}>
-                    <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+                    <form
+                      onSubmit={form.handleSubmit(handleSubmit)}
+                      className="space-y-6"
+                    >
                       <div className="grid gap-4 sm:grid-cols-2">
                         <FormField
                           control={form.control}
@@ -274,7 +333,7 @@ export default function ContactPage() {
                           )}
                         />
                       </div>
-                      
+
                       <div className="grid gap-4 sm:grid-cols-2">
                         <FormField
                           control={form.control}
@@ -312,11 +371,21 @@ export default function ContactPage() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  <SelectItem value="general">General Inquiry</SelectItem>
-                                  <SelectItem value="pricing">Pricing Question</SelectItem>
-                                  <SelectItem value="demo">Request Demo</SelectItem>
-                                  <SelectItem value="technical">Technical Support</SelectItem>
-                                  <SelectItem value="feedback">Feedback</SelectItem>
+                                  <SelectItem value="general">
+                                    General Inquiry
+                                  </SelectItem>
+                                  <SelectItem value="pricing">
+                                    Pricing Question
+                                  </SelectItem>
+                                  <SelectItem value="demo">
+                                    Request Demo
+                                  </SelectItem>
+                                  <SelectItem value="technical">
+                                    Technical Support
+                                  </SelectItem>
+                                  <SelectItem value="feedback">
+                                    Feedback
+                                  </SelectItem>
                                   <SelectItem value="other">Other</SelectItem>
                                 </SelectContent>
                               </Select>
@@ -346,14 +415,18 @@ export default function ContactPage() {
                         )}
                       />
 
-                      <Button type="submit" className="w-full" disabled={isSubmitting}>
+                      <Button
+                        type="submit"
+                        className="w-full"
+                        disabled={isSubmitting}
+                      >
                         {isSubmitting ? (
                           <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                             Sending Message...
                           </>
                         ) : (
-                          'Send Message'
+                          "Send Message"
                         )}
                       </Button>
                     </form>
@@ -370,13 +443,16 @@ export default function ContactPage() {
         <div className="container-wide px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
-              <h2 className="text-3xl font-bold tracking-tighter">Common Questions</h2>
+              <h2 className="text-3xl font-bold tracking-tighter">
+                Common Questions
+              </h2>
               <p className="max-w-[700px] text-muted-foreground md:text-lg">
-                Find quick answers to frequently asked questions about our contact and support
+                Find quick answers to frequently asked questions about our
+                contact and support
               </p>
             </div>
           </div>
-          
+
           <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-2 mt-10">
             <Card>
               <CardHeader>
@@ -384,41 +460,52 @@ export default function ContactPage() {
               </CardHeader>
               <CardContent>
                 <p>
-                  We aim to respond to all inquiries within 24 hours on business days. 
-                  For faster support, we recommend contacting us via WhatsApp at +234 81 49113328.
+                  We aim to respond to all inquiries within 24 hours on business
+                  days. For faster support, we recommend contacting us via
+                  WhatsApp at +234 81 49113328.
                 </p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle>Can I schedule a demo of the restaurant QR system?</CardTitle>
+                <CardTitle>
+                  Can I schedule a demo of the restaurant QR system?
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <p>
-                  Yes! You can request a demo through our contact form or by sending a direct message 
-                  on WhatsApp. Our team will arrange a convenient time to walk you through all the features.
+                  Yes! You can request a demo through our contact form or by
+                  sending a direct message on WhatsApp. Our team will arrange a
+                  convenient time to walk you through all the features.
                 </p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle>Do you offer technical support for existing customers?</CardTitle>
+                <CardTitle>
+                  Do you offer technical support for existing customers?
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <p>
-                  Absolutely. Existing customers can reach out through any of our contact channels. 
-                  Premium support is available for customers on higher-tier plans.
+                  Absolutely. Existing customers can reach out through any of
+                  our contact channels. Premium support is available for
+                  customers on higher-tier plans.
                 </p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle>I'm interested in custom features. Who should I talk to?</CardTitle>
+                <CardTitle>
+                  I'm interested in custom features. Who should I talk to?
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <p>
-                  For custom feature requests and enterprise solutions, please indicate this in your message. 
-                  Our solutions team will contact you to discuss your specific requirements and provide a custom quote.
+                  For custom feature requests and enterprise solutions, please
+                  indicate this in your message. Our solutions team will contact
+                  you to discuss your specific requirements and provide a custom
+                  quote.
                 </p>
               </CardContent>
             </Card>

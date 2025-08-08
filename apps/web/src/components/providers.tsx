@@ -1,9 +1,9 @@
 "use client";
 
 import { ThemeProvider as NextThemesProvider } from "next-themes";
-import type * as React from "react";
+import type { ReactNode } from "react";
 
-export function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({ children }: { children: ReactNode }) {
   return (
     <NextThemesProvider
       attribute="class"
@@ -12,6 +12,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       disableTransitionOnChange
       enableColorScheme
     >
+      {/* @ts-ignore */}
       {children}
     </NextThemesProvider>
   );
