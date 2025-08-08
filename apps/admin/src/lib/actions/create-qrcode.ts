@@ -1,14 +1,14 @@
 "use server";
 
-import QRCode from "qrcode";
-import db from "@platter/db";
 import type { QRCodeResponse } from "@/types/qr-code";
+import db from "@platter/db";
+import QRCode from "qrcode";
 import getServerSession from "../auth/server";
 
 type QRCodeTarget = "table" | "menu" | "location";
 
 export async function createQRCodeAction(
-  tableNumber?: number,
+  tableName?: string,
   target: QRCodeTarget = "table",
   capacity = 4,
   locationName?: string,
@@ -27,15 +27,19 @@ export async function createQRCodeAction(
     if (!restaurant?.subdomain) {
       return { success: false, error: "Restaurant subdomain not found" };
     }
-    let userLocation;
+    let userLocation: {
+      id: string;
+      name: string;
+      table: Array<{ number: string }>;
+    } | null = null;
     let extractedLocationName = "";
 
     // Location validation logic
     if (target === "location") {
-      if (!tableNumber) {
+      if (!tableName) {
         return {
           success: false,
-          error: "Table number is required for location QR codes",
+          error: "Table name is required for location QR codes",
         };
       }
 
@@ -51,13 +55,13 @@ export async function createQRCodeAction(
 
       // Validate table exists in location
       const tableExists = userLocation.table.some(
-        (t: { number: string; }) => t.number === tableNumber.toString(),
+        (t: { number: string }) => t.number === tableName,
       );
 
       if (!tableExists) {
         return {
           success: false,
-          error: `Table ${tableNumber} not found in this location`,
+          error: `Table ${tableName} not found in this location`,
         };
       }
 
@@ -69,18 +73,18 @@ export async function createQRCodeAction(
     }
 
     // QR Code handling
-    let qrCodeRecord;
-    if (target === "table" && tableNumber) {
+    let qrCodeRecord: { id: string; link?: string } | null = null;
+    if (target === "table" && tableName) {
       // Existing table QR code logic
       const existingTable = await db.table.findFirst({
-        where: { number: tableNumber.toString(), userId: session.user.id },
+        where: { number: tableName, userId: session.user.id },
       });
 
       const tableRecord =
         existingTable ||
         (await db.table.create({
           data: {
-            number: tableNumber.toString(),
+            number: tableName,
             capacity,
             userId: session.user.id,
             isAvailable: true,
@@ -100,7 +104,7 @@ export async function createQRCodeAction(
         (await db.qRCode.create({
           data: {
             target: "table",
-            targetNumber: tableNumber.toString(),
+            targetNumber: tableName,
             userId: session.user.id,
             tableId: tableRecord.id,
           },
@@ -111,7 +115,7 @@ export async function createQRCodeAction(
         where: {
           locationId: userLocation?.id,
           target: "location",
-          targetNumber: tableNumber?.toString(),
+          targetNumber: tableName,
           userId: session.user.id,
         },
       });
@@ -149,7 +153,7 @@ export async function createQRCodeAction(
 
     const path =
       target === "location"
-        ? `${extractedLocationName}/${tableNumber}`
+        ? `${extractedLocationName}/${tableName}`
         : target === "menu"
           ? "menu"
           : qrCodeRecord?.id;

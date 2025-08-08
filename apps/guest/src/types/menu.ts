@@ -37,12 +37,12 @@ export interface MenuItem {
   image?: string | null;
   isAvailable: boolean;
   categoryId: string;
-  varieties?: MenuItemVariety[]; 
+  varieties?: MenuItemVariety[];
 }
 
 export interface CartItem extends MenuItem {
   quantity: number;
-  selectedVariety?: MenuItemVariety; 
+  selectedVariety?: MenuItemVariety;
 }
 
 export interface CategoryGroup {
@@ -50,4 +50,28 @@ export interface CategoryGroup {
   name: string;
   description?: string | null;
   position?: number;
+}
+
+// Product interface for the new menu components
+export interface Product {
+  _id: string;
+  name: string;
+  price: number;
+  image?: string;
+  outOfStock: boolean;
+  description?: string;
+  category?: {
+    name: string;
+    group?: {
+      name: string;
+    };
+  };
+  varieties?: Array<{
+    _id: string;
+    name: string;
+    price: number;
+    outOfStock?: boolean;
+    weight?: string;
+    description?: string;
+  }>;
 }

@@ -1,12 +1,12 @@
 import OrderPageClient from "@/components/modules/orders/order-page";
 import getServerSession from "@/lib/auth/server";
-import { PaginatedResponse } from "@/types/pagniation";
+import type { PaginatedResponse } from "@/types/pagniation";
 import db from "@platter/db";
 
 export default async function OrdersTemplate() {
   const session = await getServerSession();
   const userId = session?.session?.userId;
-  
+
   // Fetch all data needed for initial render
   const [totalOrders, tables, orders] = await Promise.all([
     db.order.count({ where: { userId } }),
@@ -19,7 +19,14 @@ export default async function OrdersTemplate() {
             menuItem: {
               include: {
                 varieties: true, // Include menu item varieties
-              }
+                servicePoint: {
+                  select: {
+                    id: true,
+                    name: true,
+                    description: true,
+                  },
+                },
+              },
             },
             variety: true, // Include the selected variety for this order item
           },
@@ -27,25 +34,27 @@ export default async function OrdersTemplate() {
       },
       orderBy: { createdAt: "desc" },
       take: 1000, // Increase if needed, or implement server-side pagination later
-    })
+    }),
   ]);
 
-  const ordersWithTableNumber = orders.map((order: { tableId: any; }) => ({
+  const ordersWithTableNumber = orders.map((order: (typeof orders)[0]) => ({
     ...order,
     tableNumber: order.tableId
-      ? tables.find((t: { id: any; }) => t.id === order.tableId)?.number || "Unknown"
+      ? tables.find((t: (typeof tables)[0]) => t.id === order.tableId)
+          ?.number || "Unknown"
       : "N/A",
   }));
 
-  const paginatedOrders: PaginatedResponse<typeof ordersWithTableNumber[0]> = {
-    data: ordersWithTableNumber,
-    meta: {
-      currentPage: 1, // Default to first page
-      totalPages: Math.ceil(totalOrders / 10), // Assuming 10 items per page
-      totalItems: totalOrders,
-      itemsPerPage: 10
-    }
-  };
+  const paginatedOrders: PaginatedResponse<(typeof ordersWithTableNumber)[0]> =
+    {
+      data: ordersWithTableNumber,
+      meta: {
+        currentPage: 1, // Default to first page
+        totalPages: Math.ceil(totalOrders / 10), // Assuming 10 items per page
+        totalItems: totalOrders,
+        itemsPerPage: 10,
+      },
+    };
 
   return (
     <OrderPageClient

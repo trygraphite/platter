@@ -1,17 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { formatNairaWithDecimals } from "@/utils";
+import { Button } from "@platter/ui/components/button";
 import {
   Card,
+  CardContent,
   CardHeader,
   CardTitle,
-  CardContent,
 } from "@platter/ui/components/card";
-import { Button } from "@platter/ui/components/button";
-import { Order } from "@prisma/client";
 import { ArrowLeft } from "@platter/ui/lib/icons";
-import { formatPrice } from "../order-menu-page/menuPage";
+import type { Order } from "@prisma/client";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const statusColors = {
   PENDING: "bg-gray-50 dark:bg-gray-900/30",
@@ -95,7 +95,7 @@ export function OrdersPage({
               <CardContent>
                 <p className="font-semibold mb-2">Status: {order.status}</p>
                 <p className="mb-2">
-                  Total: ₦{formatPrice(Number(order.totalAmount))}
+                  Total: {formatNairaWithDecimals(Number(order.totalAmount))}
                 </p>
                 {order.specialNotes && (
                   <p className="text-sm text-muted-foreground mb-2">

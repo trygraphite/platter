@@ -9,18 +9,18 @@ export async function GET(request: Request) {
 
   if (!userId) {
     return NextResponse.json({ error: "User ID is required" }, { status: 400 });
-  }  
-  
+  }
+
   try {
     const menuItems = await db.menuItem.findMany({
       where: {
         userId,
         deletedAt: null, // Only get non-deleted menu items
-        ...(categoryId && { 
+        ...(categoryId && {
           categoryId,
           category: {
             deletedAt: null, // Ensure the category is also not deleted
-          }
+          },
         }),
       },
       include: {
@@ -47,6 +47,14 @@ export async function GET(request: Request) {
             updatedAt: true,
           },
           orderBy: { position: "asc" },
+        },
+        servicePoint: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            isActive: true,
+          },
         },
       },
       orderBy: { createdAt: "desc" },

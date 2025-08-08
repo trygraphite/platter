@@ -132,11 +132,11 @@ export async function updateOrder(order: any) {
       const socketServerUrl = process.env.NEXT_PUBLIC_SOCKET_SERVER_URL;
       if (socketServerUrl) {
         await fetch(`${socketServerUrl}/api/orders/${order.id}`, {
-          method: 'PUT',
+          method: "PUT",
           headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify(updatedOrder)
+          body: JSON.stringify(updatedOrder),
         });
       }
     } catch (error) {
@@ -147,6 +147,118 @@ export async function updateOrder(order: any) {
     return updatedOrder;
   } catch (error) {
     console.error("Error updating order:", error);
+    throw error;
+  }
+}
+
+export async function updateOrderItemStatus(
+  orderItemId: string,
+  status:
+    | "PENDING"
+    | "CONFIRMED"
+    | "PREPARING"
+    | "READY"
+    | "DELIVERED"
+    | "CANCELLED",
+  userId: string,
+) {
+  try {
+    // Verify the order item belongs to the user's restaurant
+    const orderItem = await db.orderItem.findFirst({
+      where: {
+        id: orderItemId,
+        order: {
+          userId: userId,
+        },
+      },
+      include: {
+        order: true,
+        menuItem: {
+          include: {
+            servicePoint: {
+              select: {
+                id: true,
+                name: true,
+                description: true,
+              },
+            },
+          },
+        },
+        variety: true,
+      },
+    });
+
+    if (!orderItem) {
+      throw new Error("Order item not found or access denied");
+    }
+
+    // Update the order item status with timestamps
+    const updateData: {
+      status: typeof status;
+      confirmedAt?: Date;
+      preparingAt?: Date;
+      readyAt?: Date;
+      deliveredAt?: Date;
+      cancelledAt?: Date;
+    } = {
+      status,
+    };
+
+    // Add timestamps based on status
+    if (status === "CONFIRMED") {
+      updateData.confirmedAt = new Date();
+    } else if (status === "PREPARING") {
+      updateData.preparingAt = new Date();
+    } else if (status === "READY") {
+      updateData.readyAt = new Date();
+    } else if (status === "DELIVERED") {
+      updateData.deliveredAt = new Date();
+    } else if (status === "CANCELLED") {
+      updateData.cancelledAt = new Date();
+    }
+
+    const updatedOrderItem = await db.orderItem.update({
+      where: { id: orderItemId },
+      data: updateData,
+      include: {
+        menuItem: {
+          include: {
+            servicePoint: {
+              select: {
+                id: true,
+                name: true,
+                description: true,
+              },
+            },
+          },
+        },
+        variety: true,
+      },
+    });
+
+    // Notify socket server about the update
+    try {
+      const socketServerUrl = process.env.NEXT_PUBLIC_SOCKET_SERVER_URL;
+      if (socketServerUrl) {
+        await fetch(`${socketServerUrl}/api/orders/${orderItem.orderId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            type: "itemStatusUpdate",
+            orderItem: updatedOrderItem,
+          }),
+        });
+      }
+    } catch (error) {
+      console.error("Error notifying socket server:", error);
+      // Continue even if socket notification fails
+    }
+
+    return updatedOrderItem;
+  } catch (error) {
+    console.error("Error updating order item status:", error);
     throw error;
   }
 }
@@ -163,7 +275,7 @@ export async function deleteOrder(orderId: string) {
       const socketServerUrl = process.env.NEXT_PUBLIC_SOCKET_SERVER_URL;
       if (socketServerUrl) {
         await fetch(`${socketServerUrl}/api/orders/${orderId}`, {
-          method: 'DELETE',
+          method: "DELETE",
         });
       }
     } catch (error) {
@@ -172,6 +284,123 @@ export async function deleteOrder(orderId: string) {
     }
   } catch (error) {
     console.error("Error deleting order:", error);
+    throw error;
+  }
+}
+
+export async function updateAllOrderItemsStatus(
+  orderId: string,
+  status:
+    | "PENDING"
+    | "CONFIRMED"
+    | "PREPARING"
+    | "READY"
+    | "DELIVERED"
+    | "CANCELLED",
+  userId: string,
+) {
+  try {
+    // Verify the order belongs to the user's restaurant
+    const order = await db.order.findFirst({
+      where: {
+        id: orderId,
+        userId: userId,
+      },
+      include: {
+        items: true,
+      },
+    });
+
+    if (!order) {
+      throw new Error("Order not found or access denied");
+    }
+
+    // Prepare update data with timestamps
+    const updateData: {
+      status: typeof status;
+      confirmedAt?: Date;
+      preparingAt?: Date;
+      readyAt?: Date;
+      deliveredAt?: Date;
+      cancelledAt?: Date;
+    } = {
+      status,
+    };
+
+    // Add timestamps based on status
+    if (status === "CONFIRMED") {
+      updateData.confirmedAt = new Date();
+    } else if (status === "PREPARING") {
+      updateData.preparingAt = new Date();
+    } else if (status === "READY") {
+      updateData.readyAt = new Date();
+    } else if (status === "DELIVERED") {
+      updateData.deliveredAt = new Date();
+    } else if (status === "CANCELLED") {
+      updateData.cancelledAt = new Date();
+    }
+
+    // Update all order items in the order
+    const updatedOrderItems = await db.orderItem.updateMany({
+      where: {
+        orderId: orderId,
+      },
+      data: updateData,
+    });
+
+    // Also update the main order status
+    await db.order.update({
+      where: { id: orderId },
+      data: { status },
+    });
+
+    // Get the updated order with all items for socket notification
+    const updatedOrder = await db.order.findUnique({
+      where: { id: orderId },
+      include: {
+        items: {
+          include: {
+            menuItem: {
+              include: {
+                servicePoint: {
+                  select: {
+                    id: true,
+                    name: true,
+                    description: true,
+                  },
+                },
+              },
+            },
+            variety: true,
+          },
+        },
+      },
+    });
+
+    // Notify socket server about the bulk update
+    try {
+      const socketServerUrl = process.env.NEXT_PUBLIC_SOCKET_SERVER_URL;
+      if (socketServerUrl) {
+        await fetch(`${socketServerUrl}/api/orders/${orderId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            type: "bulkItemStatusUpdate",
+            order: updatedOrder,
+            status,
+          }),
+        });
+      }
+    } catch (error) {
+      console.error("Error notifying socket server:", error);
+      // Continue even if socket notification fails
+    }
+
+    return { success: true, updatedCount: updatedOrderItems.count };
+  } catch (error) {
+    console.error("Error updating all order items status:", error);
     throw error;
   }
 }

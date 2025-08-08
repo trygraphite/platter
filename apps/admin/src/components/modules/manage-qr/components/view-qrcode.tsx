@@ -1,19 +1,19 @@
-'use client';
+"use client";
 
-import { QRCode } from '@prisma/client';
-import { Share2 } from 'lucide-react';
+import { Button } from "@platter/ui/components/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
-} from '@platter/ui/components/dialog';
-import { Button } from '@platter/ui/components/button';
-import { Separator } from '@platter/ui/components/separator';
-import { QRDisplay } from '@/components/qrcode/qr-display';
-import { useState } from 'react';
-import { QRViewDisplay } from '@/components/qrcode/qr-view-display';
+} from "@platter/ui/components/dialog";
+import { Separator } from "@platter/ui/components/separator";
+import type { QRCode } from "@prisma/client";
+import { Share2 } from "lucide-react";
+
+import { QRViewDisplay } from "@/components/qrcode/qr-view-display";
+import { useState } from "react";
 
 type QRCodeWithRelations = QRCode & {
   user?: { name: string; email: string } | null;
@@ -33,13 +33,15 @@ export default function ViewQRCodeDialog({
   isOpen,
   onClose,
 }: ViewQRCodeDialogProps) {
-  const [isLoading,] = useState(false);
+  const [isLoading] = useState(false);
   const getQRCodeType = (): "table" | "menu" | "location" => {
-    if (!qrCode.target) return 'table';
-    return qrCode.target.toLowerCase() === 'menu' ? 'menu' : 
-    qrCode.target.toLowerCase() === 'location' ? 'location' : 'table';
+    if (!qrCode.target) return "table";
+    return qrCode.target.toLowerCase() === "menu"
+      ? "menu"
+      : qrCode.target.toLowerCase() === "location"
+        ? "location"
+        : "table";
   };
-  
 
   const handleShare = () => {
     // Implement share functionality
@@ -52,45 +54,49 @@ export default function ViewQRCodeDialog({
         <DialogHeader>
           <DialogTitle>QR Code Details</DialogTitle>
           <DialogDescription>
-            {`QR code for ${getQRCodeType()}${qrCode.targetNumber ? ` #${qrCode.targetNumber}` : ''}`}
+            {`QR code for ${getQRCodeType()}${qrCode.targetNumber ? ` #${qrCode.targetNumber}` : ""}`}
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="flex flex-col items-center py-4">
           {qrCode.link ? (
             <QRViewDisplay
               qrCodeUrl={qrCode.link}
-              tableNumber={qrCode.targetNumber ? parseInt(qrCode.targetNumber) : null}
+              tableName={qrCode.targetNumber || null}
               type={getQRCodeType()}
-              locationName={qrCode.location?.name || ''}
-              restaurantName={qrCode.user?.name || ''}
+              locationName={qrCode.location?.name || ""}
+              restaurantName={qrCode.user?.name || ""}
             />
           ) : (
             <div className="text-center p-8 bg-gray-100 rounded-md w-full">
               <p>No QR code URL available</p>
             </div>
           )}
-          
+
           <div className="w-full mt-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Target</p>
-                <p className="text-sm">{qrCode.target || '-'}</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Target
+                </p>
+                <p className="text-sm">{qrCode.target || "-"}</p>
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Target Number</p>
-                <p className="text-sm">{qrCode.targetNumber || '-'}</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Table Name
+                </p>
+                <p className="text-sm">{qrCode.targetNumber || "-"}</p>
               </div>
             </div>
           </div>
         </div>
-        
+
         <Separator />
-        
+
         <div className="flex justify-end gap-2">
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             onClick={handleShare}
             disabled={!qrCode.link || isLoading}
           >

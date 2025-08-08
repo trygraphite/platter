@@ -4,13 +4,13 @@
 import { Button } from "@platter/ui/components/button";
 import { Card } from "@platter/ui/components/card";
 import { Download } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { QRCodeCanvas } from "./qrCodeCanvas";
 import { QRCodeViewCanvas } from "./qrCodeViewCanvas";
 
 interface QRDisplayProps {
   qrCodeUrl: string;
-  tableNumber?: number | null;
+  tableName?: string | null;
   locationName?: string;
   type: "table" | "menu" | "location";
   restaurantName?: string;
@@ -18,11 +18,11 @@ interface QRDisplayProps {
 
 export function QRViewDisplay({
   qrCodeUrl,
-  tableNumber,
+  tableName,
   type,
   locationName,
-  restaurantName
- }: QRDisplayProps) {
+  restaurantName,
+}: QRDisplayProps) {
   const [combinedImageUrl, setCombinedImageUrl] = useState<string | null>(null);
 
   const handleDownload = () => {
@@ -39,16 +39,16 @@ export function QRViewDisplay({
   const getFileName = () => {
     if (type === "location") {
       const sanitizedName = locationName?.toLowerCase().replace(/\s+/g, "-");
-      return `${sanitizedName}-table-${tableNumber}-qrcode.png`;
+      return `${sanitizedName}-table-${tableName}-qrcode.png`;
     }
     if (type === "menu") return "menu-qrcode.png";
-    return `table-${tableNumber}-qrcode.png`;
+    return `table-${tableName}-qrcode.png`;
   };
 
   const getTitle = () => {
     if (type === "menu") return "Menu QR Code";
     if (type === "location") return `${locationName} QR Code`;
-    return `Table ${tableNumber} QR Code`;
+    return `Table ${tableName} QR Code`;
   };
 
   return (
@@ -60,7 +60,7 @@ export function QRViewDisplay({
           width={556}
           height={756}
           target={type}
-          targetId={tableNumber?.toString() || ""}
+          targetId={tableName?.toString() || ""}
           locationName={locationName}
           onImageGenerated={setCombinedImageUrl}
           restaurantName={restaurantName}

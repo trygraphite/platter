@@ -9,7 +9,7 @@ import { QRCodeCanvas } from "./qrCodeCanvas";
 
 interface QRDisplayProps {
   qrCodeUrl: string;
-  tableNumber?: number | null;
+  tableName?: string | null;
   locationName?: string;
   type: "table" | "menu" | "location";
   restaurantName?: string;
@@ -17,11 +17,11 @@ interface QRDisplayProps {
 
 export function QRDisplay({
   qrCodeUrl,
-  tableNumber,
+  tableName,
   type,
   restaurantName,
   locationName,
- }: QRDisplayProps) {
+}: QRDisplayProps) {
   const [combinedImageUrl, setCombinedImageUrl] = useState<string | null>(null);
 
   const handleDownload = () => {
@@ -38,15 +38,16 @@ export function QRDisplay({
   const getFileName = () => {
     if (type === "location") {
       const sanitizedName = locationName?.toLowerCase().replace(/\s+/g, "-");
-      return `${sanitizedName}-table-${tableNumber}-qrcode.png`;
+      return `${sanitizedName}-table-${tableName}-qrcode.png`;
     }
     if (type === "menu") return "menu-qrcode.png";
-    return `table-${tableNumber}-qrcode.png`;
+    return `table-${tableName}-qrcode.png`;
   };
+
   const getTitle = () => {
     if (type === "menu") return "Menu QR Code";
     if (type === "location") return `${locationName} QR Code`;
-    return `Table ${tableNumber} QR Code`;
+    return `Table ${tableName} QR Code`;
   };
 
   return (
@@ -58,7 +59,7 @@ export function QRDisplay({
           width={556}
           height={756}
           target={type}
-          targetId={tableNumber?.toString() || ""}
+          targetId={tableName?.toString() || ""}
           locationName={locationName}
           onImageGenerated={setCombinedImageUrl}
           restaurantName={restaurantName}

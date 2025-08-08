@@ -1,6 +1,28 @@
 import type { Order, OrderStatus } from "@prisma/client";
-import { ChevronDown, ChevronUp, ClipboardIcon, Edit2, PackageIcon, Trash2, Tag } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  ClipboardIcon,
+  Edit2,
+  PackageIcon,
+  Printer,
+  Tag,
+  Trash2,
+} from "lucide-react";
 import React, { useState } from "react";
+import EditOrderItemStatus from "./edit-order-item-status";
+import { PrintDocketDialog } from "./print-docket-dialog";
+
+import { Badge } from "@platter/ui/components/badge";
+import { Button } from "@platter/ui/components/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@platter/ui/components/dialog";
 
 import {
   Table,
@@ -10,22 +32,21 @@ import {
   TableHeader,
   TableRow,
 } from "@platter/ui/components/table";
-import { Button } from "@platter/ui/components/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@platter/ui/components/dialog";
 import { formatNaira } from "utils";
 
 interface OrdersTableProps {
   orders: (Order & {
     tableNumber: string;
     items: {
+      id: string;
       quantity: number;
+      status:
+        | "PENDING"
+        | "CONFIRMED"
+        | "PREPARING"
+        | "READY"
+        | "DELIVERED"
+        | "CANCELLED";
       menuItem: {
         name: string;
         price: number;
@@ -48,17 +69,29 @@ interface OrdersTableProps {
   })[];
   onEditOrder: (order: Order) => void;
   onDeleteOrder: (orderId: string) => void;
+  onUpdateOrderItemStatus: (
+    orderItemId: string,
+    newStatus:
+      | "PENDING"
+      | "CONFIRMED"
+      | "PREPARING"
+      | "READY"
+      | "DELIVERED"
+      | "CANCELLED",
+  ) => Promise<void>;
 }
 
 export default function OrdersTable({
   orders,
   onEditOrder,
   onDeleteOrder,
+  onUpdateOrderItemStatus,
 }: OrdersTableProps) {
   const [expandedOrderIds, setExpandedOrderIds] = useState<Set<string>>(
     new Set(),
   );
   const [deleteOrderId, setDeleteOrderId] = useState<string | null>(null);
+  const [printOrderId, setPrintOrderId] = useState<string | null>(null);
 
   const toggleOrderExpansion = (orderId: string) => {
     const newExpandedOrders = new Set(expandedOrderIds);
@@ -93,12 +126,12 @@ export default function OrdersTable({
   };
 
   // Calculate actual item price based on variety or base price
-  const getItemPrice = (item: any) => {
+  const getItemPrice = (item: OrdersTableProps["orders"][0]["items"][0]) => {
     return item.variety ? item.variety.price : item.menuItem.price;
   };
 
   // Calculate total price for an item (quantity * actual price)
-  const getItemTotal = (item: any) => {
+  const getItemTotal = (item: OrdersTableProps["orders"][0]["items"][0]) => {
     return getItemPrice(item) * item.quantity;
   };
 
@@ -120,7 +153,7 @@ export default function OrdersTable({
               <TableRow>
                 <TableCell>
                   <div className="flex items-center">
-                    {order.items.length > 0 && (
+                    {order.items && order.items.length > 0 && (
                       <Button
                         variant="ghost"
                         size="icon"
@@ -171,6 +204,13 @@ export default function OrdersTable({
                     <Button
                       variant="ghost"
                       size="icon"
+                      onClick={() => setPrintOrderId(order.id)}
+                    >
+                      <Printer size={16} />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       className="text-destructive hover:text-destructive"
                       onClick={() => setDeleteOrderId(order.id)}
                     >
@@ -193,9 +233,9 @@ export default function OrdersTable({
                             </h4>
                           </div>
                           <div className="space-y-3">
-                            {order.items.map((item, index) => (
+                            {order.items.map((item) => (
                               <div
-                                key={index}
+                                key={item.id}
                                 className="flex justify-between items-center p-2 rounded-md bg-muted/30 hover:bg-muted/50 transition-colors"
                               >
                                 <div className="flex items-center gap-3">
@@ -203,12 +243,34 @@ export default function OrdersTable({
                                     {item.quantity}x
                                   </span>
                                   <div className="flex flex-col">
-                                    <span className="text-lg">
-                                      {item.menuItem.name}
-                                    </span>
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-lg">
+                                        {item.menuItem.name}
+                                      </span>
+                                      <Badge
+                                        className={`text-xs px-2 py-1 ${
+                                          item.status === "PENDING"
+                                            ? "bg-gray-100 text-gray-800"
+                                            : item.status === "CONFIRMED"
+                                              ? "bg-yellow-100 text-yellow-800"
+                                              : item.status === "PREPARING"
+                                                ? "bg-blue-100 text-blue-800"
+                                                : item.status === "READY"
+                                                  ? "bg-green-100 text-green-800"
+                                                  : item.status === "DELIVERED"
+                                                    ? "bg-emerald-100 text-emerald-800"
+                                                    : "bg-red-100 text-red-800"
+                                        }`}
+                                      >
+                                        {item.status}
+                                      </Badge>
+                                    </div>
                                     {item.variety && (
                                       <div className="flex items-center gap-1 mt-1">
-                                        <Tag size={12} className="text-primary" />
+                                        <Tag
+                                          size={12}
+                                          className="text-primary"
+                                        />
                                         <span className="text-xs text-primary font-medium">
                                           {item.variety.name}
                                         </span>
@@ -221,9 +283,26 @@ export default function OrdersTable({
                                     )}
                                   </div>
                                 </div>
-                                <span className="font-medium text-lg">
-                                  {formatNaira(getItemTotal(item))}
-                                </span>
+                                <div className="flex items-center gap-6">
+                                  <div className="flex flex-col gap-1">
+                                    <span className="text-xs text-muted-foreground font-medium">
+                                      Status
+                                    </span>
+                                    <EditOrderItemStatus
+                                      orderItemId={item.id}
+                                      currentStatus={item.status}
+                                      onStatusUpdate={onUpdateOrderItemStatus}
+                                    />
+                                  </div>
+                                  <div className="flex flex-col gap-1">
+                                    <span className="text-xs text-muted-foreground font-medium">
+                                      Total
+                                    </span>
+                                    <span className="font-medium text-lg">
+                                      {formatNaira(getItemTotal(item))}
+                                    </span>
+                                  </div>
+                                </div>
                               </div>
                             ))}
                           </div>
@@ -278,6 +357,13 @@ export default function OrdersTable({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Print Docket Dialog */}
+      <PrintDocketDialog
+        order={orders.find((order) => order.id === printOrderId) || null}
+        open={!!printOrderId}
+        onClose={() => setPrintOrderId(null)}
+      />
     </>
   );
 }
