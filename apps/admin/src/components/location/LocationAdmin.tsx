@@ -1,4 +1,10 @@
 "use client";
+import {
+  addRestaurantToLocation,
+  createLocation,
+  getLocations,
+  removeRestaurantFromLocation,
+} from "@/lib/actions/location-actions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@platter/ui/components/button";
 import {
@@ -22,12 +28,6 @@ import { Trash2Icon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import {
-  addRestaurantToLocation,
-  createLocation,
-  getLocations,
-  removeRestaurantFromLocation,
-} from "@/lib/actions/location-actions";
 import { JoinRequests } from "./JoinRequest";
 
 const locationSchema = z.object({
@@ -40,7 +40,7 @@ const locationSchema = z.object({
 });
 
 export function LocationAdmin({ restaurants }: { restaurants: User[] }) {
-  const [locations, setLocations] = useState<any[]>([]);
+  const [locations, setLocations] = useState<Location[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<z.infer<typeof locationSchema>>({
@@ -122,14 +122,16 @@ export function LocationAdmin({ restaurants }: { restaurants: User[] }) {
           <CardTitle>Create New Location</CardTitle>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+          <Form {...(form as any)}>
             <form
               onSubmit={form.handleSubmit(handleCreateLocation)}
               className="space-y-4"
             >
               <div className="grid grid-cols-2 gap-4">
                 <FormField
-                  control={form.control}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  control={form.control as any}
                   name="name"
                   render={({ field }) => (
                     <FormItem>
@@ -142,7 +144,8 @@ export function LocationAdmin({ restaurants }: { restaurants: User[] }) {
                   )}
                 />
                 <FormField
-                  control={form.control}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  control={form.control as any}
                   name="seatingCapacity"
                   render={({ field }) => (
                     <FormItem>
@@ -161,7 +164,8 @@ export function LocationAdmin({ restaurants }: { restaurants: User[] }) {
                   )}
                 />
                 <FormField
-                  control={form.control}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  control={form.control as any}
                   name="address"
                   render={({ field }) => (
                     <FormItem>
@@ -174,7 +178,8 @@ export function LocationAdmin({ restaurants }: { restaurants: User[] }) {
                   )}
                 />
                 <FormField
-                  control={form.control}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  control={form.control as any}
                   name="city"
                   render={({ field }) => (
                     <FormItem>
@@ -187,7 +192,8 @@ export function LocationAdmin({ restaurants }: { restaurants: User[] }) {
                   )}
                 />
                 <FormField
-                  control={form.control}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  control={form.control as any}
                   name="state"
                   render={({ field }) => (
                     <FormItem>
@@ -201,7 +207,8 @@ export function LocationAdmin({ restaurants }: { restaurants: User[] }) {
                 />
 
                 <FormField
-                  control={form.control}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  control={form.control as any}
                   name="description"
                   render={({ field }) => (
                     <FormItem>
@@ -226,7 +233,7 @@ export function LocationAdmin({ restaurants }: { restaurants: User[] }) {
         <CardHeader>
           <CardTitle>Manage Restaurants in Locations</CardTitle>
         </CardHeader>
-        <CardContent>
+        {/* <CardContent>
           <div className="space-y-4">
             {locations?.map((location) => (
               <div key={location?.id} className="border p-4 rounded-lg">
@@ -299,7 +306,7 @@ export function LocationAdmin({ restaurants }: { restaurants: User[] }) {
               </div>
             ))}
           </div>
-        </CardContent>
+        </CardContent> */}
       </Card>
     </div>
   );

@@ -53,7 +53,7 @@ export default function ManageStaffClient({
 
   useEffect(() => {
     loadStaff();
-  }, [loadStaff]);
+  }, []);
 
   const loadStaff = async () => {
     try {
