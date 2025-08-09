@@ -62,7 +62,7 @@ export default function ManageServicePointPage({
 
   useEffect(() => {
     fetchServicePoints();
-  }, [fetchServicePoints]);
+  }, []);
 
   const fetchServicePoints = async () => {
     try {

@@ -91,7 +91,7 @@ export default function EditStaffModal({
     if (isOpen && staffId) {
       loadStaff();
     }
-  }, [isOpen, staffId, loadStaff]);
+  }, [isOpen, staffId]);
 
   const loadStaff = async () => {
     if (!staffId) return;
