@@ -1,6 +1,6 @@
-import { getCurrentStaff } from "@/utils/auth";
-import { type FileRouter, createUploadthing } from "uploadthing/next";
+import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
+import { getCurrentStaff } from "@/utils/auth";
 
 const f = createUploadthing();
 

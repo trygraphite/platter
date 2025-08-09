@@ -1,7 +1,7 @@
 "use client";
-import { loginAction } from "@/actions/staff-auth";
 import { Eye, EyeOff, Loader2, Lock, User } from "lucide-react";
 import { type FC, useState } from "react";
+import { loginAction } from "@/actions/staff-auth";
 
 const StaffLoginPage: FC = () => {
   const [showPassword, setShowPassword] = useState(false);

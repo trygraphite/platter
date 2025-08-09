@@ -1,7 +1,6 @@
+import db from "@platter/db";
 import UpdateRestaurantDetailsForm from "@/components/modules/setting/ProfileForm";
 import getServerSession from "@/lib/auth/server";
-import db from "@platter/db";
-import { redirect } from "next/navigation";
 
 export default async function EditRestaurantPage() {
   const user = await getServerSession();

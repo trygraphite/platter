@@ -1,7 +1,4 @@
 "use client";
-import React, { useState } from 'react';
-import { TrendingUp } from "lucide-react";
-import { Area, AreaChart, CartesianGrid, XAxis } from "@platter/ui/lib/charts";
 import {
   Card,
   CardContent,
@@ -11,14 +8,18 @@ import {
   CardTitle,
 } from "@platter/ui/components/card";
 import {
-  ChartConfig,
+  type ChartConfig,
   ChartContainer,
   ChartLegend,
   ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
 } from "@platter/ui/components/chart";
-import { processFeedbackData } from './feedback-utils';
+import { Area, AreaChart, CartesianGrid, XAxis } from "@platter/ui/lib/charts";
+import { TrendingUp } from "lucide-react";
+import { useState } from "react";
+import { processFeedbackData } from "./feedback-utils";
+
 interface Review {
   id: string;
   rating: number;
@@ -36,9 +37,14 @@ interface FeedbackLineChartProps {
   complaints: Complaint[] | undefined;
 }
 
-const FeedbackLineChart = ({ reviews = [], complaints = [] }: FeedbackLineChartProps) => {
-  const [timeFilter, setTimeFilter] = useState<'daily' | 'weekly' | 'monthly'>('daily');
-  
+const FeedbackLineChart = ({
+  reviews = [],
+  complaints = [],
+}: FeedbackLineChartProps) => {
+  const [timeFilter, setTimeFilter] = useState<"daily" | "weekly" | "monthly">(
+    "daily",
+  );
+
   const chartConfig = {
     reviews: {
       label: "Reviews",
@@ -47,18 +53,18 @@ const FeedbackLineChart = ({ reviews = [], complaints = [] }: FeedbackLineChartP
     complaints: {
       label: "Complaints",
       color: "hsl(var(--chart-2))",
-    }
+    },
   } satisfies ChartConfig;
-  
+
   // Process data using utility function
-  const { 
-    filteredData, 
-    totalReviews, 
-    totalComplaints, 
-    reviewsPercentage, 
-    timeframeText 
+  const {
+    filteredData,
+    totalReviews,
+    totalComplaints,
+    reviewsPercentage,
+    timeframeText,
   } = processFeedbackData(reviews, complaints, timeFilter);
-  
+
   return (
     <Card>
       <CardHeader>
@@ -68,21 +74,21 @@ const FeedbackLineChart = ({ reviews = [], complaints = [] }: FeedbackLineChartP
             <CardDescription>Showing feedback over time</CardDescription>
           </div>
           <div className="flex space-x-2">
-            <button 
-              className={`px-3 py-1 text-xs rounded-md ${timeFilter === 'daily' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}
-              onClick={() => setTimeFilter('daily')}
+            <button
+              className={`px-3 py-1 text-xs rounded-md ${timeFilter === "daily" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
+              onClick={() => setTimeFilter("daily")}
             >
               Daily
             </button>
-            <button 
-              className={`px-3 py-1 text-xs rounded-md ${timeFilter === 'weekly' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}
-              onClick={() => setTimeFilter('weekly')}
+            <button
+              className={`px-3 py-1 text-xs rounded-md ${timeFilter === "weekly" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
+              onClick={() => setTimeFilter("weekly")}
             >
               Weekly
             </button>
-            <button 
-              className={`px-3 py-1 text-xs rounded-md ${timeFilter === 'monthly' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}
-              onClick={() => setTimeFilter('monthly')}
+            <button
+              className={`px-3 py-1 text-xs rounded-md ${timeFilter === "monthly" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
+              onClick={() => setTimeFilter("monthly")}
             >
               Monthly
             </button>
@@ -105,9 +111,9 @@ const FeedbackLineChart = ({ reviews = [], complaints = [] }: FeedbackLineChartP
               tickMargin={8}
               tickFormatter={(value) => {
                 // Simplify x-axis labels
-                if (timeFilter === 'daily') {
+                if (timeFilter === "daily") {
                   return value.slice(0, 3); // First 3 letters of day
-                } else if (timeFilter === 'weekly') {
+                } else if (timeFilter === "weekly") {
                   return value.slice(0, 6); // First part of week range
                 }
                 return value; // Month abbreviations
@@ -143,16 +149,18 @@ const FeedbackLineChart = ({ reviews = [], complaints = [] }: FeedbackLineChartP
             <div className="flex items-center gap-2 font-medium leading-none">
               {totalReviews > totalComplaints ? (
                 <>
-                  Positive trend: {reviewsPercentage}% reviews <TrendingUp className="h-4 w-4 text-green-500" />
+                  Positive trend: {reviewsPercentage}% reviews{" "}
+                  <TrendingUp className="h-4 w-4 text-green-500" />
                 </>
+              ) : totalComplaints > 0 ? (
+                `${100 - reviewsPercentage}% complaints`
               ) : (
-                <>
-                  {totalComplaints > 0 ? `${100 - reviewsPercentage}% complaints` : 'No feedback data'}
-                </>
+                "No feedback data"
               )}
             </div>
             <div className="flex items-center gap-2 leading-none text-muted-foreground">
-              {timeframeText} • Reviews: {totalReviews} • Complaints: {totalComplaints}
+              {timeframeText} • Reviews: {totalReviews} • Complaints:{" "}
+              {totalComplaints}
             </div>
           </div>
         </div>

@@ -12,7 +12,7 @@ export interface QRCodeFormData {
 export interface QRCodeResponse {
   success: boolean;
   qrCodeUrl?: string;
-  locationName? : string;
+  locationName?: string;
   error?: string;
   restaurantName?: string;
 }

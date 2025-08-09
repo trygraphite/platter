@@ -51,7 +51,7 @@ export default function EditOrderModal({
   tables,
 }: EditOrderModalProps) {
   const [status, setStatus] = useState<OrderStatus>(order.status);
-  const [tableId, setTableId] = useState(order.tableId);
+  const [tableId, _setTableId] = useState(order.tableId);
   const [specialNotes, setSpecialNotes] = useState(order.specialNotes || "");
   const [applyToAllItems, setApplyToAllItems] = useState(false);
   const [isLoading, setIsLoading] = useState(false);

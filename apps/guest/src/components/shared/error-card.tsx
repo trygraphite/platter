@@ -1,12 +1,12 @@
-import Link from "next/link";
 import { Button } from "@platter/ui/components/button";
 import {
   Card,
-  CardHeader,
-  CardTitle,
   CardContent,
   CardFooter,
+  CardHeader,
+  CardTitle,
 } from "@platter/ui/components/card";
+import Link from "next/link";
 
 export default function ErrorCard(error: any) {
   return (

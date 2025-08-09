@@ -1,12 +1,11 @@
-import StaffLoginPage from '@/components/auth/loginForm'
-import React from 'react'
+import StaffLoginPage from "@/components/auth/loginForm";
 
 const Login = () => {
   return (
     <div>
-      <StaffLoginPage/>
+      <StaffLoginPage />
     </div>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

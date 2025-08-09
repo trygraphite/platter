@@ -1,6 +1,5 @@
 import type { Config } from "tailwindcss";
 import tailwindcssAnimate from "tailwindcss-animate";
-import { fontFamily } from "tailwindcss/defaultTheme";
 
 const config = {
   darkMode: ["class"],
@@ -26,11 +25,11 @@ const config = {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
           // Add custom shades of blue for secondary
-          light: "hsl(210, 100%, 75%)",    // Light blue
-          medium: "hsl(220, 90%, 60%)",    // Medium blue
-          dark: "hsl(230, 80%, 45%)",      // Dark blue
-          navy: "hsl(240, 70%, 30%)",      // Navy blue
-          sky: "hsl(200, 95%, 65%)",       // Sky blue
+          light: "hsl(210, 100%, 75%)", // Light blue
+          medium: "hsl(220, 90%, 60%)", // Medium blue
+          dark: "hsl(230, 80%, 45%)", // Dark blue
+          navy: "hsl(240, 70%, 30%)", // Navy blue
+          sky: "hsl(200, 95%, 65%)", // Sky blue
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
@@ -69,12 +68,12 @@ const config = {
         sm: "calc(var(--radius) - 4px)",
       },
       animation: {
-        shimmer: 'shimmer 1.5s infinite',
+        shimmer: "shimmer 1.5s infinite",
       },
       keyframes: {
         shimmer: {
-          '0%': { backgroundPosition: '-200% 0' },
-          '100%': { backgroundPosition: '200% 0' },
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
         },
       },
     },

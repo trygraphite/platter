@@ -1,11 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@platter/ui/components/card";
 import { Button } from "@platter/ui/components/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@platter/ui/components/card";
+import useSocketIO from "@platter/ui/hooks/useSocketIO";
 import { Bell, Check, Clock } from "@platter/ui/lib/icons";
 import { formatDistanceToNow } from "date-fns";
-import useSocketIO from "@platter/ui/hooks/useSocketIO";
+import { useEffect, useState } from "react";
 
 interface WaiterNotification {
   id: string;
@@ -26,17 +31,17 @@ export function AdminNotifications({ restaurantId }: { restaurantId: string }) {
     if (socket && isConnected && restaurantId) {
       // Join the restaurant room to receive notifications
       socket.emit("joinRestaurantRoom", restaurantId);
-      
+
       // Listen for waiter notifications
       socket.on("waiterNotification", (notification: WaiterNotification) => {
         // Play notification sound
         const audio = new Audio("/notification-sound.mp3");
-        audio.play().catch(e => console.log("Audio play failed:", e));
-        
+        audio.play().catch((e) => console.log("Audio play failed:", e));
+
         // Add notification to the list
-        setNotifications(prev => [notification, ...prev]);
+        setNotifications((prev) => [notification, ...prev]);
       });
-      
+
       // Clean up
       return () => {
         socket.off("waiterNotification");
@@ -46,30 +51,34 @@ export function AdminNotifications({ restaurantId }: { restaurantId: string }) {
   }, [socket, isConnected, restaurantId]);
 
   const markAsCompleted = (notificationId: string) => {
-    setNotifications(prev => 
-      prev.map(notification => 
-        notification.id === notificationId 
-          ? { ...notification, status: "completed" } 
-          : notification
-      )
+    setNotifications((prev) =>
+      prev.map((notification) =>
+        notification.id === notificationId
+          ? { ...notification, status: "completed" }
+          : notification,
+      ),
     );
-    
+
     // Optionally inform the server about the status change
     if (socket) {
-      socket.emit("updateNotification", { 
-        id: notificationId, 
-        status: "completed" 
+      socket.emit("updateNotification", {
+        id: notificationId,
+        status: "completed",
       });
     }
   };
 
   // Display only notifications from the last 4 hours
   const recentNotifications = notifications.filter(
-    n => new Date(n.timestamp) > new Date(Date.now() - 4 * 60 * 60 * 1000)
+    (n) => new Date(n.timestamp) > new Date(Date.now() - 4 * 60 * 60 * 1000),
   );
 
-  const pendingNotifications = recentNotifications.filter(n => n.status === "pending");
-  const completedNotifications = recentNotifications.filter(n => n.status === "completed");
+  const pendingNotifications = recentNotifications.filter(
+    (n) => n.status === "pending",
+  );
+  const completedNotifications = recentNotifications.filter(
+    (n) => n.status === "completed",
+  );
 
   return (
     <Card className="w-full shadow-md">
@@ -95,19 +104,23 @@ export function AdminNotifications({ restaurantId }: { restaurantId: string }) {
               <div className="space-y-3">
                 <h3 className="font-medium text-amber-600">Pending</h3>
                 {pendingNotifications.map((notification) => (
-                  <div 
+                  <div
                     key={notification.id}
                     className="flex items-center justify-between p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg animate-pulse"
                   >
                     <div>
-                      <p className="font-medium">Table: {notification.tableId}</p>
+                      <p className="font-medium">
+                        Table: {notification.tableId}
+                      </p>
                       <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
                         <Clock className="h-3 w-3" />
-                        {formatDistanceToNow(new Date(notification.timestamp), { addSuffix: true })}
+                        {formatDistanceToNow(new Date(notification.timestamp), {
+                          addSuffix: true,
+                        })}
                       </p>
                     </div>
-                    <Button 
-                      size="sm" 
+                    <Button
+                      size="sm"
                       variant="outline"
                       className="border-amber-200 dark:border-amber-800"
                       onClick={() => markAsCompleted(notification.id)}
@@ -124,15 +137,19 @@ export function AdminNotifications({ restaurantId }: { restaurantId: string }) {
               <div className="space-y-3">
                 <h3 className="font-medium text-green-600">Completed</h3>
                 {completedNotifications.slice(0, 5).map((notification) => (
-                  <div 
+                  <div
                     key={notification.id}
                     className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg"
                   >
                     <div>
-                      <p className="font-medium">Table: {notification.tableId}</p>
+                      <p className="font-medium">
+                        Table: {notification.tableId}
+                      </p>
                       <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
                         <Clock className="h-3 w-3" />
-                        {formatDistanceToNow(new Date(notification.timestamp), { addSuffix: true })}
+                        {formatDistanceToNow(new Date(notification.timestamp), {
+                          addSuffix: true,
+                        })}
                       </p>
                     </div>
                     <span className="text-xs font-medium px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-full">

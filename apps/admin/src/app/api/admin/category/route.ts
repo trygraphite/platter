@@ -13,7 +13,7 @@ export async function GET(request: Request) {
 
   try {
     const categories = await db.category.findMany({
-      where: { 
+      where: {
         userId,
         ...(includeDeleted ? {} : { deletedAt: null }), // Include deleted if requested
       },

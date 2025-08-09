@@ -1,6 +1,5 @@
 import ManageServicePointPage from "@/components/modules/manage-service-point/page";
 import getServerSession from "@/lib/auth/server";
-import React from "react";
 
 const page = async () => {
   const session = await getServerSession();

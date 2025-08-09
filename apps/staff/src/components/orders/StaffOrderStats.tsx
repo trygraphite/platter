@@ -1,14 +1,8 @@
 "use client";
 
-import type { OrderStats, StaffOrderStatsProps } from "@/types/orders";
-import {
-  AlertCircle,
-  CheckCircle,
-  CheckSquare,
-  Clock,
-  Package,
-} from "lucide-react";
+import { AlertCircle, CheckCircle, CheckSquare, Package } from "lucide-react";
 import type React from "react";
+import type { StaffOrderStatsProps } from "@/types/orders";
 
 export function StaffOrderStats({
   stats,

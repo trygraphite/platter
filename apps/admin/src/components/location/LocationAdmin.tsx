@@ -30,17 +30,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { JoinRequests } from "./JoinRequest";
 
-interface Location {
-  id: string;
-  name: string;
-  address: string;
-  city: string;
-  state: string;
-  seatingCapacity: number;
-  description?: string;
-  users: User[];
-}
-
 const locationSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters"),
   address: z.string().min(5, "Address must be at least 5 characters"),
@@ -80,7 +69,7 @@ export function LocationAdmin({ restaurants }: { restaurants: User[] }) {
       } else if (result?.error) {
         toast.error(result.error);
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error("An unexpected error occurred");
     } finally {
       setIsSubmitting(false);
@@ -106,7 +95,7 @@ export function LocationAdmin({ restaurants }: { restaurants: User[] }) {
       } else if (result.error) {
         toast.error(result.error);
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to add restaurant");
     }
   };
@@ -115,7 +104,7 @@ export function LocationAdmin({ restaurants }: { restaurants: User[] }) {
     try {
       const data = await getLocations();
       setLocations(Array.isArray(data) ? data : []);
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to load locations");
       setLocations([]);
     }
@@ -244,7 +233,7 @@ export function LocationAdmin({ restaurants }: { restaurants: User[] }) {
         <CardHeader>
           <CardTitle>Manage Restaurants in Locations</CardTitle>
         </CardHeader>
-        <CardContent>
+        {/* <CardContent>
           <div className="space-y-4">
             {locations?.map((location) => (
               <div key={location?.id} className="border p-4 rounded-lg">
@@ -317,7 +306,7 @@ export function LocationAdmin({ restaurants }: { restaurants: User[] }) {
               </div>
             ))}
           </div>
-        </CardContent>
+        </CardContent> */}
       </Card>
     </div>
   );

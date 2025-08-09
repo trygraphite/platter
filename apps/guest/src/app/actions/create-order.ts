@@ -1,44 +1,44 @@
-"use server"
+"use server";
 
-import db from "@platter/db"
-import { revalidatePath } from "next/cache"
+import db from "@platter/db";
+import { revalidatePath } from "next/cache";
 
 interface CreateOrderParams {
-  tableId: string
-  qrId: string
+  tableId: string;
+  qrId: string;
   items: {
-    id: string
-    quantity: number
-    price: number
-    name: string
-    selectedVarietyId?: string
-  }[]
-  totalAmount: number
-  specialNotes?: string
+    id: string;
+    quantity: number;
+    price: number;
+    name: string;
+    selectedVarietyId?: string;
+  }[];
+  totalAmount: number;
+  specialNotes?: string;
 }
 
-export async function createOrder({ 
-  tableId, 
-  qrId, 
-  items, 
-  totalAmount, 
-  specialNotes 
+export async function createOrder({
+  tableId,
+  qrId,
+  items,
+  totalAmount,
+  specialNotes,
 }: CreateOrderParams) {
   try {
     // Get restaurant ID from QR code
     const qrCode = await db.qRCode.findUnique({
       where: { id: qrId },
       select: { userId: true },
-    })
+    });
 
     // Check if QR code exists and has a valid userId
     if (!qrCode?.userId) {
-      throw new Error("QR code not found or not associated with a user")
+      throw new Error("QR code not found or not associated with a user");
     }
 
     // Get the start of the current day (12 AM)
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
     // Fetch the latest orderNumber for today
     const lastOrder = await db.order.findFirst({
@@ -50,10 +50,10 @@ export async function createOrder({
       orderBy: {
         orderNumber: "desc",
       },
-    })
+    });
 
     // Determine the next orderNumber
-    const orderNumber = lastOrder?.orderNumber ? lastOrder.orderNumber + 1 : 1
+    const orderNumber = lastOrder?.orderNumber ? lastOrder.orderNumber + 1 : 1;
 
     // Create the order with validated userId and special notes
     const order = await db.order.create({
@@ -62,7 +62,7 @@ export async function createOrder({
         orderNumber,
         totalAmount,
         specialNotes: specialNotes || null,
-        userId: qrCode.userId, 
+        userId: qrCode.userId,
         tableId,
         items: {
           create: items.map((item) => ({
@@ -82,25 +82,27 @@ export async function createOrder({
         },
         table: true,
       },
-    })
+    });
 
     // console.log("Order created:", order)
-    revalidatePath(`/${qrId}/order-status`)
+    revalidatePath(`/${qrId}/order-status`);
 
     // Notify socket server about the new order
     try {
-      const socketServerUrl = process.env.NEXT_PUBLIC_SOCKET_SERVER_URL || process.env.SOCKET_SERVER_URL
+      const socketServerUrl =
+        process.env.NEXT_PUBLIC_SOCKET_SERVER_URL ||
+        process.env.SOCKET_SERVER_URL;
       if (socketServerUrl) {
         // Format the order items correctly for the socket server
         const formattedItems = order.items.map((item: any) => ({
           menuItemId: item.menuItemId,
           quantity: item.quantity,
           selectedVarietyId: item.selectedVarietyId,
-        }))
+        }));
 
         // Use fetch with improved error handling and timeout
-        const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
         try {
           const response = await fetch(`${socketServerUrl}/api/orders/`, {
@@ -123,45 +125,47 @@ export async function createOrder({
                     name: item.menuItem.name,
                     price: item.menuItem.price,
                   },
-                  variety: item.variety ? {
-                    id: item.variety.id,
-                    name: item.variety.name,
-                    price: item.variety.price,
-                  } : null,
+                  variety: item.variety
+                    ? {
+                        id: item.variety.id,
+                        name: item.variety.name,
+                        price: item.variety.price,
+                      }
+                    : null,
                 })),
                 tableNumber: order.table?.number || "Unknown",
                 specialNotes: order.specialNotes,
               },
             }),
             signal: controller.signal,
-          })
+          });
 
-          clearTimeout(timeoutId)
+          clearTimeout(timeoutId);
 
           if (!response.ok) {
-            const errorText = await response.text()
-            console.error("Failed to notify socket server:", errorText)
+            const errorText = await response.text();
+            console.error("Failed to notify socket server:", errorText);
           } else {
-            console.log("Socket server notified successfully")
+            console.log("Socket server notified successfully");
           }
         } catch (fetchError: any) {
-          clearTimeout(timeoutId)
+          clearTimeout(timeoutId);
           if (fetchError.name === "AbortError") {
-            console.error("Socket server notification timed out")
+            console.error("Socket server notification timed out");
           } else {
-            console.error("Error notifying socket server:", fetchError)
+            console.error("Error notifying socket server:", fetchError);
           }
           // Continue even if socket notification fails
         }
       }
     } catch (error) {
-      console.error("Error in socket notification block:", error)
+      console.error("Error in socket notification block:", error);
       // Continue even if socket notification fails
     }
 
-    return { success: true, orderId: order.id }
+    return { success: true, orderId: order.id };
   } catch (error) {
-    console.error("Error creating order:", error)
-    return { success: false, error: "Failed to create order" }
+    console.error("Error creating order:", error);
+    return { success: false, error: "Failed to create order" };
   }
 }

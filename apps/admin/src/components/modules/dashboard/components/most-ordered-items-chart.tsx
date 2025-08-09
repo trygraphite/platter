@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import { ArrowUpDown } from "lucide-react";
-import { type ColumnDef } from "@tanstack/react-table";
-import { Button } from "@platter/ui/components/button";
 import { Badge } from "@platter/ui/components/badge";
-import { DataTable } from "@/components/custom/data-table";
+import { Button } from "@platter/ui/components/button";
 import { formatCurrency } from "@platter/ui/lib/utils";
+import type { ColumnDef } from "@tanstack/react-table";
+import { ArrowUpDown } from "lucide-react";
+import { useMemo } from "react";
+import { DataTable } from "@/components/custom/data-table";
 
 interface MenuItemWithOrderCount {
   id: string;

@@ -25,15 +25,14 @@ import {
 } from "@platter/ui/components/table";
 import {
   type ColumnDef,
-  type SortingState,
   flexRender,
   getCoreRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  type SortingState,
   useReactTable,
 } from "@tanstack/react-table";
 import React from "react";
-
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
@@ -109,11 +108,10 @@ export function DataTable<TData, TValue>({
                     <TableHead key={header.id} className="text-left pl-5">
                       {header.isPlaceholder
                         ? null
-                        : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                          (flexRender(
+                        : flexRender(
                             header.column.columnDef.header,
                             header.getContext(),
-                          ) as any)}
+                          )}
                     </TableHead>
                   ))}
                 </TableRow>
@@ -128,13 +126,10 @@ export function DataTable<TData, TValue>({
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id} className="text-left pl-5">
-                        {
-                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                          flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          ) as any
-                        }
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
                       </TableCell>
                     ))}
                   </TableRow>

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import { Badge } from "@platter/ui/components/badge";
 import {
   Card,
   CardContent,
@@ -8,8 +8,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@platter/ui/components/card";
-import { Badge } from "@platter/ui/components/badge";
 import type { Order } from "@prisma/client";
+import React from "react";
 
 interface LiveOrderTrackingProps extends React.ComponentProps<typeof Card> {
   orders: Order[];
@@ -19,7 +19,7 @@ export function LiveOrderTracking({
   orders,
   className,
 }: LiveOrderTrackingProps) {
-  const [liveOrders, setLiveOrders] = React.useState<Order[]>([]);
+  const [liveOrders, _setLiveOrders] = React.useState<Order[]>([]);
 
   // React.useEffect(() => {
   //   setLiveOrders(orders.slice(-5));

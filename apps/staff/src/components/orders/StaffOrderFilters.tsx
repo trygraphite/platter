@@ -1,8 +1,8 @@
 "use client";
 
-import type { StaffOrderFiltersProps } from "@/types/orders";
 import type { OrderStatus } from "@prisma/client";
-import { Filter, Search } from "lucide-react";
+import { Search } from "lucide-react";
+import type { StaffOrderFiltersProps } from "@/types/orders";
 
 export function StaffOrderFilters({
   statusFilter,

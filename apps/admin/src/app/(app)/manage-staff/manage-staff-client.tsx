@@ -1,11 +1,5 @@
 "use client";
 
-import EditStaffModal from "@/components/modules/edit-staff-modal";
-import {
-  type StaffMember,
-  deleteStaff,
-  getAllStaff,
-} from "@/lib/actions/manage-staff";
 import { Badge } from "@platter/ui/components/badge";
 import { Button } from "@platter/ui/components/button";
 import {
@@ -37,6 +31,12 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import EditStaffModal from "@/components/modules/edit-staff-modal";
+import {
+  deleteStaff,
+  getAllStaff,
+  type StaffMember,
+} from "@/lib/actions/manage-staff";
 
 interface ManageStaffClientProps {
   restaurantId: string;
@@ -53,7 +53,7 @@ export default function ManageStaffClient({
 
   useEffect(() => {
     loadStaff();
-  }, []);
+  }, [loadStaff]);
 
   const loadStaff = async () => {
     try {

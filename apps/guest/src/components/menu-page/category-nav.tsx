@@ -1,27 +1,27 @@
-"use client"
+"use client";
 
-import { ChevronLeft, ChevronRight } from "@platter/ui/lib/icons"
-import { cn } from "@platter/ui/lib/utils"
-import { useState, useRef, useEffect } from "react"
+import { ChevronLeft, ChevronRight } from "@platter/ui/lib/icons";
+import { cn } from "@platter/ui/lib/utils";
+import { useEffect, useRef, useState } from "react";
 
 interface Category {
-  id: string
-  name: string
+  id: string;
+  name: string;
 }
 
 interface CategoryGroup {
-  id: string
-  name: string
-  categories: Category[]
+  id: string;
+  name: string;
+  categories: Category[];
 }
 
 interface CategoryNavProps {
-  categoryGroups: CategoryGroup[]
-  ungroupedCategories: Category[]
-  selectedGroup: string | null
-  selectedCategory: string | null
-  onSelectGroup: (groupId: string | null) => void
-  onSelectCategory: (categoryId: string | null) => void
+  categoryGroups: CategoryGroup[];
+  ungroupedCategories: Category[];
+  selectedGroup: string | null;
+  selectedCategory: string | null;
+  onSelectGroup: (groupId: string | null) => void;
+  onSelectCategory: (categoryId: string | null) => void;
 }
 
 export function CategoryNav({
@@ -32,129 +32,160 @@ export function CategoryNav({
   onSelectGroup,
   onSelectCategory,
 }: CategoryNavProps): JSX.Element {
-  const groupsScrollContainerRef = useRef<HTMLDivElement>(null)
-  const categoriesScrollContainerRef = useRef<HTMLDivElement>(null)
-  
-  const [showLeftGroupScroll, setShowLeftGroupScroll] = useState(false)
-  const [showRightGroupScroll, setShowRightGroupScroll] = useState(false)
-  const [showLeftCategoryScroll, setShowLeftCategoryScroll] = useState(false)
-  const [showRightCategoryScroll, setShowRightCategoryScroll] = useState(false)
+  const groupsScrollContainerRef = useRef<HTMLDivElement>(null);
+  const categoriesScrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const [showLeftGroupScroll, setShowLeftGroupScroll] = useState(false);
+  const [showRightGroupScroll, setShowRightGroupScroll] = useState(false);
+  const [showLeftCategoryScroll, setShowLeftCategoryScroll] = useState(false);
+  const [showRightCategoryScroll, setShowRightCategoryScroll] = useState(false);
 
   // Check if group scroll buttons should be visible
   const checkGroupScrollButtons = () => {
     if (groupsScrollContainerRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = groupsScrollContainerRef.current
-      setShowLeftGroupScroll(scrollLeft > 0)
-      setShowRightGroupScroll(scrollLeft < scrollWidth - clientWidth - 10)
+      const { scrollLeft, scrollWidth, clientWidth } =
+        groupsScrollContainerRef.current;
+      setShowLeftGroupScroll(scrollLeft > 0);
+      setShowRightGroupScroll(scrollLeft < scrollWidth - clientWidth - 10);
     }
-  }
+  };
 
   // Check if category scroll buttons should be visible
   const checkCategoryScrollButtons = () => {
     if (categoriesScrollContainerRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = categoriesScrollContainerRef.current
-      setShowLeftCategoryScroll(scrollLeft > 0)
-      setShowRightCategoryScroll(scrollLeft < scrollWidth - clientWidth - 10)
+      const { scrollLeft, scrollWidth, clientWidth } =
+        categoriesScrollContainerRef.current;
+      setShowLeftCategoryScroll(scrollLeft > 0);
+      setShowRightCategoryScroll(scrollLeft < scrollWidth - clientWidth - 10);
     }
-  }
+  };
 
   // Handle scroll events
   useEffect(() => {
-    const groupsScrollContainer = groupsScrollContainerRef.current
-    const categoriesScrollContainer = categoriesScrollContainerRef.current
-    
+    const groupsScrollContainer = groupsScrollContainerRef.current;
+    const categoriesScrollContainer = categoriesScrollContainerRef.current;
+
     if (groupsScrollContainer) {
-      groupsScrollContainer.addEventListener("scroll", checkGroupScrollButtons)
-      checkGroupScrollButtons()
+      groupsScrollContainer.addEventListener("scroll", checkGroupScrollButtons);
+      checkGroupScrollButtons();
     }
-    
+
     if (categoriesScrollContainer) {
-      categoriesScrollContainer.addEventListener("scroll", checkCategoryScrollButtons)
-      checkCategoryScrollButtons()
+      categoriesScrollContainer.addEventListener(
+        "scroll",
+        checkCategoryScrollButtons,
+      );
+      checkCategoryScrollButtons();
     }
 
     // Check on window resize
     window.addEventListener("resize", () => {
-      checkGroupScrollButtons()
-      checkCategoryScrollButtons()
-    })
+      checkGroupScrollButtons();
+      checkCategoryScrollButtons();
+    });
 
     return () => {
       if (groupsScrollContainer) {
-        groupsScrollContainer.removeEventListener("scroll", checkGroupScrollButtons)
+        groupsScrollContainer.removeEventListener(
+          "scroll",
+          checkGroupScrollButtons,
+        );
       }
       if (categoriesScrollContainer) {
-        categoriesScrollContainer.removeEventListener("scroll", checkCategoryScrollButtons)
+        categoriesScrollContainer.removeEventListener(
+          "scroll",
+          checkCategoryScrollButtons,
+        );
       }
-      window.removeEventListener("resize", checkGroupScrollButtons)
-      window.removeEventListener("resize", checkCategoryScrollButtons)
-    }
-  }, [])
+      window.removeEventListener("resize", checkGroupScrollButtons);
+      window.removeEventListener("resize", checkCategoryScrollButtons);
+    };
+  }, [checkCategoryScrollButtons, checkGroupScrollButtons]);
 
   // Scroll functions for groups
   const scrollGroupsLeft = () => {
     if (groupsScrollContainerRef.current) {
-      groupsScrollContainerRef.current.scrollBy({ left: -200, behavior: "smooth" })
+      groupsScrollContainerRef.current.scrollBy({
+        left: -200,
+        behavior: "smooth",
+      });
     }
-  }
+  };
 
   const scrollGroupsRight = () => {
     if (groupsScrollContainerRef.current) {
-      groupsScrollContainerRef.current.scrollBy({ left: 200, behavior: "smooth" })
+      groupsScrollContainerRef.current.scrollBy({
+        left: 200,
+        behavior: "smooth",
+      });
     }
-  }
+  };
 
   // Scroll functions for categories
   const scrollCategoriesLeft = () => {
     if (categoriesScrollContainerRef.current) {
-      categoriesScrollContainerRef.current.scrollBy({ left: -200, behavior: "smooth" })
+      categoriesScrollContainerRef.current.scrollBy({
+        left: -200,
+        behavior: "smooth",
+      });
     }
-  }
+  };
 
   const scrollCategoriesRight = () => {
     if (categoriesScrollContainerRef.current) {
-      categoriesScrollContainerRef.current.scrollBy({ left: 200, behavior: "smooth" })
+      categoriesScrollContainerRef.current.scrollBy({
+        left: 200,
+        behavior: "smooth",
+      });
     }
-  }
+  };
 
   // Handle "All" button click
   const handleAllClick = () => {
-    onSelectGroup(null)
-    onSelectCategory(null)
-  }
+    onSelectGroup(null);
+    onSelectCategory(null);
+  };
 
   // Get categories for the selected group
   const getActiveCategories = () => {
-    if (!selectedGroup) return ungroupedCategories
-    const group = categoryGroups.find((g) => g.id === selectedGroup)
-    return group ? group.categories : []
-  }
+    if (!selectedGroup) return ungroupedCategories;
+    const group = categoryGroups.find((g) => g.id === selectedGroup);
+    return group ? group.categories : [];
+  };
 
   // Scroll selected category into view
   useEffect(() => {
     if (selectedCategory && categoriesScrollContainerRef.current) {
       const selectedButton = categoriesScrollContainerRef.current.querySelector(
-        `[data-category-id="${selectedCategory}"]`
-      ) as HTMLElement
+        `[data-category-id="${selectedCategory}"]`,
+      ) as HTMLElement;
 
       if (selectedButton) {
-        selectedButton.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" })
+        selectedButton.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+          inline: "center",
+        });
       }
     }
-  }, [selectedCategory])
+  }, [selectedCategory]);
 
   // Scroll selected group into view
   useEffect(() => {
     if (selectedGroup && groupsScrollContainerRef.current) {
       const selectedButton = groupsScrollContainerRef.current.querySelector(
-        `[data-group-id="${selectedGroup}"]`
-      ) as HTMLElement
+        `[data-group-id="${selectedGroup}"]`,
+      ) as HTMLElement;
 
       if (selectedButton) {
-        selectedButton.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" })
+        selectedButton.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+          inline: "center",
+        });
       }
     }
-  }, [selectedGroup])
+  }, [selectedGroup]);
 
   return (
     <div className="sticky top-0 z-10 bg-white shadow-md">
@@ -284,5 +315,5 @@ export function CategoryNav({
         </div>
       </div>
     </div>
-  )
+  );
 }

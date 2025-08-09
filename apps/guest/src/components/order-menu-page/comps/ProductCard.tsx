@@ -1,8 +1,8 @@
-import { formatNaira } from "@/utils";
 import { Button } from "@platter/ui/components/button";
 import { ChevronRight } from "@platter/ui/lib/icons";
 import Image from "next/image";
 import type React from "react";
+import { formatNaira } from "@/utils";
 
 interface ProductCardProps {
   product: any;

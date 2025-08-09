@@ -1,12 +1,5 @@
 "use client";
 
-import { createRestaurantAction } from "@/lib/actions/create-restaurant";
-import { useSession } from "@/lib/auth/client";
-import { states } from "@/lib/constants/states";
-import {
-  type RestaurantDetailsData,
-  restaurantDetailsSchema,
-} from "@/lib/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@platter/ui/components/button";
 import { Input } from "@platter/ui/components/input";
@@ -22,9 +15,16 @@ import { toast } from "@platter/ui/components/sonner";
 import { Textarea } from "@platter/ui/components/textarea";
 import { Info, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Controller, useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { createRestaurantAction } from "@/lib/actions/create-restaurant";
+import { useSession } from "@/lib/auth/client";
+import { states } from "@/lib/constants/states";
 import { useEdgeStore } from "@/lib/edgestore/edgestore";
+import {
+  type RestaurantDetailsData,
+  restaurantDetailsSchema,
+} from "@/lib/validations/auth";
 import ImageUpload from "../modules/setting/settings-image-component";
 
 export default function RestaurantDetailsForm() {
@@ -33,7 +33,7 @@ export default function RestaurantDetailsForm() {
   const { edgestore } = useEdgeStore();
   const [iconUrl, setIconUrl] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
-  
+
   const {
     control,
     register,
@@ -47,7 +47,7 @@ export default function RestaurantDetailsForm() {
       seatingCapacity: 0,
     },
   });
-  
+
   // Update the form values when the image URLs change
   useEffect(() => {
     setValue("icon", iconUrl);
@@ -56,7 +56,7 @@ export default function RestaurantDetailsForm() {
 
   // Watch the name field to update subdomain
   const restaurantName = watch("name");
-  
+
   // Generate subdomain from restaurant name
   useEffect(() => {
     if (restaurantName) {
@@ -78,10 +78,13 @@ export default function RestaurantDetailsForm() {
       ...data,
       hasCompletedOnboarding: true,
       icon: iconUrl,
-      image: imageUrl
+      image: imageUrl,
     };
 
-    const result = await createRestaurantAction(submissionData, session.user.id);
+    const result = await createRestaurantAction(
+      submissionData,
+      session.user.id,
+    );
 
     if (result.success) {
       toast.success("Restaurant details saved!");
@@ -114,7 +117,7 @@ export default function RestaurantDetailsForm() {
           imageType="restaurant-cover"
           onImageChange={setImageUrl}
         />
-        
+
         {/* Restaurant Name */}
         <div className="space-y-2">
           <Label htmlFor="name">Restaurant Name</Label>
@@ -190,10 +193,7 @@ export default function RestaurantDetailsForm() {
               name="state"
               control={control}
               render={({ field }) => (
-                <Select
-                  onValueChange={field.onChange}
-                  value={field.value}
-                >
+                <Select onValueChange={field.onChange} value={field.value}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select state" />
                   </SelectTrigger>
@@ -268,11 +268,14 @@ export default function RestaurantDetailsForm() {
             placeholder="https://g.page/r/..."
           />
           {errors.googleReviewLink && (
-            <p className="text-xs text-red-500">{errors.googleReviewLink.message}</p>
+            <p className="text-xs text-red-500">
+              {errors.googleReviewLink.message}
+            </p>
           )}
           <p className="text-xs text-gray-500 flex items-center gap-1">
             <Info className="size-3" />
-            This link is your Google Maps listing link, so users can leave a Google review
+            This link is your Google Maps listing link, so users can leave a
+            Google review
           </p>
         </div>
 
@@ -283,10 +286,7 @@ export default function RestaurantDetailsForm() {
             name="cuisine"
             control={control}
             render={({ field }) => (
-              <Select
-                onValueChange={field.onChange}
-                value={field.value}
-              >
+              <Select onValueChange={field.onChange} value={field.value}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select cuisine type" />
                 </SelectTrigger>

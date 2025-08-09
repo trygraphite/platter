@@ -1,11 +1,5 @@
 "use client";
 
-import { useSession } from "@/lib/auth/client";
-import { states } from "@/lib/constants/states";
-import {
-  type RestaurantDetailsData,
-  restaurantDetailsSchema,
-} from "@/lib/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@platter/ui/components/button";
 import { Input } from "@platter/ui/components/input";
@@ -19,12 +13,18 @@ import {
 } from "@platter/ui/components/select";
 import { toast } from "@platter/ui/components/sonner";
 import { Textarea } from "@platter/ui/components/textarea";
-import { Loader2, Info } from "lucide-react";
+import { Info, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Controller, useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { updateRestaurantAction } from "@/lib/actions/update-profile";
+import { useSession } from "@/lib/auth/client";
+import { states } from "@/lib/constants/states";
 import { useEdgeStore } from "@/lib/edgestore/edgestore";
+import {
+  type RestaurantDetailsData,
+  restaurantDetailsSchema,
+} from "@/lib/validations/auth";
 import ImageUpload from "./settings-image-component";
 
 interface RestaurantDetailsFormProps {
@@ -38,7 +38,7 @@ export default function UpdateRestaurantDetailsForm({ initialData }: any) {
   // Initialize state with empty string instead of null
   const [iconUrl, setIconUrl] = useState<string>(initialData.icon || "");
   const [imageUrl, setImageUrl] = useState<string>(initialData.image || "");
-  
+
   // Ensure initialData has valid defaults to avoid null/undefined issues
   const defaultValues = {
     name: initialData.name || "",
@@ -52,15 +52,15 @@ export default function UpdateRestaurantDetailsForm({ initialData }: any) {
     website: initialData.website || "",
     googleReviewLink: initialData.googleReviewLink || "",
     cuisine: initialData.cuisine || "",
-    seatingCapacity: initialData.seatingCapacity 
-      ? Number(initialData.seatingCapacity) 
+    seatingCapacity: initialData.seatingCapacity
+      ? Number(initialData.seatingCapacity)
       : 0,
     openingHours: initialData.openingHours || "",
     closingHours: initialData.closingHours || "",
     icon: initialData.icon || "",
     image: initialData.image || "",
   };
-  
+
   const {
     control,
     register,
@@ -73,7 +73,7 @@ export default function UpdateRestaurantDetailsForm({ initialData }: any) {
     resolver: zodResolver(restaurantDetailsSchema),
     defaultValues,
   });
-  
+
   // Update the form values when the image URLs change
   useEffect(() => {
     setValue("icon", iconUrl);
@@ -82,7 +82,7 @@ export default function UpdateRestaurantDetailsForm({ initialData }: any) {
 
   // Watch the name field to update subdomain
   const restaurantName = watch("name");
-  
+
   // Generate subdomain from restaurant name
   useEffect(() => {
     if (restaurantName) {
@@ -103,14 +103,17 @@ export default function UpdateRestaurantDetailsForm({ initialData }: any) {
     const submissionData = {
       ...data,
       icon: iconUrl,
-      image: imageUrl
+      image: imageUrl,
     };
 
-    const result = await updateRestaurantAction(submissionData, session.user.id);
+    const result = await updateRestaurantAction(
+      submissionData,
+      session.user.id,
+    );
 
     if (result.success) {
       toast.success("Restaurant details updated successfully!");
-      reset({...submissionData}); // Reset form state to mark it as "unmodified"
+      reset({ ...submissionData }); // Reset form state to mark it as "unmodified"
       router.refresh(); // Refresh the page to show updated data
     } else {
       toast.error(result.error || "Something went wrong");
@@ -144,17 +147,15 @@ export default function UpdateRestaurantDetailsForm({ initialData }: any) {
         {/* Restaurant Name */}
         <div className="space-y-2">
           <Label htmlFor="name">Restaurant Name</Label>
-          <Input
-            id="name"
-            {...register("name")}
-            aria-invalid={!!errors.name}
-          />
+          <Input id="name" {...register("name")} aria-invalid={!!errors.name} />
           {errors.name && (
             <p className="text-xs text-red-500">{errors.name.message}</p>
           )}
           <p className="text-xs text-amber-600 flex items-center gap-1">
             <Info className="size-3" />
-            Changing the name will change the subdomain. All created and printed QR codes will be void/not work until new QR codes are created and reprinted.
+            Changing the name will change the subdomain. All created and printed
+            QR codes will be void/not work until new QR codes are created and
+            reprinted.
           </p>
         </div>
 
@@ -164,7 +165,7 @@ export default function UpdateRestaurantDetailsForm({ initialData }: any) {
           <div className="flex items-center">
             <Input
               id="subdomain"
-              {...register("subdomain")} 
+              {...register("subdomain")}
               disabled
               className="bg-gray-100 rounded-r-none border-r-0"
               style={{ maxWidth: "150px" }}
@@ -302,11 +303,14 @@ export default function UpdateRestaurantDetailsForm({ initialData }: any) {
             placeholder="https://g.page/r/..."
           />
           {errors.googleReviewLink && (
-            <p className="text-xs text-red-500">{errors.googleReviewLink.message}</p>
+            <p className="text-xs text-red-500">
+              {errors.googleReviewLink.message}
+            </p>
           )}
           <p className="text-xs text-gray-500 flex items-center gap-1">
             <Info className="size-3" />
-            This link is your Google Maps listing link, so users can leave a Google review
+            This link is your Google Maps listing link, so users can leave a
+            Google review
           </p>
         </div>
 

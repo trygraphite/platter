@@ -1,14 +1,11 @@
-import RestaurantDetailsForm from "@/components/auth/restaurant-details-form";
-import getServerSession from "@/lib/auth/server";
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
+import RestaurantDetailsForm from "@/components/auth/restaurant-details-form";
 
 export const metadata: Metadata = {
   title: " Details",
 };
 
 async function DetailsPage() {
-
   return (
     <div className="container max-w-3xl py-10">
       <div className="mb-8">

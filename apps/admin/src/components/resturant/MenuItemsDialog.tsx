@@ -1,5 +1,4 @@
 "use client";
-import { useRestaurant } from "@/context/resturant-context";
 import { Badge } from "@platter/ui/components/badge";
 import { Button } from "@platter/ui/components/button";
 import { Checkbox } from "@platter/ui/components/checkbox";
@@ -16,6 +15,7 @@ import Image from "next/image";
 import type { ComponentProps } from "react";
 import { Suspense, useState } from "react";
 import { ImageLoadingPlaceholder, NoImagePlaceholder } from "utils";
+import { useRestaurant } from "@/context/resturant-context";
 import { AddMenuItemModal } from "./AddMenuItemModal";
 import { EditMenuItemModal } from "./EditMenuItemModal";
 
@@ -112,9 +112,7 @@ export function MenuItemsDialog({
       return formatPrice(item.price);
     }
 
-    const prices = (item.varieties ?? [])
-      .map((v) => v.price)
-      .sort((a, b) => a - b);
+    const prices = item.varieties?.map((v) => v.price).sort((a, b) => a - b) ?? [];
     if (prices.length === 0) {
       return formatPrice(0);
     }
@@ -203,7 +201,7 @@ export function MenuItemsDialog({
                               {hasVarieties && (
                                 <div className="flex items-center gap-2 mt-2">
                                   <Badge variant="secondary">
-                                    {(item.varieties ?? []).length} varieties
+                                    {item.varieties?.length} varieties
                                   </Badge>
                                   <Button
                                     variant="ghost"
@@ -276,8 +274,8 @@ export function MenuItemsDialog({
                           Available Varieties:
                         </h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          {(item.varieties ?? [])
-                            .sort((a, b) => a.position - b.position)
+                          {item.varieties
+                            ?.sort((a, b) => a.position - b.position)
                             .map((variety) => (
                               <div
                                 key={variety.id}

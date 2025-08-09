@@ -1,5 +1,8 @@
 "use client";
 
+import type { OrderStatus } from "@prisma/client";
+import { ChevronDown, ChevronUp, Printer } from "lucide-react";
+import React, { useState } from "react";
 import {
   updateAllOrderItemsStatus,
   updateManageableOrderItemsStatus,
@@ -9,18 +12,15 @@ import {
 import type { OrderWithDetails, StaffOrdersTableProps } from "@/types/orders";
 import { formatCurrency } from "@/utils/format";
 import {
-  type ORDER_ITEM_STATUSES,
   getStatusIcon,
   getStatusStyle,
+  type ORDER_ITEM_STATUSES,
 } from "@/utils/order-utils";
-import type { OrderStatus } from "@prisma/client";
-import { ChevronDown, ChevronUp, Package, Printer, User } from "lucide-react";
-import React, { useState } from "react";
 import { OrderItemCard } from "./OrderItemCard";
 import { OrderStatusSelector } from "./OrderStatusSelector";
 import { PrintSelectionModal } from "./PrintSelectionModal";
-import { StaffOrderModal } from "./StaffOrderModal";
 import { printFullOrder, printServicePointItems } from "./print/PrintUtils";
+import { StaffOrderModal } from "./StaffOrderModal";
 
 export function StaffOrdersTable({
   orders,
@@ -119,7 +119,7 @@ export function StaffOrdersTable({
     }
   };
 
-  const handleBulkOrderItemStatusUpdate = async (
+  const _handleBulkOrderItemStatusUpdate = async (
     orderId: string,
     newStatus: (typeof ORDER_ITEM_STATUSES)[number],
   ) => {

@@ -1,9 +1,5 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { QRCode } from '@prisma/client';
-import { Trash2, Loader2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -12,10 +8,14 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@platter/ui/components//alert-dialog';
-import { Button } from '@platter/ui/components/button';
-import { toast } from '@platter/ui/components/sonner';
-import { deleteQRCode } from '@/lib/actions/delete-qrcode';
+} from "@platter/ui/components//alert-dialog";
+import { Button } from "@platter/ui/components/button";
+import { toast } from "@platter/ui/components/sonner";
+import type { QRCode } from "@prisma/client";
+import { Loader2, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { deleteQRCode } from "@/lib/actions/delete-qrcode";
 
 type QRCodeWithRelations = QRCode & {
   user?: { name: string; email: string } | null;
@@ -40,23 +40,23 @@ export default function DeleteQRCodeDialog({
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      
+
       // Call the server action to delete the QR code
       const response = await deleteQRCode({ id: qrCode.id });
-      
+
       if (!response.success) {
-        throw new Error(response.error || 'Failed to delete QR code');
+        throw new Error(response.error || "Failed to delete QR code");
       }
-      
-      toast.success('QR code deleted', {
+
+      toast.success("QR code deleted", {
         description: `QR code for ${qrCode.target} has been deleted.`,
       });
-      
+
       router.refresh();
       onClose();
     } catch (error) {
-      console.error('Error deleting QR code:', error);
-      toast.error('Failed to delete QR code. Please try again.');
+      console.error("Error deleting QR code:", error);
+      toast.error("Failed to delete QR code. Please try again.");
     } finally {
       setIsDeleting(false);
     }
@@ -71,7 +71,7 @@ export default function DeleteQRCodeDialog({
             Delete QR Code
           </AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete the QR code for{' '}
+            Are you sure you want to delete the QR code for{" "}
             <span className="font-medium">{qrCode.target}</span>
             {qrCode.targetNumber && ` #${qrCode.targetNumber}`}?
             <br />
@@ -92,7 +92,7 @@ export default function DeleteQRCodeDialog({
                 Deleting...
               </>
             ) : (
-              'Delete'
+              "Delete"
             )}
           </Button>
         </AlertDialogFooter>

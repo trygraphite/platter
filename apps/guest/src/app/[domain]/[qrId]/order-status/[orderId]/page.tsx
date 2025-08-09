@@ -1,22 +1,26 @@
-import OrderStatusPage from "@/components/order-status-page/orderStatusPage";
-import ErrorCard from "@/components/shared/error-card";
-import type { Params } from "@/types/pages";
 import db from "@platter/db";
 import { OrderStatus } from "@prisma/client";
 import { notFound } from "next/navigation";
+import OrderStatusPage from "@/components/order-status-page/orderStatusPage";
+import ErrorCard from "@/components/shared/error-card";
+import type { Params } from "@/types/pages";
 
-export default async function OrderPage({ params }: { params: Params }): Promise<JSX.Element> {
+export default async function OrderPage({
+  params,
+}: {
+  params: Params;
+}): Promise<JSX.Element> {
   const { qrId, orderId } = await params;
 
   try {
     const order = await db.order.findUnique({
       where: { id: orderId },
       include: {
-        items: { 
-          include: { 
+        items: {
+          include: {
             menuItem: true,
             variety: true, // Include varieties
-          } 
+          },
         },
         table: true,
         user: true,

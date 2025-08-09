@@ -1,7 +1,7 @@
-import { requireAuth } from "@/utils/auth";
 import db from "@platter/db/index";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import { requireAuth } from "@/utils/auth";
 
 export async function GET() {
   try {

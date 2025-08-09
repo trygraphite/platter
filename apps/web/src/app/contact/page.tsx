@@ -9,14 +9,12 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@platter/ui/components/card";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -30,12 +28,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@platter/ui/components/select";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@platter/ui/components/tabs";
 import { Textarea } from "@platter/ui/components/textarea";
 import {
   CheckCircle2,
@@ -43,11 +35,9 @@ import {
   Loader2,
   Mail,
   MessageSquare,
-  Phone,
   PhoneIcon,
 } from "lucide-react";
-import type { LucideProps } from "lucide-react";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 interface ContactFormData {
@@ -69,7 +59,7 @@ export default function ContactPage() {
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [activeTab, setActiveTab] = useState("inquiry");
+  const [_activeTab, _setActiveTab] = useState("inquiry");
 
   const form = useForm<ContactFormData>({
     defaultValues: {

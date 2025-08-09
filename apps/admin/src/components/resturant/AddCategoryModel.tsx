@@ -1,6 +1,5 @@
 "use client";
 
-import { useRestaurant } from "@/context/resturant-context";
 import { Button } from "@platter/ui/components/button";
 import {
   Dialog,
@@ -10,15 +9,16 @@ import {
 } from "@platter/ui/components/dialog";
 import { Input } from "@platter/ui/components/input";
 import { Label } from "@platter/ui/components/label";
-import { Textarea } from "@platter/ui/components/textarea";
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "@platter/ui/components/select";
+import { Textarea } from "@platter/ui/components/textarea";
 import { useState } from "react";
+import { useRestaurant } from "@/context/resturant-context";
 
 export function AddCategoryModal() {
   const [isOpen, setIsOpen] = useState(false);
@@ -31,7 +31,7 @@ export function AddCategoryModal() {
   const { handleAddCategory, categoryGroups } = useRestaurant();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
+    if (e.target.files?.[0]) {
       const file = e.target.files[0];
       setImage(file);
       setImagePreview(URL.createObjectURL(file));
@@ -41,17 +41,17 @@ export function AddCategoryModal() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     try {
       const categoryInput = {
         name,
         description,
         image,
-        groupId: selectedGroupId
+        groupId: selectedGroupId,
       };
-      
+
       await handleAddCategory(categoryInput);
-      
+
       // Reset form
       setName("");
       setDescription("");
@@ -68,7 +68,9 @@ export function AddCategoryModal() {
 
   return (
     <>
-      <Button onClick={() => setIsOpen(true)} variant="outline">Add Category</Button>
+      <Button onClick={() => setIsOpen(true)} variant="outline">
+        Add Category
+      </Button>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
@@ -102,10 +104,10 @@ export function AddCategoryModal() {
               />
               {imagePreview && (
                 <div className="mt-2">
-                  <img 
-                    src={imagePreview} 
-                    alt="Preview" 
-                    className="max-w-full h-32 object-cover rounded-md" 
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="max-w-full h-32 object-cover rounded-md"
                   />
                 </div>
               )}
@@ -115,8 +117,10 @@ export function AddCategoryModal() {
             </div>
             <div>
               <Label htmlFor="categoryGroup">Category Group</Label>
-              <Select 
-                onValueChange={(value) => setSelectedGroupId(value === "none" ? null : value)}
+              <Select
+                onValueChange={(value) =>
+                  setSelectedGroupId(value === "none" ? null : value)
+                }
                 defaultValue="none"
               >
                 <SelectTrigger>
@@ -125,12 +129,14 @@ export function AddCategoryModal() {
                 <SelectContent>
                   <SelectItem value="none">None (Ungrouped)</SelectItem>
                   {categoryGroups.map((group) => (
-                    <SelectItem key={group.id} value={group.id}>{group.name}</SelectItem>
+                    <SelectItem key={group.id} value={group.id}>
+                      {group.name}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-            <Button 
+            <Button
               type="submit"
               disabled={isLoading}
               className={isLoading ? "opacity-70 cursor-not-allowed" : ""}

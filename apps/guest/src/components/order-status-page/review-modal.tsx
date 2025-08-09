@@ -1,15 +1,20 @@
 // components/order/review-modal.tsx
 "use client";
 
-import { useState } from "react";
-import { Star } from "@platter/ui/lib/icons";
 import { Button } from "@platter/ui/components/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@platter/ui/components/dialog";
 import { Label } from "@platter/ui/components/label";
-import { Textarea } from "@platter/ui/components/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@platter/ui/components/dialog";
 import { toast } from "@platter/ui/components/sonner";
-import { orderReview } from "@/app/actions/order-review";
+import { Textarea } from "@platter/ui/components/textarea";
+import { Star } from "@platter/ui/lib/icons";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { orderReview } from "@/app/actions/order-review";
 
 interface ReviewModalProps {
   isOpen: boolean;
@@ -20,12 +25,12 @@ interface ReviewModalProps {
   orderId: string;
 }
 
-export function ReviewModal({ 
-  isOpen, 
-  onClose, 
-  qrId, 
-  tableId, 
-  userId, 
+export function ReviewModal({
+  isOpen,
+  onClose,
+  qrId,
+  tableId,
+  userId,
   orderId,
 }: ReviewModalProps) {
   const [rating, setRating] = useState<number>(5);
@@ -35,39 +40,32 @@ export function ReviewModal({
   const handleCommentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setComment(e.target.value);
   };
-  
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
       // Use the server action to create the review
-      const result = await orderReview(
-        userId,
-        qrId,
-        tableId,
-        rating,
-        comment
-      );
-      
+      const result = await orderReview(userId, qrId, tableId, rating, comment);
+
       if (!result.success) {
-        throw new Error(result.error || 'Failed to submit review');
+        throw new Error(result.error || "Failed to submit review");
       }
-      
+
       toast.success("Review submitted", {
         description: "Thank you for your feedback!",
       });
-      
+
       // Close the modal
       onClose();
-      
+
       // Redirect to menu page after a short delay
       setTimeout(() => {
         router.push(`/${qrId}`);
       }, 500); // Small delay to ensure toast is visible
-      
     } catch (error) {
-      console.error('Error submitting review:', error);
+      console.error("Error submitting review:", error);
       toast.error("Error", {
         description: "Failed to submit review. Please try again.",
       });
@@ -75,17 +73,17 @@ export function ReviewModal({
       setIsSubmitting(false);
     }
   };
-  
+
   const handleSkip = () => {
     // Simply close the modal when user skips
     onClose();
-    
+
     // Redirect to menu page after skipping as well
     setTimeout(() => {
       router.push(`/${qrId}`);
     }, 300);
   };
-  
+
   const renderStars = () => {
     return Array.from({ length: 5 }, (_, i) => {
       const starValue = i + 1;
@@ -95,29 +93,36 @@ export function ReviewModal({
           type="button"
           onClick={() => setRating(starValue)}
           className={`text-xl focus:outline-none ${
-            starValue <= rating ? 'text-yellow-400' : 'text-gray-300'
+            starValue <= rating ? "text-yellow-400" : "text-gray-300"
           }`}
           aria-label={`Rate ${starValue} stars`}
         >
-          <Star className={`h-8 w-8 ${starValue <= rating ? 'fill-yellow-400 text-yellow-400' : 'fill-gray-200 text-gray-300'}`} />
+          <Star
+            className={`h-8 w-8 ${starValue <= rating ? "fill-yellow-400 text-yellow-400" : "fill-gray-200 text-gray-300"}`}
+          />
         </button>
       );
     });
   };
-  
+
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => {
-      if (!open) {
-        onClose();
-        // If dialog is closed by clicking outside, still redirect
-        setTimeout(() => {
-          router.push(`/${qrId}`);
-        }, 300);
-      }
-    }}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) {
+          onClose();
+          // If dialog is closed by clicking outside, still redirect
+          setTimeout(() => {
+            router.push(`/${qrId}`);
+          }, 300);
+        }
+      }}
+    >
       <DialogContent className="sm:max-w-md px-4">
         <DialogHeader>
-          <DialogTitle className="text-center text-xl">How was your meal?</DialogTitle>
+          <DialogTitle className="text-center text-xl">
+            How was your meal?
+          </DialogTitle>
         </DialogHeader>
         <div className="pt-1 pb-4">
           <form onSubmit={handleSubmit}>
@@ -125,7 +130,7 @@ export function ReviewModal({
               <div className="flex justify-center space-x-1">
                 {renderStars()}
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="comment">Leave a comment (optional)</Label>
                 <Textarea
@@ -137,7 +142,7 @@ export function ReviewModal({
                   onChange={handleCommentChange}
                 />
               </div>
-              
+
               <div className="flex justify-end space-x-2">
                 <Button
                   type="button"

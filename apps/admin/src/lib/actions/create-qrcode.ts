@@ -1,8 +1,8 @@
 "use server";
 
-import type { QRCodeResponse } from "@/types/qr-code";
 import db from "@platter/db";
 import QRCode from "qrcode";
+import type { QRCodeResponse } from "@/types/qr-code";
 import getServerSession from "../auth/server";
 
 type QRCodeTarget = "table" | "menu" | "location";
@@ -11,7 +11,7 @@ export async function createQRCodeAction(
   tableName?: string,
   target: QRCodeTarget = "table",
   capacity = 4,
-  locationName?: string,
+  _locationName?: string,
 ): Promise<QRCodeResponse> {
   try {
     const session = await getServerSession();

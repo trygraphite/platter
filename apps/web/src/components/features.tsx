@@ -1,4 +1,4 @@
-import { Clock, CreditCard, Smile, Settings, BarChart } from "lucide-react";
+import { BarChart, Clock, CreditCard, Settings, Smile } from "lucide-react";
 
 export function Features() {
   return (
@@ -9,16 +9,23 @@ export function Features() {
             Take more orders in less time!
           </h2>
           <p className="mt-4 text-lg text-gray-600">
-            Transform your ordering experience today with our digital QR menu solution.
+            Transform your ordering experience today with our digital QR menu
+            solution.
           </p>
         </div>
 
         <div className="mt-12 grid grid-cols-1 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-8">
           {features.map((feature) => (
-            <div key={feature.name} className="relative bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+            <div
+              key={feature.name}
+              className="relative bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow"
+            >
               <div className="absolute -top-4 left-4">
                 <div className="inline-flex items-center justify-center rounded-lg bg-primary p-3 shadow-lg">
-                  <feature.icon className="h-6 w-6 text-white" aria-hidden="true" />
+                  <feature.icon
+                    className="h-6 w-6 text-white"
+                    aria-hidden="true"
+                  />
                 </div>
               </div>
               <h3 className="mt-6 text-xl font-semibold text-gray-900">
@@ -33,7 +40,8 @@ export function Features() {
 
         <div className="mt-16 flex flex-col items-center">
           <p className="text-gray-600 text-lg max-w-2xl text-center">
-            Get started in minutes - create your free QR code menu and watch your business transform. Your customers will thank you for it.
+            Get started in minutes - create your free QR code menu and watch
+            your business transform. Your customers will thank you for it.
           </p>
           <a
             href="/request"
@@ -52,33 +60,39 @@ export function Features() {
 
 const features = [
   {
-    name: 'Take more orders in less time',
-    description: 'Increase table turnover rates by up to 30% with instant QR code ordering. No more waiting for waiters.',
+    name: "Take more orders in less time",
+    description:
+      "Increase table turnover rates by up to 30% with instant QR code ordering. No more waiting for waiters.",
     icon: Clock,
   },
   {
-    name: 'Eliminate frustrating wait times',
-    description: 'Customers can browse and order at their own pace, removing queues and reducing frustration.',
+    name: "Eliminate frustrating wait times",
+    description:
+      "Customers can browse and order at their own pace, removing queues and reducing frustration.",
     icon: Smile,
   },
   {
-    name: 'Let customers order at their own pace',
-    description: 'Give customers the freedom to explore the menu and order whenever they\'re ready, no pressure.',
+    name: "Let customers order at their own pace",
+    description:
+      "Give customers the freedom to explore the menu and order whenever they're ready, no pressure.",
     icon: Settings,
   },
   {
-    name: 'Boost customer satisfaction',
-    description: 'Deliver a modern dining experience with digital menus, leading to higher customer satisfaction scores.',
+    name: "Boost customer satisfaction",
+    description:
+      "Deliver a modern dining experience with digital menus, leading to higher customer satisfaction scores.",
     icon: CreditCard,
   },
   {
-    name: 'Streamline your operations',
-    description: 'Integrate orders directly to your kitchen display system, reducing errors and improving efficiency.',
+    name: "Streamline your operations",
+    description:
+      "Integrate orders directly to your kitchen display system, reducing errors and improving efficiency.",
     icon: Settings,
   },
   {
-    name: 'Track performance metrics',
-    description: 'Access real-time analytics on your most popular items, revenue, and customer behavior.',
+    name: "Track performance metrics",
+    description:
+      "Access real-time analytics on your most popular items, revenue, and customer behavior.",
     icon: BarChart,
   },
 ];

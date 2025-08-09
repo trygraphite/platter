@@ -1,31 +1,30 @@
-import { getAssignedTables, getDashboardStats } from "@/actions/order-actions";
-import { CurrentStaffInfo } from "@/components/CurrentStaffInfo";
-import { StaffNavigation } from "@/components/navigation/StaffNavigation";
-import { requireAuth } from "@/utils/auth";
 import { Badge } from "@platter/ui/components/badge";
 import {
   AlertCircle,
   BarChart3,
   CheckCircle,
   Clock,
-  DollarSign,
   Menu,
   Package,
   Settings,
   User,
   Users,
 } from "lucide-react";
+import { getAssignedTables, getDashboardStats } from "@/actions/order-actions";
+import { CurrentStaffInfo } from "@/components/CurrentStaffInfo";
+import { StaffNavigation } from "@/components/navigation/StaffNavigation";
+import { requireAuth } from "@/utils/auth";
 
 export default async function DashboardPage(): Promise<JSX.Element> {
   const user = await requireAuth();
-  const [dashboardData, assignedTables] = await Promise.all([
+  const [dashboardData, _assignedTables] = await Promise.all([
     getDashboardStats(),
     getAssignedTables(),
   ]);
   const { stats, restaurant } = dashboardData;
 
   // Format currency
-  const formatCurrency = (amount: number) => {
+  const _formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-NG", {
       style: "currency",
       currency: "NGN",

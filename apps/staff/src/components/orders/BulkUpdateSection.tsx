@@ -1,5 +1,3 @@
-import type { OrderWithDetails } from "@/types/orders";
-import { ORDER_ITEM_STATUSES } from "@/utils/order-utils";
 import {
   Select,
   SelectContent,
@@ -8,7 +6,8 @@ import {
   SelectValue,
 } from "@platter/ui/components/select";
 import { ChefHat } from "lucide-react";
-import React from "react";
+import type { OrderWithDetails } from "@/types/orders";
+import { ORDER_ITEM_STATUSES } from "@/utils/order-utils";
 
 interface BulkUpdateSectionProps {
   order: OrderWithDetails;

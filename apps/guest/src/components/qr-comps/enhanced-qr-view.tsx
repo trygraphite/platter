@@ -9,7 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@platter/ui/components/card";
-import React, { useState } from "react";
 import { CallWaiterBell } from "./call-waiter-bell";
 
 interface EnhancedQRViewProps {

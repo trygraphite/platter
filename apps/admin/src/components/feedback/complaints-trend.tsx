@@ -1,13 +1,5 @@
 "use client";
 
-import React from "react";
-import {
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-} from "@platter/ui/lib/charts";
 import {
   Card,
   CardContent,
@@ -20,6 +12,14 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@platter/ui/components/chart";
+import {
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+} from "@platter/ui/lib/charts";
+import React from "react";
 
 interface ComplaintsTrendProps extends React.ComponentProps<typeof Card> {
   complaints: Array<{ createdAt: Date }>;

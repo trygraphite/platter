@@ -1,33 +1,33 @@
 // orderService.ts
-import { CreateOrderInput, OrderUpdateData } from "@/types/order-types";
-import db from "@platter/db";
-import { Order, Prisma } from '@platter/db/client';
 
+import db from "@platter/db";
+import type { Order, Prisma } from "@platter/db/client";
+import type { CreateOrderInput, OrderUpdateData } from "@/types/order-types";
 
 const orderService = {
   createOrder: async (orderData: CreateOrderInput): Promise<Order> => {
-  const newOrder = await db.order.create({
-    data: {
-      userId: orderData.userId,
-      tableId: orderData.tableId,
-      specialNotes: orderData.specialNotes,
-      status: 'PENDING',
-      items: {
-        create: orderData.items.map(item => ({
-          menuItemId: item.menuItemId,
-          quantity: item.quantity,
-        })),
+    const newOrder = await db.order.create({
+      data: {
+        userId: orderData.userId,
+        tableId: orderData.tableId,
+        specialNotes: orderData.specialNotes,
+        status: "PENDING",
+        items: {
+          create: orderData.items.map((item) => ({
+            menuItemId: item.menuItemId,
+            quantity: item.quantity,
+          })),
+        },
       },
-    },
-    include: {
-      items: { include: { menuItem: true } },
-      table: true,
-      user: true,
-    },
-  });
+      include: {
+        items: { include: { menuItem: true } },
+        table: true,
+        user: true,
+      },
+    });
 
-  return newOrder;
-},
+    return newOrder;
+  },
   // Get order by ID
   getOrderById: async (id: string): Promise<Order | null> => {
     return db.order.findUnique({
@@ -39,39 +39,44 @@ const orderService = {
       },
     });
   },
-  
+
   // Get all new/incoming orders
   getNewOrders: async (userId: string): Promise<Order[]> => {
     return db.order.findMany({
       where: {
         userId,
         status: {
-          in: ['PENDING', 'CONFIRMED']
-        }
+          in: ["PENDING", "CONFIRMED"],
+        },
       },
       include: {
         items: { include: { menuItem: true } },
         table: true,
       },
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: "desc",
+      },
     });
   },
   // Update order
-  updateOrder: async (id: string, orderData: OrderUpdateData): Promise<Order> => {
+  updateOrder: async (
+    id: string,
+    orderData: OrderUpdateData,
+  ): Promise<Order> => {
     const data: Prisma.OrderUpdateInput = {
       status: orderData.status,
-      ...(orderData.tableId && { table: { connect: { id: orderData.tableId } } }),
+      ...(orderData.tableId && {
+        table: { connect: { id: orderData.tableId } },
+      }),
       specialNotes: orderData.specialNotes,
       // Add timestamps based on status
-      ...(orderData.status === 'CONFIRMED' ? { confirmedAt: new Date() } : {}),
-      ...(orderData.status === 'PREPARING' ? { preparingAt: new Date() } : {}),
-      ...(orderData.status === 'DELIVERED' ? { readyAt: new Date() } : {}),
-      ...(orderData.status === 'DELIVERED' ? { deliveredAt: new Date() } : {}),
-      ...(orderData.status === 'CANCELLED' ? { cancelledAt: new Date() } : {})
+      ...(orderData.status === "CONFIRMED" ? { confirmedAt: new Date() } : {}),
+      ...(orderData.status === "PREPARING" ? { preparingAt: new Date() } : {}),
+      ...(orderData.status === "DELIVERED" ? { readyAt: new Date() } : {}),
+      ...(orderData.status === "DELIVERED" ? { deliveredAt: new Date() } : {}),
+      ...(orderData.status === "CANCELLED" ? { cancelledAt: new Date() } : {}),
     };
-    
+
     return db.order.update({
       where: { id },
       data,
@@ -82,7 +87,7 @@ const orderService = {
       },
     });
   },
-  
+
   // Delete order
   deleteOrder: async (id: string): Promise<Order> => {
     return db.order.delete({
@@ -105,16 +110,17 @@ const orderService = {
       },
     });
 
-    if (order?.status === 'DELIVERED' && !order.totalTime) {
+    if (order?.status === "DELIVERED" && !order.totalTime) {
       return db.order.update({
         where: { id: order.id },
         data: {
-          confirmationTime: order.confirmedAt && order.createdAt
-            ? Math.floor(
-                (order.confirmedAt.getTime() - order.createdAt.getTime()) /
-                  60000,
-              )
-            : null,
+          confirmationTime:
+            order.confirmedAt && order.createdAt
+              ? Math.floor(
+                  (order.confirmedAt.getTime() - order.createdAt.getTime()) /
+                    60000,
+                )
+              : null,
           preparationTime:
             order.readyAt && order.confirmedAt
               ? Math.floor(
@@ -129,20 +135,19 @@ const orderService = {
                     60000,
                 )
               : null,
-          totalTime: order.deliveredAt && order.createdAt
-            ? Math.floor(
-                (order.deliveredAt.getTime() - order.createdAt.getTime()) /
-                  60000,
-              )
-            : null,
+          totalTime:
+            order.deliveredAt && order.createdAt
+              ? Math.floor(
+                  (order.deliveredAt.getTime() - order.createdAt.getTime()) /
+                    60000,
+                )
+              : null,
         },
       });
     }
-    
-    return order;
-  }
 
-  
+    return order;
+  },
 };
 
 export default orderService;

@@ -1,7 +1,5 @@
 "use client";
 
-import { useRestaurant } from "@/context/resturant-context";
-import { getServicePoints } from "@/lib/actions/get-service-points";
 import { Button } from "@platter/ui/components/button";
 import { Checkbox } from "@platter/ui/components/checkbox";
 import {
@@ -21,10 +19,12 @@ import {
 } from "@platter/ui/components/select";
 import { Textarea } from "@platter/ui/components/textarea";
 import type { MenuItem } from "@prisma/client";
-import { MoveDown, MoveUp, Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { Suspense, useEffect, useState } from "react";
 import { ImageLoadingPlaceholder } from "utils";
+import { useRestaurant } from "@/context/resturant-context";
+import { getServicePoints } from "@/lib/actions/get-service-points";
 
 interface MenuItemVariety {
   id?: string;

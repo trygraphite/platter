@@ -7,7 +7,6 @@ import { HowItWorks } from "@/components/how-it-works";
 const Index = () => {
   return (
     <div className="flex min-h-screen flex-col">
-    
       <Hero />
       <Features />
       <HowItWorks />

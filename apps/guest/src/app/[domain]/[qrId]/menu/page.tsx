@@ -1,10 +1,18 @@
-import { MenuPage } from "@/components/order-menu-page/menuPage";
-import type { Params } from "@/types/pages";
-import type { RestaurantDetails, MenuCategory, CategoryGroup } from "@/types/menu";
 import db from "@platter/db";
 import { notFound } from "next/navigation";
+import { MenuPage } from "@/components/order-menu-page/menuPage";
+import type {
+  CategoryGroup,
+  MenuCategory,
+  RestaurantDetails,
+} from "@/types/menu";
+import type { Params } from "@/types/pages";
 
-export default async function Page({ params }: { params: Params }): Promise<JSX.Element> {
+export default async function Page({
+  params,
+}: {
+  params: Params;
+}): Promise<JSX.Element> {
   const { qrId, domain } = await params;
 
   // Get restaurant details

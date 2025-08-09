@@ -1,11 +1,5 @@
 "use client";
 
-import {
-  type ServicePointData,
-  deleteServicePoint,
-  getServicePoints,
-  updateServicePoint,
-} from "@/lib/actions/manage-service-points";
 import { Badge } from "@platter/ui/components/badge";
 import { Button } from "@platter/ui/components/button";
 import {
@@ -22,7 +16,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@platter/ui/components/dialog";
 import { Input } from "@platter/ui/components/input";
 import { Label } from "@platter/ui/components/label";
@@ -41,13 +34,19 @@ import { Building2, Edit, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import {
+  deleteServicePoint,
+  getServicePoints,
+  type ServicePointData,
+  updateServicePoint,
+} from "@/lib/actions/manage-service-points";
 
 export default function ManageServicePointPage({
   params,
 }: {
   params: { restaurantId: string };
 }) {
-  const router = useRouter();
+  const _router = useRouter();
   const [servicePoints, setServicePoints] = useState<ServicePointData[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingServicePoint, setEditingServicePoint] =
@@ -63,7 +62,7 @@ export default function ManageServicePointPage({
 
   useEffect(() => {
     fetchServicePoints();
-  }, []);
+  }, [fetchServicePoints]);
 
   const fetchServicePoints = async () => {
     try {

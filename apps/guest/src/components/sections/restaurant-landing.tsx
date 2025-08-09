@@ -1,6 +1,5 @@
 "use client";
 
-import Header from "@/components/shared/header";
 import { ChevronRight, Clock, MapPin, Star } from "@platter/ui/lib/icons";
 import Image from "next/image";
 import { useState } from "react";
@@ -28,7 +27,7 @@ export function RestaurantLanding({
   restaurantDetails,
   isLoading = false,
 }: RestaurantLandingProps) {
-  const [isHoursModalOpen, setIsHoursModalOpen] = useState(false);
+  const [_isHoursModalOpen, setIsHoursModalOpen] = useState(false);
 
   if (isLoading) {
     return <RestaurantLandingSkeleton />;

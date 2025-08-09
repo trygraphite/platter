@@ -1,13 +1,13 @@
 "use client";
 
+import type { OrderStatus } from "@prisma/client";
+import { Package } from "lucide-react";
+import { useEffect, useState } from "react";
 import type {
   OrderStats,
   OrderWithDetails,
   StaffOrdersClientProps,
 } from "@/types/orders";
-import type { OrderStatus } from "@prisma/client";
-import { AlertCircle, CheckCircle, Clock, Filter, Package } from "lucide-react";
-import { useEffect, useState } from "react";
 import { StaffOrderFilters } from "./StaffOrderFilters";
 import { StaffOrderModal } from "./StaffOrderModal";
 import { StaffOrderStats } from "./StaffOrderStats";
@@ -27,7 +27,7 @@ export function StaffOrdersClient({
   const [searchTerm, setSearchTerm] = useState("");
 
   // Global UI update queue: serialize all order/item updates to avoid races
-  const [queueTail, setQueueTail] = useState<Promise<unknown>>(
+  const [_queueTail, setQueueTail] = useState<Promise<unknown>>(
     Promise.resolve(),
   );
   const enqueueUiUpdate = <T,>(task: () => Promise<T>): Promise<T> => {

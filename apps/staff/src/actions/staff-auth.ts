@@ -1,7 +1,7 @@
 "use server";
 
-import { getCurrentStaff, staffLogin, staffLogout } from "@/utils/auth";
 import { redirect } from "next/navigation";
+import { getCurrentStaff, staffLogin, staffLogout } from "@/utils/auth";
 
 export async function loginAction(formData: FormData) {
   const email = formData.get("email") as string;

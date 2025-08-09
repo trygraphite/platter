@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useRef } from "react";
 import { Button } from "@platter/ui/components/button";
 import { Label } from "@platter/ui/components/label";
-import { Upload, X, Loader2, Info } from "lucide-react";
-import Image from "next/image";
 import { toast } from "@platter/ui/components/sonner";
+import { Info, Loader2, Upload, X } from "lucide-react";
+import Image from "next/image";
+import { useRef, useState } from "react";
 import { useEdgeStore } from "@/lib/edgestore/edgestore";
 
 interface ImageUploadProps {
@@ -121,12 +121,7 @@ export default function ImageUpload({
             <Loader2 className="h-8 w-8 text-gray-400 animate-spin" />
           ) : image ? (
             <>
-              <Image
-                src={image}
-                alt={label}
-                fill
-                className="object-cover"
-              />
+              <Image src={image} alt={label} fill className="object-cover" />
               <button
                 type="button"
                 onClick={handleRemoveImage}

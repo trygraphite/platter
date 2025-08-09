@@ -2,7 +2,6 @@
 
 import db from "@platter/db";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { z } from "zod";
 
 const ComplaintSchema = z.object({

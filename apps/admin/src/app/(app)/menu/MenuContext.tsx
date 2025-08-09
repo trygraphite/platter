@@ -1,20 +1,18 @@
 "use client";
 
 import { Button } from "@platter/ui/components/button";
-import { useEffect, useState } from "react";
-
-import { AddCategoryModal } from "@/components/resturant/AddCategoryModel";
-import { AddCategoryGroupModal } from "@/components/resturant/AddCategoryGroupModal";
-
-import { CategoryCard } from "@/components/resturant/CategoryCard";
-import { EditCategoryModal } from "@/components/resturant/EditCategoryModal";
 import { Switch } from "@platter/ui/components/switch";
+import { Tabs, TabsContent } from "@platter/ui/components/tabs";
 import { HourglassLoader } from "@platter/ui/components/timeLoader";
-import { useRestaurant } from "../../../context/resturant-context";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@platter/ui/components/tabs";
-import { MenuIcon } from "lucide-react";
 import type { Category } from "@prisma/client";
+import { MenuIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+import { AddCategoryGroupModal } from "@/components/resturant/AddCategoryGroupModal";
+import { AddCategoryModal } from "@/components/resturant/AddCategoryModel";
+import { CategoryCard } from "@/components/resturant/CategoryCard";
 import { CategoryGroupManagerModal } from "@/components/resturant/CategoryGroupManager";
+import { EditCategoryModal } from "@/components/resturant/EditCategoryModal";
+import { useRestaurant } from "../../../context/resturant-context";
 
 export default function MenuPage() {
   const {
@@ -63,7 +61,11 @@ export default function MenuPage() {
   };
 
   if (isLoading) {
-    return <div><HourglassLoader label="Loading Menu..." /></div>;
+    return (
+      <div>
+        <HourglassLoader label="Loading Menu..." />
+      </div>
+    );
   }
 
   if (error || !user) {
@@ -88,14 +90,17 @@ export default function MenuPage() {
             <h1 className="text-3xl font-bold">Menu Management</h1>
           </div>
           <div className="flex items-center space-x-2">
-            <span className="text-sm mr-2">{editMode ? "Edit Mode On" : "View Mode"}</span>
+            <span className="text-sm mr-2">
+              {editMode ? "Edit Mode On" : "View Mode"}
+            </span>
             <Switch checked={editMode} onCheckedChange={setEditMode} />
           </div>
         </div>
         <p className="text-lg text-muted-foreground mb-6">
-          Organize your menu items into categories and groups to improve customer experience
+          Organize your menu items into categories and groups to improve
+          customer experience
         </p>
-        
+
         <div className="flex justify-end space-x-3">
           <AddCategoryModal />
           <AddCategoryGroupModal />
@@ -104,8 +109,6 @@ export default function MenuPage() {
 
       {/* Tabs for different views */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-     
-        
         {/* Grouped Categories Tab */}
         <TabsContent value="grouped">
           {categoryGroups.length > 0 ? (
@@ -116,12 +119,14 @@ export default function MenuPage() {
                     <div>
                       <h2 className="text-2xl font-semibold">{group.name}</h2>
                       {group.description && (
-                        <p className="text-muted-foreground">{group.description}</p>
+                        <p className="text-muted-foreground">
+                          {group.description}
+                        </p>
                       )}
                     </div>
                     {editMode && (
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={openGroupManagerModal}
                       >
@@ -129,24 +134,28 @@ export default function MenuPage() {
                       </Button>
                     )}
                   </div>
-                  
+
                   {group.categories.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {group.categories.map((category) => (
                         <div key={category.id} className="relative">
-                          <CategoryCard category={category} />                         
+                          <CategoryCard category={category} />
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-muted-foreground italic">No categories in this group yet</p>
+                    <p className="text-muted-foreground italic">
+                      No categories in this group yet
+                    </p>
                   )}
                 </div>
               ))}
             </div>
           ) : (
             <div className="text-center py-12 border rounded-lg">
-              <h3 className="text-xl font-semibold mb-2">No Category Groups Yet</h3>
+              <h3 className="text-xl font-semibold mb-2">
+                No Category Groups Yet
+              </h3>
               <p className="text-muted-foreground mb-4">
                 Create groups to organize your menu categories
               </p>
@@ -154,7 +163,7 @@ export default function MenuPage() {
             </div>
           )}
         </TabsContent>
-        
+
         {/* All Categories Tab */}
         <TabsContent value="all">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -176,7 +185,9 @@ export default function MenuPage() {
               ))
             ) : (
               <div className="col-span-3 text-center py-12 border rounded-lg">
-                <h3 className="text-xl font-semibold mb-2">No Categories Yet</h3>
+                <h3 className="text-xl font-semibold mb-2">
+                  No Categories Yet
+                </h3>
                 <p className="text-muted-foreground mb-4">
                   Add categories to start building your menu
                 </p>

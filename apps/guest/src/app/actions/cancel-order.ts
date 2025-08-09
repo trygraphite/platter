@@ -1,7 +1,7 @@
 "use server";
 
+import { OrderStatus, PrismaClient } from "@prisma/client";
 import { revalidatePath } from "next/cache";
-import { PrismaClient, OrderStatus } from "@prisma/client";
 
 const prisma = new PrismaClient();
 

@@ -1,6 +1,5 @@
 "use client";
 
-import { formatNairaWithDecimals } from "@/utils";
 import { Button } from "@platter/ui/components/button";
 import {
   Card,
@@ -11,7 +10,8 @@ import {
 import { ArrowLeft } from "@platter/ui/lib/icons";
 import type { Order } from "@prisma/client";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { formatNairaWithDecimals } from "@/utils";
 
 const statusColors = {
   PENDING: "bg-gray-50 dark:bg-gray-900/30",
@@ -34,7 +34,7 @@ export function OrdersPage({
   tableId,
   tableNumber,
 }: OrdersPageProps) {
-  const [orders, setOrders] = useState<Order[]>(initialOrders);
+  const [orders, _setOrders] = useState<Order[]>(initialOrders);
   const router = useRouter();
 
   //   useEffect(() => {

@@ -1,11 +1,9 @@
 "use client";
 
-import React from "react";
-import { format } from "date-fns";
-import { ColumnDef } from "@tanstack/react-table";
-import { Star, ChevronRight } from "lucide-react";
 import { Button } from "@platter/ui/components/button";
-import { Badge } from "@platter/ui/components/badge";
+import type { ColumnDef } from "@tanstack/react-table";
+import { format } from "date-fns";
+import { Star } from "lucide-react";
 import Link from "next/link";
 import { DataTable } from "@/components/custom/data-table";
 
@@ -24,8 +22,11 @@ interface CustomerReviewsTableProps {
   limit?: number;
 }
 
-export function FeedBackCustomerReviewsTable({ reviews, limit = 5 }: CustomerReviewsTableProps) {
-   // Function to render star ratings
+export function FeedBackCustomerReviewsTable({
+  reviews,
+  limit = 5,
+}: CustomerReviewsTableProps) {
+  // Function to render star ratings
   const renderRating = (rating: number) => {
     return (
       <div className="flex items-center">
@@ -73,9 +74,7 @@ export function FeedBackCustomerReviewsTable({ reviews, limit = 5 }: CustomerRev
       <div className="flex items-center justify-between mx-6">
         <h3 className="text-lg font-medium">Recent Reviews</h3>
         <Button asChild variant="outline">
-          <Link href="/reviews">
-            View All Reviews
-          </Link>
+          <Link href="/reviews">View All Reviews</Link>
         </Button>
       </div>
 
@@ -86,7 +85,9 @@ export function FeedBackCustomerReviewsTable({ reviews, limit = 5 }: CustomerRev
         showPageSizeSelector={false}
         maxItems={limit}
         showPagination={false}
-        description={reviews.length === 0 ? "No customer reviews yet." : undefined}
+        description={
+          reviews.length === 0 ? "No customer reviews yet." : undefined
+        }
         className="border-none"
       />
     </div>

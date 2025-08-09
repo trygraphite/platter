@@ -1,12 +1,16 @@
+import { PrismaClient } from "@prisma/client";
+import { notFound } from "next/navigation";
 import TableNotFound from "@/components/shared/TableNotFound";
 import { OrdersPage } from "@/components/view-orders/view-order";
 import type { Params } from "@/types/pages";
-import { PrismaClient } from "@prisma/client";
-import { notFound } from "next/navigation";
 
 const prisma = new PrismaClient();
 
-export default async function Page({ params }: { params: Params }): Promise<JSX.Element> {
+export default async function Page({
+  params,
+}: {
+  params: Params;
+}): Promise<JSX.Element> {
   const { qrId } = await params;
 
   try {
@@ -24,7 +28,11 @@ export default async function Page({ params }: { params: Params }): Promise<JSX.
     const table = qrCode.table;
 
     if (!table) {
-      return <div><TableNotFound/></div>;
+      return (
+        <div>
+          <TableNotFound />
+        </div>
+      );
     }
 
     // Step 3: Fetch Orders for this Table
@@ -34,8 +42,8 @@ export default async function Page({ params }: { params: Params }): Promise<JSX.
       where: {
         tableId: table.id,
         createdAt: {
-          gte: twentyFourHoursAgo
-        }
+          gte: twentyFourHoursAgo,
+        },
       },
       include: {
         items: {

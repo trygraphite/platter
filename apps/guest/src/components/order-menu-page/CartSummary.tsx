@@ -1,12 +1,12 @@
+import { Button } from "@platter/ui/components/button";
+import { ChocoLoader } from "@platter/ui/components/choco-loader";
+import { Minus, Plus, X } from "@platter/ui/lib/icons";
+import Image from "next/image";
+import * as React from "react";
 import { createOrder } from "@/app/actions/create-order";
 import { modifyOrder } from "@/app/actions/modify-order";
 import type { CartItem } from "@/types/menu";
 import { formatNaira } from "@/utils";
-import { Button } from "@platter/ui/components/button";
-import { ChocoLoader } from "@platter/ui/components/choco-loader";
-import { Minus, Plus, ShoppingCart, X } from "@platter/ui/lib/icons";
-import Image from "next/image";
-import * as React from "react";
 
 interface CartSummaryProps {
   cart: CartItem[];

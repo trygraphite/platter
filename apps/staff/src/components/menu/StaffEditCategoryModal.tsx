@@ -1,6 +1,5 @@
 "use client";
 
-import { useUploadThing } from "@/utils/uploadThing";
 import { Button } from "@platter/ui/components/button";
 import {
   Dialog,
@@ -20,6 +19,7 @@ import {
 import { Textarea } from "@platter/ui/components/textarea";
 import type { Category } from "@prisma/client";
 import { useEffect, useState } from "react";
+import { useUploadThing } from "@/utils/uploadThing";
 import { useStaffMenu } from "./StaffMenuProvider";
 
 interface StaffEditCategoryModalProps {

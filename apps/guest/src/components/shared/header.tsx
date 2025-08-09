@@ -1,24 +1,21 @@
 "use client";
 
-import React from "react";
-import Container from "./container";
-import Link from "next/link";
-import {
-  Building2,
-  ExternalLink,
-  Info,
-  Menu,
-  ForkKnifeCrossedIcon,
-  LucideMapPinHouse,
-} from "@platter/ui/lib/icons";
-import { buttonVariants } from "@platter/ui/components/button";
+import { Button, buttonVariants } from "@platter/ui/components/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@platter/ui/components/dropdown-menu";
-import { Button } from "@platter/ui/components/button";
+import {
+  ExternalLink,
+  Info,
+  LucideMapPinHouse,
+  Menu,
+} from "@platter/ui/lib/icons";
+import Link from "next/link";
+import React from "react";
+import Container from "./container";
 
 interface HeaderProps {
   restaurantName: string;
@@ -56,7 +53,6 @@ function Header({ restaurantName, reviewLink }: HeaderProps) {
                 </Link>
               </li> */}
 
-            
               <li>
                 <Link
                   href="/about"
@@ -69,7 +65,7 @@ function Header({ restaurantName, reviewLink }: HeaderProps) {
                   About
                 </Link>
               </li>
-                {reviewLink && (
+              {reviewLink && (
                 <li>
                   <Link
                     href={reviewLink}

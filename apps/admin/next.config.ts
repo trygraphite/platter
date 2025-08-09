@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "files.edgestore.dev", 
+        hostname: "files.edgestore.dev",
       },
       // UploadThing domains
       {

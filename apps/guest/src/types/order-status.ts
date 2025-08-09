@@ -1,11 +1,5 @@
 // types/orderStatus.ts
-import {
-  Order as PrismaOrder,
-  OrderStatus,
-  Order,
-  Table,
-  User,
-} from "@prisma/client";
+import type { Order, Table, User } from "@prisma/client";
 
 export interface OrderItem {
   id: string;
@@ -23,8 +17,7 @@ export interface OrderStatusPageProps {
   qrId: string;
   table: Table;
   user: User;
-    socketServerUrl?: string;
-
+  socketServerUrl?: string;
 }
 
 export interface StatusConfig {

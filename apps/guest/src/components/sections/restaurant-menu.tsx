@@ -1,6 +1,5 @@
 "use client";
 
-import { QrCodeSection } from "@/components/sections/Qrcode";
 import { Badge } from "@platter/ui/components/badge";
 import { Card, CardContent } from "@platter/ui/components/card";
 import { Star } from "@platter/ui/lib/icons";

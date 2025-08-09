@@ -1,9 +1,9 @@
 "use server";
 
-import type { MenuItemVarietyInput } from "@/types";
 import db from "@platter/db";
 import type { MenuItem, Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import type { MenuItemVarietyInput } from "@/types";
 
 interface UpdateMenuItemData extends Partial<MenuItem> {
   servicePointId?: string | null;

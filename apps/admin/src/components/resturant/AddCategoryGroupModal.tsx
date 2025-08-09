@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-import { useRestaurant } from "@/context/resturant-context";
 import { Button } from "@platter/ui/components/button";
 import {
   Dialog,
@@ -13,6 +11,8 @@ import { Input } from "@platter/ui/components/input";
 import { Label } from "@platter/ui/components/label";
 import { Textarea } from "@platter/ui/components/textarea";
 import { Layers } from "lucide-react";
+import { useState } from "react";
+import { useRestaurant } from "@/context/resturant-context";
 
 export function AddCategoryGroupModal() {
   const [isOpen, setIsOpen] = useState(false);

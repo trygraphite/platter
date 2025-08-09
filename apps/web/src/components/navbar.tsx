@@ -1,16 +1,16 @@
 "use client";
 
+import { Button } from "@platter/ui/components/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from "@platter/ui/components/sheet";
+import { Menu } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { Button } from "@platter/ui/components/button";
-import { 
-  Sheet, 
-  SheetContent, 
-  SheetTrigger,
-  SheetTitle 
-} from "@platter/ui/components/sheet";
-import { Menu, X } from "lucide-react";
-import Image from "next/image";
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -21,20 +21,32 @@ export function Navbar() {
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2">
             {/* Replace with your logo */}
-            <Image src="/logo.png" alt="Platter Logo" width={40} height={40} className="rounded-full bg-primary" />
+            <Image
+              src="/logo.png"
+              alt="Platter Logo"
+              width={40}
+              height={40}
+              className="rounded-full bg-primary"
+            />
             <span className="font-bold text-xl text-gray-900">Platter</span>
           </Link>
         </div>
 
         {/* Desktop navigation */}
         <nav className="hidden md:flex items-center gap-6">
-          <Link href="/pricing" className="text-sm font-medium text-gray-600 hover:text-primary transition-colors">
+          <Link
+            href="/pricing"
+            className="text-sm font-medium text-gray-600 hover:text-primary transition-colors"
+          >
             Pricing
-          </Link>   
+          </Link>
           {/* <Link href="/blogs" className="text-sm font-medium text-gray-600 hover:text-primary transition-colors">
             Blog
           </Link>    */}
-          <Link href="/contact" className="text-sm font-medium text-gray-600 hover:text-primary transition-colors">
+          <Link
+            href="/contact"
+            className="text-sm font-medium text-gray-600 hover:text-primary transition-colors"
+          >
             Contact
           </Link>
         </nav>
@@ -63,12 +75,20 @@ export function Navbar() {
           <SheetContent side="right" className="w-[300px] sm:w-[400px] ">
             {/* Added SheetTitle for accessibility */}
             <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-            
+
             <div className="flex flex-col gap-6 ">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                <Image src="/logo.png" alt="Platter Logo" width={40} height={40} className="rounded-full bg-primary" />
-                <span className="font-bold text-xl text-gray-900">Platter</span>
+                  <Image
+                    src="/logo.png"
+                    alt="Platter Logo"
+                    width={40}
+                    height={40}
+                    className="rounded-full bg-primary"
+                  />
+                  <span className="font-bold text-xl text-gray-900">
+                    Platter
+                  </span>
                 </div>
                 <Button
                   variant="ghost"
@@ -81,7 +101,6 @@ export function Navbar() {
               </div>
 
               <nav className="flex flex-col gap-4">
-              
                 <Link
                   href="/pricing"
                   className="text-base font-medium text-gray-600 hover:text-primary transition-colors py-2"
@@ -89,7 +108,7 @@ export function Navbar() {
                 >
                   Pricing
                 </Link>
-              
+
                 <Link
                   href="/contact"
                   className="text-base font-medium text-gray-600 hover:text-primary transition-colors py-2"
@@ -100,13 +119,9 @@ export function Navbar() {
               </nav>
 
               <div className="flex flex-col gap-2 mt-4">
-             
-                <Link
-                  href="/request"
-                  onClick={() => setIsMenuOpen(false)}
-                >
+                <Link href="/request" onClick={() => setIsMenuOpen(false)}>
                   <Button className="w-full bg-primary hover:bg-primary-600 text-white">
-                   Get Started!
+                    Get Started!
                   </Button>
                 </Link>
               </div>

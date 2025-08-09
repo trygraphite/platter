@@ -1,8 +1,5 @@
 "use client";
 
-import { logoutAction } from "@/actions/staff-auth";
-import type { StaffUser } from "@/utils/auth";
-import { Button } from "@platter/ui/components/button";
 import {
   BarChart3,
   Bell,
@@ -15,6 +12,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { logoutAction } from "@/actions/staff-auth";
+import type { StaffUser } from "@/utils/auth";
 
 interface StaffNavigationProps {
   user: StaffUser;

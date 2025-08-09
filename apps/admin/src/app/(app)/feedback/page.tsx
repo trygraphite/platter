@@ -1,10 +1,7 @@
-import FeedbackTemplatePage from '@/components/modules/feedback/feedback-template'
-import React from 'react'
+import FeedbackTemplatePage from "@/components/modules/feedback/feedback-template";
 
 const page = () => {
-  return (
-   <FeedbackTemplatePage/>
-  )
-}
+  return <FeedbackTemplatePage />;
+};
 
-export default page
+export default page;

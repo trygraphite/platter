@@ -1,7 +1,5 @@
 "use client";
 
-import { authClient, signUp } from "@/lib/auth/client";
-import { type AccountData, accountSchema } from "@/lib/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@platter/ui/components/button";
 import {
@@ -20,6 +18,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { authClient } from "@/lib/auth/client";
+import { type AccountData, accountSchema } from "@/lib/validations/auth";
 
 export default function RegisterForm() {
   const [type, setType] = useState<"text" | "password">("password");
@@ -49,7 +49,7 @@ export default function RegisterForm() {
             toast.success("Account created. Please verify your email.");
             router.push("/verify");
           },
-          onError: (ctx) => {
+          onError: (_ctx) => {
             toast.error("Failed to create account");
           },
         },

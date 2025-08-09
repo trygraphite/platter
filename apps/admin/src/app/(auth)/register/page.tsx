@@ -1,8 +1,8 @@
-import RegistrationForm from "@/components/auth/register-form";
-import Container from "@/components/shared/container";
 import type { Metadata } from "next";
 import Link from "next/link";
-import React, { Suspense } from "react";
+import { Suspense } from "react";
+import RegistrationForm from "@/components/auth/register-form";
+import Container from "@/components/shared/container";
 
 export const metadata: Metadata = {
   title: "Register",

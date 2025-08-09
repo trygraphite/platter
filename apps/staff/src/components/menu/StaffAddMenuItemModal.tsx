@@ -1,7 +1,5 @@
 "use client";
 
-import { getServicePoints } from "@/actions/menu";
-import { useUploadThing } from "@/utils/uploadThing";
 import { Button } from "@platter/ui/components/button";
 import { Checkbox } from "@platter/ui/components/checkbox";
 import {
@@ -23,6 +21,8 @@ import { toast } from "@platter/ui/components/sonner";
 import { Textarea } from "@platter/ui/components/textarea";
 import { MoveDown, MoveUp, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { getServicePoints } from "@/actions/menu";
+import { useUploadThing } from "@/utils/uploadThing";
 import { useStaffMenu } from "./StaffMenuProvider";
 
 interface StaffAddMenuItemModalProps {
@@ -81,7 +81,10 @@ export function StaffAddMenuItemModal({
 
     // Fetch service points
     fetchServicePoints();
-  }, [isOpen]);
+  }, [
+    isOpen, // Fetch service points
+    fetchServicePoints,
+  ]);
 
   const fetchServicePoints = async () => {
     try {

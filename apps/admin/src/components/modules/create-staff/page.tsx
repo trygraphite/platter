@@ -1,9 +1,5 @@
 "use client";
 
-import {
-  type CreateStaffFormData,
-  createStaff,
-} from "@/lib/actions/create-staff";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Badge } from "@platter/ui/components/badge";
 import { Button } from "@platter/ui/components/button";
@@ -45,6 +41,10 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import {
+  type CreateStaffFormData,
+  createStaff,
+} from "@/lib/actions/create-staff";
 
 const staffSchema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
@@ -81,7 +81,9 @@ interface ServicePoint {
 
 export default function CreateStaffPage({
   params,
-}: { params: { restaurantId: string } }) {
+}: {
+  params: { restaurantId: string };
+}) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [tables, setTables] = useState<Table[]>([]);

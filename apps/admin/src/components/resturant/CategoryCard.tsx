@@ -1,12 +1,12 @@
 "use client";
+import { Button } from "@platter/ui/components/button";
+import { Card, CardContent, CardFooter } from "@platter/ui/components/card";
+import type { Category } from "@prisma/client";
+import { Trash } from "lucide-react";
 import { useState } from "react";
 import { useRestaurant } from "@/context/resturant-context";
-import { Button } from "@platter/ui/components/button";
-import { Card, CardContent, CardFooter, CardHeader } from "@platter/ui/components/card";
 import { EditCategoryModal } from "./EditCategoryModal";
-import { Trash } from "lucide-react";
-import type { Category, MenuItem } from "@prisma/client";
-import { MenuItemsDialog, MenuItemWithVarieties } from "./MenuItemsDialog";
+import { MenuItemsDialog, type MenuItemWithVarieties } from "./MenuItemsDialog";
 
 interface CategoryCardProps {
   category: Category & { menuItems: MenuItemWithVarieties[] };
@@ -17,7 +17,11 @@ export function CategoryCard({ category }: CategoryCardProps) {
   const [isMenuItemsOpen, setIsMenuItemsOpen] = useState(false);
   const { handleDeleteCategory, editMode } = useRestaurant();
   const handleDelete = () => {
-    if (window.confirm(`Are you sure you want to delete category "${category.name}"?`)) {
+    if (
+      window.confirm(
+        `Are you sure you want to delete category "${category.name}"?`,
+      )
+    ) {
       handleDeleteCategory(category.id);
     }
   };
@@ -39,7 +43,9 @@ export function CategoryCard({ category }: CategoryCardProps) {
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
-            <h3 className="text-xl font-bold text-white p-4">{category.name}</h3>
+            <h3 className="text-xl font-bold text-white p-4">
+              {category.name}
+            </h3>
           </div>
         </div>
         <CardContent className="flex-grow pt-4">
@@ -47,32 +53,29 @@ export function CategoryCard({ category }: CategoryCardProps) {
             {category.description || "No description provided"}
           </p>
           <p className="text-sm mt-2">
-            <span className="font-medium">{category.menuItems.length}</span> menu items
+            <span className="font-medium">{category.menuItems.length}</span>{" "}
+            menu items
           </p>
         </CardContent>
         <CardFooter className="flex justify-between pt-0">
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => setIsMenuItemsOpen(true)}
           >
             View Items
           </Button>
-          
+
           {editMode && (
             <div className="flex space-x-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => setIsEditModalOpen(true)}
               >
                 Edit
               </Button>
-              <Button 
-                variant="destructive" 
-                size="sm" 
-                onClick={handleDelete}
-              >
+              <Button variant="destructive" size="sm" onClick={handleDelete}>
                 <Trash className="h-4 w-4" />
               </Button>
             </div>
@@ -84,7 +87,7 @@ export function CategoryCard({ category }: CategoryCardProps) {
         onClose={() => setIsEditModalOpen(false)}
         category={category}
       />
-      
+
       <MenuItemsDialog
         isOpen={isMenuItemsOpen}
         onClose={() => setIsMenuItemsOpen(false)}

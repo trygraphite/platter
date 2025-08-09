@@ -1,7 +1,7 @@
 "use client";
 
-import { ArrowUp, ArrowDown } from "lucide-react";
 import { Button } from "@platter/ui/components/button";
+import { ArrowDown, ArrowUp } from "lucide-react";
 
 interface PositionControlsProps {
   onMoveUp: () => void;
@@ -10,11 +10,11 @@ interface PositionControlsProps {
   isLast?: boolean;
 }
 
-export function PositionControls({ 
-  onMoveUp, 
-  onMoveDown, 
-  isFirst = false, 
-  isLast = false 
+export function PositionControls({
+  onMoveUp,
+  onMoveDown,
+  isFirst = false,
+  isLast = false,
 }: PositionControlsProps) {
   return (
     <div className="flex flex-col gap-1">

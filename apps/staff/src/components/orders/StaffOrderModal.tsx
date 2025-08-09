@@ -1,5 +1,9 @@
 "use client";
 
+import type { OrderStatus } from "@prisma/client";
+import { DollarSign, Printer, X } from "lucide-react";
+import type React from "react";
+import { useState } from "react";
 import {
   updateAllOrderItemsStatus,
   updateManageableOrderItemsStatus,
@@ -9,14 +13,10 @@ import {
 import type { OrderWithDetails, StaffOrderModalProps } from "@/types/orders";
 import { formatCurrency } from "@/utils/format";
 import {
-  type ORDER_ITEM_STATUSES,
   getStatusIcon,
   getStatusStyle,
+  type ORDER_ITEM_STATUSES,
 } from "@/utils/order-utils";
-import type { OrderStatus } from "@prisma/client";
-import { Calendar, DollarSign, Printer, User, X } from "lucide-react";
-import { useState } from "react";
-import type React from "react";
 import { BulkUpdateSection } from "./BulkUpdateSection";
 import { OrderItemCard } from "./OrderItemCard";
 import { OrderStatusSelector } from "./OrderStatusSelector";

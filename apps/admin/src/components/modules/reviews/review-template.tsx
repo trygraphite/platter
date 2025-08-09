@@ -1,9 +1,8 @@
-import type { Metadata } from "next";
-
-import getServerSession from "@/lib/auth/server";
 import db from "@platter/db";
-import { DashboardShell } from "@/components/dashboard/dashboard-shell";
+import type { Metadata } from "next";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
+import { DashboardShell } from "@/components/dashboard/dashboard-shell";
+import getServerSession from "@/lib/auth/server";
 import { ReviewsTable } from "./components/review-table";
 
 export const metadata: Metadata = {
@@ -27,7 +26,7 @@ export default async function ReviewsPage() {
     },
   });
 
-  const formattedReviews = reviews.map((review: typeof reviews[number]) => ({
+  const formattedReviews = reviews.map((review: (typeof reviews)[number]) => ({
     id: review.id,
     rating: review.rating,
     comment: review.comment,

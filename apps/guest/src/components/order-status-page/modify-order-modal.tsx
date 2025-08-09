@@ -1,8 +1,5 @@
 "use client";
 
-import { modifyOrder } from "@/app/actions/modify-order";
-import type { CartItem } from "@/types/menu";
-import { formatNaira } from "@/utils";
 import { Button } from "@platter/ui/components/button";
 import {
   Dialog,
@@ -12,12 +9,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@platter/ui/components/dialog";
-import { Input } from "@platter/ui/components/input";
 import { toast } from "@platter/ui/components/sonner";
 import { Textarea } from "@platter/ui/components/textarea";
 import { Minus, Plus, X } from "@platter/ui/lib/icons";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { modifyOrder } from "@/app/actions/modify-order";
+import type { CartItem } from "@/types/menu";
+import { formatNaira } from "@/utils";
 
 interface OrderItem {
   id: string;
@@ -155,7 +154,7 @@ export function ModifyOrderModal({
       } else {
         toast.error(result.error || "Failed to modify order");
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error("An error occurred while modifying the order");
     } finally {
       setIsModifying(false);
