@@ -46,6 +46,7 @@ export default function DashboardOrdersTable({
   };
 
   // Define columns for the table
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <>
   const columns: ColumnDef<EnhancedOrder>[] = useMemo(
     () => [
       {
@@ -143,7 +144,7 @@ export default function DashboardOrdersTable({
         },
       },
     ],
-    [formatDateTime],
+    [],
   );
 
   // Sort orders by createdAt (newest first) before display
