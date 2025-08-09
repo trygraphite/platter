@@ -1,8 +1,8 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { getCurrentStaffAction } from "@/actions/staff-auth";
 import type { StaffUser } from "@/utils/auth";
-import { useEffect, useState } from "react";
 
 export function useCurrentStaff() {
   const [staff, setStaff] = useState<StaffUser | null>(null);

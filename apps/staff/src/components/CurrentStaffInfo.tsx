@@ -1,8 +1,8 @@
 "use client";
 
-import { useCurrentStaff } from "@/hooks/useCurrentStaff";
 import { Badge } from "@platter/ui/components/badge";
 import { AlertCircle, Loader2, Package, User, Users } from "lucide-react";
+import { useCurrentStaff } from "@/hooks/useCurrentStaff";
 
 export function CurrentStaffInfo() {
   const { staff, loading, error } = useCurrentStaff();

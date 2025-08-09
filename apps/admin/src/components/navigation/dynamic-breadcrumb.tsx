@@ -1,6 +1,5 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,7 +8,9 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@platter/ui/components/breadcrumb";
+import { usePathname } from "next/navigation";
 import React from "react";
+
 const formatSegment = (segment: string) => {
   return segment
     .replace(/-/g, " ")

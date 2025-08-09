@@ -1,13 +1,13 @@
 "use client";
 
-import { useMemo } from "react";
-import { ArrowUpDown } from "lucide-react";
-import { type ColumnDef } from "@tanstack/react-table";
-import { Button } from "@platter/ui/components/button";
 import { Badge } from "@platter/ui/components/badge";
-import { DataTable } from "@/components/custom/data-table";
-import type { Order } from "@prisma/client";
+import { Button } from "@platter/ui/components/button";
 import { formatCurrency } from "@platter/ui/lib/utils";
+import type { Order } from "@prisma/client";
+import type { ColumnDef } from "@tanstack/react-table";
+import { ArrowUpDown } from "lucide-react";
+import { useMemo } from "react";
+import { DataTable } from "@/components/custom/data-table";
 
 interface EnhancedOrder extends Order {
   tableNumber: string;
@@ -31,112 +31,120 @@ export default function DashboardOrdersTable({
   orders,
   className,
   showPagination = false,
-  maxItems = 5
+  maxItems = 5,
 }: OrdersTableProps) {
   // Format date/time for display
   const formatDateTime = (dateString: Date | string) => {
     const date = new Date(dateString);
-    return date.toLocaleString('en-NG', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return date.toLocaleString("en-NG", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   // Define columns for the table
-  const columns: ColumnDef<EnhancedOrder>[] = useMemo(() => [
-    {
-      accessorKey: "orderNumber",
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Order #
-          <ArrowUpDown className="h-4 w-4" />
-        </Button>
-      ),
-      cell: ({ row }) => <div className="font-medium ml-2">{row.getValue("orderNumber")}</div>,
-    },
-    {
-      accessorKey: "tableNumber",
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Table
-          <ArrowUpDown className=" h-4 w-4" />
-        </Button>
-      ),
-      cell: ({ row }) => {
-        const tableNumber = row.getValue("tableNumber") as string;
-        return <div className="ml-2">{tableNumber}</div>;
-      },
-    },
-    {
-      accessorKey: "status",
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Status
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      ),
-      cell: ({ row }) => {
-        const status = row.getValue("status") as string;
-        return (
-          <Badge 
-            variant={
-              status === "CONFIRMED" ? "secondary" : 
-              status === "PENDING" ? "outline" : 
-              status === "DELIVERED" ? "default" : 
-              "outline"
-            }
-            className="capitalize"
+  const columns: ColumnDef<EnhancedOrder>[] = useMemo(
+    () => [
+      {
+        accessorKey: "orderNumber",
+        header: ({ column }) => (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            {status.toLowerCase()}
-          </Badge>
-        );
+            Order #
+            <ArrowUpDown className="h-4 w-4" />
+          </Button>
+        ),
+        cell: ({ row }) => (
+          <div className="font-medium ml-2">{row.getValue("orderNumber")}</div>
+        ),
       },
-    },
-    {
-      accessorKey: "createdAt",
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Date/Time
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      ),
-      cell: ({ row }) => {
-        const dateValue = row.original.createdAt;
-        return <div className="ml-2">{formatDateTime(dateValue)}</div>;
+      {
+        accessorKey: "tableNumber",
+        header: ({ column }) => (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Table
+            <ArrowUpDown className=" h-4 w-4" />
+          </Button>
+        ),
+        cell: ({ row }) => {
+          const tableNumber = row.getValue("tableNumber") as string;
+          return <div className="ml-2">{tableNumber}</div>;
+        },
       },
-    },
-    {
-      accessorKey: "totalAmount",
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Total
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      ),
-      cell: ({ row }) => {
-        const amount = parseFloat(row.getValue("totalAmount"));
-        return <div className="font-medium">{formatCurrency(amount)}</div>;
+      {
+        accessorKey: "status",
+        header: ({ column }) => (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Status
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        ),
+        cell: ({ row }) => {
+          const status = row.getValue("status") as string;
+          return (
+            <Badge
+              variant={
+                status === "CONFIRMED"
+                  ? "secondary"
+                  : status === "PENDING"
+                    ? "outline"
+                    : status === "DELIVERED"
+                      ? "default"
+                      : "outline"
+              }
+              className="capitalize"
+            >
+              {status.toLowerCase()}
+            </Badge>
+          );
+        },
       },
-    },
-  ], []);
+      {
+        accessorKey: "createdAt",
+        header: ({ column }) => (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Date/Time
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        ),
+        cell: ({ row }) => {
+          const dateValue = row.original.createdAt;
+          return <div className="ml-2">{formatDateTime(dateValue)}</div>;
+        },
+      },
+      {
+        accessorKey: "totalAmount",
+        header: ({ column }) => (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Total
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        ),
+        cell: ({ row }) => {
+          const amount = parseFloat(row.getValue("totalAmount"));
+          return <div className="font-medium">{formatCurrency(amount)}</div>;
+        },
+      },
+    ],
+    [formatDateTime],
+  );
 
   // Sort orders by createdAt (newest first) before display
   const sortedOrders = useMemo(() => {

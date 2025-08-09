@@ -1,15 +1,15 @@
-import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import type { Session } from "./lib/auth/types";
 
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const publicRoutes = ["/login", "/register"];
-  
-  const isPublicRoute = publicRoutes.some(route => path.startsWith(route));
+
+  const isPublicRoute = publicRoutes.some((route) => path.startsWith(route));
   const isOnboardingRoute = path.startsWith("/onboarding");
   const isVerifyRoute = path === "/verify";
-  
+
   let session: Session | null = null;
 
   try {

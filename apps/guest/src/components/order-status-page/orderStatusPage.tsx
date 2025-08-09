@@ -1,7 +1,6 @@
 // components/order/OrderStatusPage.tsx
 "use client";
 
-import type { OrderStatusPageProps } from "@/types/order-status";
 import { Button } from "@platter/ui/components/button";
 import {
   Card,
@@ -15,7 +14,7 @@ import { AlertTriangle, ArrowLeft, RefreshCw } from "@platter/ui/lib/icons";
 import type { Order } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import ErrorCard from "../shared/error-card";
+import type { OrderStatusPageProps } from "@/types/order-status";
 import { OrderActions } from "./order-action";
 import { OrderDetails } from "./order-details";
 import { OrderStatusDisplay } from "./order-status";
@@ -98,6 +97,7 @@ export default function OrderStatusPage({
     order.shownReview,
     socket,
     isConnected,
+    order.id,
   ]);
 
   useEffect(() => {

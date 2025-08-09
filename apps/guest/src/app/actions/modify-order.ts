@@ -60,7 +60,7 @@ export async function modifyOrder({
     });
 
     // Create new order items
-    const newItems = await db.orderItem.createMany({
+    const _newItems = await db.orderItem.createMany({
       data: items.map((item) => ({
         orderId,
         menuItemId: item.id,

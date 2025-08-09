@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import type { FC } from "react";
 
 interface MenuHeaderProps {
   userDetails: string;
@@ -17,4 +17,4 @@ export const MenuHeader: FC<MenuHeaderProps> = ({ userDetails }) => {
       </div>
     </header>
   );
-}
+};

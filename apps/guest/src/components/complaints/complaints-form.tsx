@@ -1,17 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Button } from "@platter/ui/components/button";
 import {
   Card,
-  CardHeader,
-  CardTitle,
   CardContent,
   CardFooter,
+  CardHeader,
+  CardTitle,
 } from "@platter/ui/components/card";
 import { Label } from "@platter/ui/components/label";
-import { Textarea } from "@platter/ui/components/textarea";
-import { Button } from "@platter/ui/components/button";
 import {
   Select,
   SelectContent,
@@ -20,7 +17,10 @@ import {
   SelectValue,
 } from "@platter/ui/components/select";
 import { toast } from "@platter/ui/components/sonner";
+import { Textarea } from "@platter/ui/components/textarea";
 import { AlertTriangle } from "@platter/ui/lib/icons";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { createComplaint } from "@/app/actions/create-complaint";
 
 interface ComplaintPageProps {
@@ -53,7 +53,7 @@ export const ComplaintPage: React.FC<ComplaintPageProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!content.trim()) {
       toast.error("Please describe your concern before submitting");
       return;
@@ -64,7 +64,7 @@ export const ComplaintPage: React.FC<ComplaintPageProps> = ({
     }
 
     setIsSubmitting(true);
-    
+
     try {
       await createComplaint(qrId, tableId, content, category, userId);
       toast.success(
@@ -170,4 +170,4 @@ export const ComplaintPage: React.FC<ComplaintPageProps> = ({
       </Card>
     </div>
   );
-}
+};

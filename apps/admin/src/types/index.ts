@@ -1,4 +1,3 @@
-
 export interface Complaint {
   id: string;
   content: string;
@@ -6,10 +5,9 @@ export interface Complaint {
   status: string;
   title?: string;
   createdAt: Date;
-  qrCode?: { code: string,   target?: string; };
+  qrCode?: { code: string; target?: string };
   table?: { number: number };
 }
-
 
 export interface MenuItemVarietyInput {
   id?: string; // Optional for new varieties

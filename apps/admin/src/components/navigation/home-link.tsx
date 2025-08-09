@@ -2,7 +2,6 @@
 
 import { Avatar, AvatarImage } from "@platter/ui/components/avatar";
 import Link from "next/link";
-import React from "react";
 
 function HomeLink({ user }: { user: any }) {
   return (

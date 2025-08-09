@@ -1,16 +1,14 @@
 "use client";
 
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type {
   CartItem as CartItemType,
   CategoryGroup,
   MenuCategory,
   MenuItem,
-  MenuItemVariety,
   Product,
   RestaurantDetails,
 } from "@/types/menu";
-import { formatNaira } from "@/utils";
-import React, { useState, useEffect, useMemo, useCallback } from "react";
 import CartSummary from "./CartSummary";
 // import FloatingActions from "./FloatingActions";
 import MenuPageSkeleton from "./MenuPageSkeleton";
@@ -25,7 +23,7 @@ interface MenuPageProps {
 }
 
 // Custom hooks for reusable logic
-function useCategories(items: MenuItem[]) {
+function _useCategories(items: MenuItem[]) {
   return useMemo(() => {
     return Array.from(
       new Set(items.map((item) => item.categoryId).filter(Boolean)),
@@ -356,11 +354,11 @@ export function MenuPage({
   }, [cart]);
 
   // Mock functions for floating actions
-  const callWaiter = (): void => {
+  const _callWaiter = (): void => {
     console.log("Calling waiter...");
   };
 
-  const requestBill = (): void => {
+  const _requestBill = (): void => {
     console.log("Requesting bill...");
   };
 

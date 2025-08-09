@@ -1,3 +1,21 @@
+import { Badge } from "@platter/ui/components/badge";
+import { Button } from "@platter/ui/components/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@platter/ui/components/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@platter/ui/components/table";
 import type { Order, OrderStatus } from "@prisma/client";
 import {
   ChevronDown,
@@ -10,29 +28,9 @@ import {
   Trash2,
 } from "lucide-react";
 import React, { useState } from "react";
+import { formatNaira } from "utils";
 import EditOrderItemStatus from "./edit-order-item-status";
 import { PrintDocketDialog } from "./print-docket-dialog";
-
-import { Badge } from "@platter/ui/components/badge";
-import { Button } from "@platter/ui/components/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@platter/ui/components/dialog";
-
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@platter/ui/components/table";
-import { formatNaira } from "utils";
 
 interface OrdersTableProps {
   orders: (Order & {

@@ -1,6 +1,4 @@
-import React from 'react';
-import { DollarSign, Users, ShoppingCart, TrendingUp } from "lucide-react";
-import AnimatedStatsCard from '../../../custom/animated-stats-card';
+import AnimatedStatsCard from "../../../custom/animated-stats-card";
 
 interface Order {
   status: string;
@@ -8,7 +6,9 @@ interface Order {
 }
 
 export function Overview({ orders }: { orders: Order[] }) {
-  const deliveredOrders = orders.filter((order) => order.status === "DELIVERED");
+  const deliveredOrders = orders.filter(
+    (order) => order.status === "DELIVERED",
+  );
 
   const totalRevenue = deliveredOrders.reduce(
     (sum, order) => sum + order.totalAmount,
@@ -23,21 +23,21 @@ export function Overview({ orders }: { orders: Order[] }) {
       value: totalRevenue,
       iconName: "DollarSign" as const,
       description: "Total revenue from all orders",
-      formatType: "currency"
+      formatType: "currency",
     },
     {
       title: "Total Orders",
       value: totalOrders,
       iconName: "ShoppingCart" as const,
       description: "Total number of orders",
-      formatType: "number"
+      formatType: "number",
     },
     {
       title: "Average Order Value",
       value: averageOrderValue,
       iconName: "TrendingUp" as const,
       description: "Average value per order",
-      formatType: "currency"
+      formatType: "currency",
     },
     // You can add more cards as needed, e.g., for total scans
     // {

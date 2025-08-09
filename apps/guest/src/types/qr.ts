@@ -19,7 +19,13 @@ export interface RestaurantInfo {
 export interface Button {
   label: string;
   href: string;
-  variant?: "default" | "outline" | "secondary" | "ghost" | "link" | "destructive";
+  variant?:
+    | "default"
+    | "outline"
+    | "secondary"
+    | "ghost"
+    | "link"
+    | "destructive";
 }
 
 export interface PageConfig {

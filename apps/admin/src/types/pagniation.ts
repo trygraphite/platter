@@ -3,7 +3,7 @@ export type PaginationParams = {
   page: number;
   limit: number;
   orderBy?: string;
-  orderDirection?: 'asc' | 'desc';
+  orderDirection?: "asc" | "desc";
 };
 
 export type PaginatedResponse<T> = {

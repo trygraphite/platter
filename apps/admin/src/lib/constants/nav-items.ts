@@ -6,10 +6,8 @@ import {
   ForkKnifeCrossedIcon,
   HeartCrack,
   LayoutPanelTop,
-  LucideScanQrCode,
   PanelTopDashed,
   PencilLine,
-  PinIcon,
   Plus,
   QrCode,
   ScanQrCode,
@@ -18,7 +16,6 @@ import {
   UserPlus2,
   Users2,
 } from "lucide-react";
-import { c } from "node_modules/better-auth/dist/index-4d8GiU4g";
 
 export const items = [
   {

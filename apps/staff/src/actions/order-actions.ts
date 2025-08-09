@@ -1,9 +1,9 @@
 "use server";
 
-import type { OrderWithDetails } from "@/types/orders";
-import { requireAuth } from "@/utils/auth";
 import db from "@platter/db/index";
 import type { OrderStatus } from "@prisma/client";
+import type { OrderWithDetails } from "@/types/orders";
+import { requireAuth } from "@/utils/auth";
 
 export async function getStaffOrders() {
   const staff = await requireAuth();

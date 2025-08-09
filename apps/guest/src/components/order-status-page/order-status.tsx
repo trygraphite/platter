@@ -1,7 +1,8 @@
 // components/order/OrderStatusDisplay.tsx
-import { OrderStatus } from "@prisma/client";
-import { getStatusMessage, statusConfigs } from "./status-config";
+
 import { Clock } from "@platter/ui/lib/icons";
+import type { OrderStatus } from "@prisma/client";
+import { getStatusMessage, statusConfigs } from "./status-config";
 
 interface OrderStatusDisplayProps {
   status: OrderStatus;

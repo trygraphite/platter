@@ -1,31 +1,31 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@platter/ui/components/button";
-import { ChocoLoader } from "@platter/ui/components/choco-loader";
-import { Textarea } from "@platter/ui/components/textarea";
-import { Label } from "@platter/ui/components/label";
 import {
   Card,
-  CardHeader,
-  CardTitle,
   CardContent,
   CardFooter,
+  CardHeader,
+  CardTitle,
 } from "@platter/ui/components/card";
-import { 
-  ArrowLeft, 
-  ShoppingBag, 
-  Trash2, 
-  MessageSquare,
-  Plus,
-  Minus,
-  Edit3
-} from "@platter/ui/lib/icons";
+import { ChocoLoader } from "@platter/ui/components/choco-loader";
+import { Label } from "@platter/ui/components/label";
 import { toast } from "@platter/ui/components/sonner";
+import { Textarea } from "@platter/ui/components/textarea";
+import {
+  ArrowLeft,
+  Edit3,
+  MessageSquare,
+  Minus,
+  Plus,
+  ShoppingBag,
+  Trash2,
+} from "@platter/ui/lib/icons";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { createOrder } from "@/app/actions/create-order";
 import { formatNaira } from "@/utils";
-import Image from "next/image";
 
 interface OrderSummaryPageProps {
   qrId: string;
@@ -101,7 +101,9 @@ export function OrderSummaryPage({
     setCart((prevCart) => {
       const newCart = prevCart.filter((item) => {
         if (varietyId) {
-          return !(item.id === itemId && item.selectedVariety?.id === varietyId);
+          return !(
+            item.id === itemId && item.selectedVariety?.id === varietyId
+          );
         }
         return item.id !== itemId;
       });
@@ -110,7 +112,11 @@ export function OrderSummaryPage({
     });
   };
 
-  const handleQuantityChange = (itemId: string, varietyId: string | undefined, newQuantity: number) => {
+  const handleQuantityChange = (
+    itemId: string,
+    varietyId: string | undefined,
+    newQuantity: number,
+  ) => {
     if (newQuantity <= 0) {
       handleRemoveItem(itemId, varietyId);
       return;
@@ -215,8 +221,8 @@ export function OrderSummaryPage({
               {cart.map((item, index) => {
                 const displayPrice = getItemDisplayPrice(item);
                 const totalItemPrice = displayPrice * item.quantity;
-                const uniqueKey = `${item.id}-${item.selectedVariety?.id || 'default'}-${index}`;
-                
+                const uniqueKey = `${item.id}-${item.selectedVariety?.id || "default"}-${index}`;
+
                 return (
                   <div
                     key={uniqueKey}
@@ -226,7 +232,7 @@ export function OrderSummaryPage({
                       {/* Image */}
                       <div className="flex-shrink-0">
                         <Image
-                          src={item.image || "/placeholder-food.jpg"} 
+                          src={item.image || "/placeholder-food.jpg"}
                           alt={item.name}
                           width={80}
                           height={80}
@@ -245,7 +251,7 @@ export function OrderSummaryPage({
                             <h3 className="font-semibold text-lg leading-tight mb-1">
                               {item.name}
                             </h3>
-                            
+
                             {/* Variety Information */}
                             {item.selectedVariety && (
                               <div className="mb-2">
@@ -259,10 +265,10 @@ export function OrderSummaryPage({
                                 )}
                               </div>
                             )}
-                            
+
                             <p className="text-lg font-bold text-primary mb-3">
-                            {formatNaira(displayPrice)}
-                           </p>
+                              {formatNaira(displayPrice)}
+                            </p>
                           </div>
 
                           {/* Remove Button */}
@@ -270,7 +276,12 @@ export function OrderSummaryPage({
                             variant="ghost"
                             size="icon"
                             className="text-destructive hover:text-destructive hover:bg-destructive/10 flex-shrink-0"
-                            onClick={() => handleRemoveItem(item.id, item.selectedVariety?.id)}
+                            onClick={() =>
+                              handleRemoveItem(
+                                item.id,
+                                item.selectedVariety?.id,
+                              )
+                            }
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -284,7 +295,13 @@ export function OrderSummaryPage({
                                 variant="ghost"
                                 size="icon"
                                 className="h-9 w-9 rounded-r-none border-r"
-                                onClick={() => handleQuantityChange(item.id, item.selectedVariety?.id, item.quantity - 1)}
+                                onClick={() =>
+                                  handleQuantityChange(
+                                    item.id,
+                                    item.selectedVariety?.id,
+                                    item.quantity - 1,
+                                  )
+                                }
                               >
                                 <Minus className="h-3 w-3" />
                               </Button>
@@ -295,16 +312,22 @@ export function OrderSummaryPage({
                                 variant="ghost"
                                 size="icon"
                                 className="h-9 w-9 rounded-l-none border-l"
-                                onClick={() => handleQuantityChange(item.id, item.selectedVariety?.id, item.quantity + 1)}
+                                onClick={() =>
+                                  handleQuantityChange(
+                                    item.id,
+                                    item.selectedVariety?.id,
+                                    item.quantity + 1,
+                                  )
+                                }
                               >
                                 <Plus className="h-3 w-3" />
                               </Button>
                             </div>
                           </div>
-                          
+
                           <div className="text-right">
                             <p className="text-lg font-bold">
-                            {formatNaira(totalItemPrice)}
+                              {formatNaira(totalItemPrice)}
                             </p>
                           </div>
                         </div>
@@ -330,7 +353,10 @@ export function OrderSummaryPage({
                 ) : (
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="special-notes" className="text-sm font-medium flex items-center gap-2">
+                      <Label
+                        htmlFor="special-notes"
+                        className="text-sm font-medium flex items-center gap-2"
+                      >
                         <Edit3 className="h-4 w-4" />
                         Special Instructions
                       </Label>
@@ -369,11 +395,12 @@ export function OrderSummaryPage({
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-semibold">Total Amount:</span>
                   <span className="text-2xl font-bold text-primary">
-                  {formatNaira(calculateTotal())}
+                    {formatNaira(calculateTotal())}
                   </span>
                 </div>
                 <p className="text-sm text-muted-foreground mt-1">
-                  {cart.length} item{cart.length !== 1 ? 's' : ''} • Table {tableDetails.number}
+                  {cart.length} item{cart.length !== 1 ? "s" : ""} • Table{" "}
+                  {tableDetails.number}
                 </p>
               </div>
             </div>
@@ -385,7 +412,7 @@ export function OrderSummaryPage({
 
   const renderFooter = () => {
     if (isLoading) return null;
-    
+
     if (cart.length > 0) {
       return (
         <CardFooter className="flex flex-col sm:flex-row gap-3 p-6 bg-muted/20 border-t">
@@ -401,7 +428,9 @@ export function OrderSummaryPage({
             onClick={handleCheckout}
             disabled={isLoading}
           >
-            {isLoading ? "Creating Order..." : `Place Order • ${formatNaira(calculateTotal())}`}
+            {isLoading
+              ? "Creating Order..."
+              : `Place Order • ${formatNaira(calculateTotal())}`}
           </Button>
         </CardFooter>
       );
@@ -429,18 +458,15 @@ export function OrderSummaryPage({
                 <ShoppingBag className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <CardTitle className="text-xl">
-                  Order Summary
-                </CardTitle>
+                <CardTitle className="text-xl">Order Summary</CardTitle>
                 <p className="text-sm text-muted-foreground mt-1">
-                  {restaurantDetails.name} • Table {tableDetails.number} • {restaurantDetails.cuisine}
+                  {restaurantDetails.name} • Table {tableDetails.number} •{" "}
+                  {restaurantDetails.cuisine}
                 </p>
               </div>
             </div>
           </CardHeader>
-          <CardContent className="p-6">
-            {renderContent()}
-          </CardContent>
+          <CardContent className="p-6">{renderContent()}</CardContent>
           {renderFooter()}
         </Card>
       </div>

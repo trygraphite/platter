@@ -145,7 +145,7 @@ export default function useAdminOrdersSocket({
     if (!socket || !isConnected) return;
     // Join restaurant-specific room if userId is provided
     if (userId) {
-      const roomName = `restaurant:${userId}`;
+      const _roomName = `restaurant:${userId}`;
       socket.emit("joinRestaurantRoom", userId);
     }
 

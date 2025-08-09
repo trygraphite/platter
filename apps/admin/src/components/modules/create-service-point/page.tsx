@@ -1,9 +1,5 @@
 "use client";
 
-import {
-  type CreateServicePointFormData,
-  createServicePoint,
-} from "@/lib/actions/create-service-point";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@platter/ui/components/button";
 import {
@@ -23,6 +19,10 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import {
+  type CreateServicePointFormData,
+  createServicePoint,
+} from "@/lib/actions/create-service-point";
 
 const servicePointSchema = z.object({
   name: z.string().min(1, { message: "Service point name is required" }),

@@ -1,22 +1,23 @@
 "use client";
 
-import React, { useState } from "react";
-import { ColumnDef } from "@tanstack/react-table";
-import { Eye } from "lucide-react";
 import { Badge } from "@platter/ui/components/badge";
 import { Button } from "@platter/ui/components/button";
+import type { ColumnDef } from "@tanstack/react-table";
+import { Eye } from "lucide-react";
+import { useState } from "react";
 import { formatDate, getStatusBadgeVariant } from "utils";
 import { DataTable } from "@/components/custom/data-table";
+import type { Complaint } from "@/types";
 import { ComplaintDetailsModal } from "./complaint-detail-modal";
-import { Complaint } from "@/types";
-
 
 interface ComplaintsTableProps {
   complaints: Complaint[];
 }
 
 export function ComplaintsTable({ complaints }: ComplaintsTableProps) {
-  const [selectedComplaint, setSelectedComplaint] = useState<Complaint | null>(null);
+  const [selectedComplaint, setSelectedComplaint] = useState<Complaint | null>(
+    null,
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Function to open the modal with selected complaint
@@ -24,8 +25,6 @@ export function ComplaintsTable({ complaints }: ComplaintsTableProps) {
     setSelectedComplaint(complaint);
     setIsModalOpen(true);
   };
-
-
 
   // Define the columns for the table
   const columns: ColumnDef<Complaint>[] = [
@@ -51,9 +50,7 @@ export function ComplaintsTable({ complaints }: ComplaintsTableProps) {
       accessorKey: "content",
       header: "Complaint",
       cell: ({ row }) => {
-        return (
-          <span className="line-clamp-2">{row.original.content}</span>
-        );
+        return <span className="line-clamp-2">{row.original.content}</span>;
       },
     },
     {
@@ -73,11 +70,7 @@ export function ComplaintsTable({ complaints }: ComplaintsTableProps) {
       header: "Status",
       cell: ({ row }) => {
         const status = row.original.status;
-        return (
-          <Badge variant={getStatusBadgeVariant(status)}>
-            {status}
-          </Badge>
-        );
+        return <Badge variant={getStatusBadgeVariant(status)}>{status}</Badge>;
       },
     },
     {
@@ -109,7 +102,7 @@ export function ComplaintsTable({ complaints }: ComplaintsTableProps) {
         showPagination={true}
         showPageSizeSelector={true}
       />
-      
+
       {/* Render the modal component */}
       {selectedComplaint && (
         <ComplaintDetailsModal

@@ -1,9 +1,9 @@
 "use server";
-import QRCode from "qrcode";
 import db from "@platter/db";
 import { UserRole } from "@prisma/client";
-import getServerSession from "../auth/server";
+import QRCode from "qrcode";
 import { z } from "zod";
+import getServerSession from "../auth/server";
 
 // Add Zod schema for validation
 const locationSchema = z.object({
@@ -11,7 +11,7 @@ const locationSchema = z.object({
   address: z.string().min(5),
   city: z.string().min(2),
   state: z.string().min(2),
-  seatingCapacity: z.number().min(1,),
+  seatingCapacity: z.number().min(1),
   description: z.string().optional(),
 });
 
@@ -136,7 +136,7 @@ export async function addRestaurantToLocation({
       const targetUrl = `${protocol}://${domain}/location/${extractedLocationName}/${qrCodeRecord.id}`;
 
       // Generate QR code image
-      const qrCodeUrl = await QRCode.toDataURL(targetUrl, {
+      const _qrCodeUrl = await QRCode.toDataURL(targetUrl, {
         width: 300,
         margin: 2,
         color: {
@@ -182,7 +182,7 @@ export async function removeRestaurantFromLocation(restaurantId: string) {
     });
 
     return { success: "Restaurant removed from location!" };
-  } catch (error) {
+  } catch (_error) {
     return { error: "Failed to remove restaurant" };
   }
 }
@@ -206,17 +206,16 @@ export async function leaveLocation() {
     });
 
     return { success: "Successfully left location!" };
-  } catch (error) {
+  } catch (_error) {
     return { error: "Failed to leave location" };
   }
 }
 
-export async function getLocations(search?: string) {
+export async function getLocations(_search?: string) {
   return db.location.findMany({
     include: { users: true },
   });
 }
-
 
 // REQUESTS ACTIONS
 
@@ -320,7 +319,7 @@ export async function approveRequest(requestId: string) {
       const targetUrl = `${protocol}://${domain}/location/${extractedLocationName}/${qrCodeRecord.id}`;
 
       // Generate QR code image
-      const qrCodeUrl = await QRCode.toDataURL(targetUrl, {
+      const _qrCodeUrl = await QRCode.toDataURL(targetUrl, {
         width: 300,
         margin: 2,
         color: { dark: "#000000", light: "#ffffff" },
@@ -364,7 +363,7 @@ export async function rejectRequest(requestId: string) {
     });
 
     return { success: "Request rejected!" };
-  } catch (error) {
+  } catch (_error) {
     return { error: "Failed to reject request" };
   }
 }
@@ -397,9 +396,7 @@ export async function requestToJoinLocation(locationId: string) {
     });
 
     return { success: "Join request submitted!" };
-  } catch (error) {
+  } catch (_error) {
     return { error: "Failed to submit request" };
   }
 }
-
-

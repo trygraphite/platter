@@ -1,12 +1,16 @@
+import { PrismaClient } from "@prisma/client";
+import { notFound } from "next/navigation";
 import { ReviewPage } from "@/components/review/review-form";
 import TableNotFound from "@/components/shared/TableNotFound";
 import type { Params } from "@/types/pages";
-import { PrismaClient } from "@prisma/client";
-import { notFound } from "next/navigation";
 
 const prisma = new PrismaClient();
 
-export default async function Page({ params }: { params: Params }) : Promise<JSX.Element>{
+export default async function Page({
+  params,
+}: {
+  params: Params;
+}): Promise<JSX.Element> {
   const { qrId } = await params;
 
   try {
@@ -38,7 +42,11 @@ export default async function Page({ params }: { params: Params }) : Promise<JSX
         description="We value your feedback to improve our service."
       />
     );
-  } catch (error) {
-    return <div><TableNotFound/></div>;
+  } catch (_error) {
+    return (
+      <div>
+        <TableNotFound />
+      </div>
+    );
   }
 }

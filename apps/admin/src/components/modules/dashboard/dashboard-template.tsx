@@ -1,15 +1,13 @@
-import type { Metadata } from "next";
-
-import getServerSession from "@/lib/auth/server";
 import db from "@platter/db";
-import { DashboardShell } from "@/components/dashboard/dashboard-shell";
+import type { Metadata } from "next";
+import Link from "next/link";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
+import { DashboardShell } from "@/components/dashboard/dashboard-shell";
+import { OrdersByTimeChart } from "@/components/dashboard/orders-by-time";
+import DashboardOrdersTable from "@/components/modules/dashboard/components/dashboard-order-table";
 import { Overview } from "@/components/modules/dashboard/components/dashboard-overview";
 import { RevenueChart } from "@/components/modules/dashboard/components/revenue-chart";
-import { OrdersByTimeChart } from "@/components/dashboard/orders-by-time";
-import { LiveOrderTracking } from "@/components/dashboard/live-order-tracking";
-import DashboardOrdersTable from "@/components/modules/dashboard/components/dashboard-order-table";
-import Link from "next/link";
+import getServerSession from "@/lib/auth/server";
 import { MostOrderedItems } from "./components/most-ordered-items-chart";
 
 export const metadata: Metadata = {
@@ -40,34 +38,39 @@ export default async function AdminDashboardPage() {
     );
   }
 
-const [initialOrders, tables] = await Promise.all([
+  const [initialOrders, tables] = await Promise.all([
     db.order.findMany({
-        where: { userId },
-        include: {
-            items: {
-                include: {
-                    menuItem: {
-                        include: {
-                            category: true
-                        }
-                    },
-                },
+      where: { userId },
+      include: {
+        items: {
+          include: {
+            menuItem: {
+              include: {
+                category: true,
+              },
             },
-            
+          },
         },
-        orderBy: {
-            createdAt: "desc",
-        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
     }),
     db.table.findMany(),
-]);
+  ]);
 
-  const tableMap = new Map(tables.map((table: { id: any; number: any; }) => [table.id, table.number]));
+  const tableMap = new Map(
+    tables.map((table: { id: any; number: any }) => [table.id, table.number]),
+  );
 
-const ordersWithTableNumber = initialOrders.map((order: { tableId: unknown; }) => ({
-  ...order,
-  tableNumber: order.tableId ? tableMap.get(order.tableId) || "Unknown" : "N/A", // Handle null tableId explicitly
-}));
+  const ordersWithTableNumber = initialOrders.map(
+    (order: { tableId: unknown }) => ({
+      ...order,
+      tableNumber: order.tableId
+        ? tableMap.get(order.tableId) || "Unknown"
+        : "N/A", // Handle null tableId explicitly
+    }),
+  );
 
   return (
     <DashboardShell>
@@ -86,14 +89,9 @@ const ordersWithTableNumber = initialOrders.map((order: { tableId: unknown; }) =
         />
       </div>
       <div className="grid  grid-rows-1 grid-cols-1">
-            <MostOrderedItems
-            className="w-full"
-            orders={ordersWithTableNumber}
-            />
+        <MostOrderedItems className="w-full" orders={ordersWithTableNumber} />
         <div className="col-span-4 mt-4">
-          <DashboardOrdersTable
-            orders={ordersWithTableNumber}
-          />
+          <DashboardOrdersTable orders={ordersWithTableNumber} />
         </div>
       </div>
     </DashboardShell>

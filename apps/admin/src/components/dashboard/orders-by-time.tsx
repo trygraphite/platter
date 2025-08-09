@@ -1,13 +1,5 @@
 "use client";
 
-import React from "react";
-import {
-  Bar,
-  BarChart,
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-} from "@platter/ui/lib/charts";
 import {
   Card,
   CardContent,
@@ -20,7 +12,15 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@platter/ui/components/chart";
+import {
+  Bar,
+  BarChart,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+} from "@platter/ui/lib/charts";
 import type { Order } from "@prisma/client";
+import React from "react";
 
 interface OrdersByTimeChartProps extends React.ComponentProps<typeof Card> {
   orders: Order[];

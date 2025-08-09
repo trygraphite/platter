@@ -1,27 +1,40 @@
 "use client";
 
-import { useRestaurant } from "@/context/resturant-context";
 import { Button } from "@platter/ui/components/button";
-import { Card, CardContent, CardFooter, CardHeader } from "@platter/ui/components/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@platter/ui/components/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@platter/ui/components/dialog";
 import { Input } from "@platter/ui/components/input";
 import { Label } from "@platter/ui/components/label";
 import { Textarea } from "@platter/ui/components/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@platter/ui/components/dialog";
-import { ArrowUp, ArrowDown, Edit, Trash, Plus } from "lucide-react";
+import { Edit, Plus, Trash } from "lucide-react";
 import { useState } from "react";
+import { useRestaurant } from "@/context/resturant-context";
 
 interface CategoryGroupManagerModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export function CategoryGroupManagerModal({ isOpen, onClose }: CategoryGroupManagerModalProps) {
-  const { 
-    categoryGroups, 
+export function CategoryGroupManagerModal({
+  isOpen,
+  onClose,
+}: CategoryGroupManagerModalProps) {
+  const {
+    categoryGroups,
     handleUpdateCategoryGroupPosition,
     handleUpdateCategoryGroup,
     handleDeleteCategoryGroup,
-    handleAddCategoryGroup
+    handleAddCategoryGroup,
   } = useRestaurant();
 
   const [editGroupId, setEditGroupId] = useState<string | null>(null);
@@ -29,11 +42,11 @@ export function CategoryGroupManagerModal({ isOpen, onClose }: CategoryGroupMana
   const [formData, setFormData] = useState({ name: "", description: "" });
 
   const handleEditGroup = (groupId: string) => {
-    const group = categoryGroups.find(g => g.id === groupId);
+    const group = categoryGroups.find((g) => g.id === groupId);
     if (group) {
       setFormData({
         name: group.name,
-        description: group.description || ""
+        description: group.description || "",
       });
       setEditGroupId(groupId);
     }
@@ -53,12 +66,14 @@ export function CategoryGroupManagerModal({ isOpen, onClose }: CategoryGroupMana
   };
 
   const handleDeleteGroup = async (groupId: string) => {
-    if (window.confirm("Are you sure you want to delete this category group?")) {
+    if (
+      window.confirm("Are you sure you want to delete this category group?")
+    ) {
       await handleDeleteCategoryGroup(groupId);
     }
   };
 
-  const moveGroup = async (groupId: string, direction: "up" | "down") => {
+  const _moveGroup = async (groupId: string, direction: "up" | "down") => {
     await handleUpdateCategoryGroupPosition(groupId, direction);
   };
 
@@ -70,13 +85,15 @@ export function CategoryGroupManagerModal({ isOpen, onClose }: CategoryGroupMana
           <DialogHeader>
             <DialogTitle>Manage Category Groups</DialogTitle>
           </DialogHeader>
-          
+
           <div className="space-y-4 py-4">
             <div className="flex justify-end">
-              <Button onClick={() => {
-                setFormData({ name: "", description: "" });
-                setIsAddModalOpen(true);
-              }}>
+              <Button
+                onClick={() => {
+                  setFormData({ name: "", description: "" });
+                  setIsAddModalOpen(true);
+                }}
+              >
                 <Plus className="w-4 h-4 mr-2" />
                 Add New Group
               </Button>
@@ -110,30 +127,35 @@ export function CategoryGroupManagerModal({ isOpen, onClose }: CategoryGroupMana
                         <ArrowDown className="h-4 w-4" />
                       </Button>
                     </div> */}
-                    
+
                     <CardHeader>
                       <h3 className="text-xl font-semibold">{group.name}</h3>
                       {group.description && (
-                        <p className="text-sm text-muted-foreground">{group.description}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {group.description}
+                        </p>
                       )}
                     </CardHeader>
                     <CardContent>
                       <p>
-                        <span className="font-medium">{group.categories?.length || 0}</span> categories
+                        <span className="font-medium">
+                          {group.categories?.length || 0}
+                        </span>{" "}
+                        categories
                       </p>
                     </CardContent>
                     <CardFooter className="flex justify-end space-x-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
+                      <Button
+                        variant="outline"
+                        size="sm"
                         onClick={() => handleEditGroup(group.id)}
                       >
                         <Edit className="w-4 h-4 mr-2" />
                         Edit
                       </Button>
-                      <Button 
-                        variant="destructive" 
-                        size="sm" 
+                      <Button
+                        variant="destructive"
+                        size="sm"
                         onClick={() => handleDeleteGroup(group.id)}
                       >
                         <Trash className="w-4 h-4" />
@@ -148,7 +170,10 @@ export function CategoryGroupManagerModal({ isOpen, onClose }: CategoryGroupMana
       </Dialog>
 
       {/* Edit Group Dialog */}
-      <Dialog open={!!editGroupId} onOpenChange={(open) => !open && setEditGroupId(null)}>
+      <Dialog
+        open={!!editGroupId}
+        onOpenChange={(open) => !open && setEditGroupId(null)}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Category Group</DialogTitle>
@@ -159,16 +184,22 @@ export function CategoryGroupManagerModal({ isOpen, onClose }: CategoryGroupMana
               <Input
                 id="edit-group-name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 placeholder="Group name"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="edit-group-description">Description (optional)</Label>
+              <Label htmlFor="edit-group-description">
+                Description (optional)
+              </Label>
               <Textarea
                 id="edit-group-description"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
                 placeholder="Group description"
               />
             </div>
@@ -196,16 +227,22 @@ export function CategoryGroupManagerModal({ isOpen, onClose }: CategoryGroupMana
               <Input
                 id="add-group-name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 placeholder="Group name"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="add-group-description">Description (optional)</Label>
+              <Label htmlFor="add-group-description">
+                Description (optional)
+              </Label>
               <Textarea
                 id="add-group-description"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
                 placeholder="Group description"
               />
             </div>

@@ -1,12 +1,7 @@
 "use client";
 import { Button } from "@platter/ui/components/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@platter/ui/components/card";
-import type { Category, MenuItem } from "@prisma/client";
+import { Card, CardContent, CardFooter } from "@platter/ui/components/card";
+import type { Category } from "@prisma/client";
 import { Trash } from "lucide-react";
 import { useState } from "react";
 import { StaffEditCategoryModal } from "./StaffEditCategoryModal";

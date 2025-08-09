@@ -1,18 +1,16 @@
 "use client";
 
-import React from "react";
+import { Button } from "@platter/ui/components/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@platter/ui/components/dialog";
-import { Button } from "@platter/ui/components/button";
 import { formatDate } from "utils";
-import { Review } from "./review-table";
-
+import type { Review } from "./review-table";
 
 interface ReviewDetailsModalProps {
   review: Review;
@@ -77,7 +75,9 @@ export function ReviewDetailsModal({
               {review.comment ? (
                 review.comment
               ) : (
-                <span className="text-gray-400 italic">No comment provided</span>
+                <span className="text-gray-400 italic">
+                  No comment provided
+                </span>
               )}
             </div>
           </div>

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "@/styles/admin.css";
-import Providers from "./providers";
 import { siteConfig } from "@/lib/siteConfig";
+import Providers from "./providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,7 +20,13 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
-  keywords: ["restaurant", "admin", "menu management", "order tracking", "platter"],
+  keywords: [
+    "restaurant",
+    "admin",
+    "menu management",
+    "order tracking",
+    "platter",
+  ],
   authors: [
     {
       name: "PlatterNG",

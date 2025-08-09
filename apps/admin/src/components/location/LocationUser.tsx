@@ -1,5 +1,6 @@
 "use client";
-import { useState, useEffect } from "react";
+import { Badge } from "@platter/ui/components/badge";
+import { Button } from "@platter/ui/components/button";
 import {
   Card,
   CardContent,
@@ -7,15 +8,14 @@ import {
   CardTitle,
 } from "@platter/ui/components/card";
 import { Input } from "@platter/ui/components/input";
-import { Button } from "@platter/ui/components/button";
-import {
-  requestToJoinLocation,
-  leaveLocation,
-  getLocations,
-} from "@/lib/actions/location-actions";
 import { toast } from "@platter/ui/components/sonner";
-import { Badge } from "@platter/ui/components/badge";
+import { useEffect, useState } from "react";
 import { getCurrentUserDetails } from "@/lib/actions/get-user";
+import {
+  getLocations,
+  leaveLocation,
+  requestToJoinLocation,
+} from "@/lib/actions/location-actions";
 
 export interface Location {
   id: string;
@@ -29,7 +29,9 @@ export interface Location {
 
 export function LocationUser({
   initialLocations,
-}: { initialLocations: Location[] }) {
+}: {
+  initialLocations: Location[];
+}) {
   const [search, setSearch] = useState("");
   const [locations, setLocations] = useState(initialLocations);
   const [currentUser, setCurrentUser] = useState<{

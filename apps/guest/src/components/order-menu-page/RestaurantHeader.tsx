@@ -1,7 +1,7 @@
-import type { RestaurantDetails } from "@/types/menu";
 import { Button } from "@platter/ui/components/button";
 import { Home } from "@platter/ui/lib/icons";
 import Image from "next/image";
+import type { RestaurantDetails } from "@/types/menu";
 
 interface RestaurantHeaderProps {
   restaurant: RestaurantDetails;

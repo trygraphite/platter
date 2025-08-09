@@ -1,4 +1,3 @@
-import { formatNaira } from "@/utils";
 import { Button } from "@platter/ui/components/button";
 import {
   Dialog,
@@ -15,6 +14,7 @@ import { useIsMobile } from "@platter/ui/hooks/use-mobile";
 import Image from "next/image";
 import type React from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { formatNaira } from "@/utils";
 import ProductGrid from "./comps/ProductGrid";
 import VarietyRadioGroup from "./comps/VarietyRadioGroup";
 

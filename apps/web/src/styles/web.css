@@ -10,7 +10,7 @@
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
-    --primary: 336 80% 54%;  /* Updated to match #E62C6B */
+    --primary: 336 80% 54%; /* Updated to match #E62C6B */
     --primary-foreground: 355.7 100% 97.3%;
     --secondary: 220 91% 65%; /* Updated to match #558bf6 */
     --secondary-foreground: 210 20% 98%;
@@ -60,11 +60,11 @@
 
 /* Custom styles */
 .gradient-bg {
-  background: linear-gradient(to right, #E62C6B, #558bf6);
+  background: linear-gradient(to right, #e62c6b, #558bf6);
 }
 
 .text-gradient {
-  background: linear-gradient(to right, #E62C6B, #558bf6);
+  background: linear-gradient(to right, #e62c6b, #558bf6);
   -webkit-background-clip: text;
   color: transparent;
 }

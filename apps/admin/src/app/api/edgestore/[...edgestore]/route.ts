@@ -1,10 +1,10 @@
-import getServerSession from "@/lib/auth/server";
 import { initEdgeStore } from "@edgestore/server";
 import {
   type CreateContextOptions,
   createEdgeStoreNextHandler,
 } from "@edgestore/server/adapters/next/app";
 import { z } from "zod";
+import getServerSession from "@/lib/auth/server";
 
 const session = await getServerSession();
 

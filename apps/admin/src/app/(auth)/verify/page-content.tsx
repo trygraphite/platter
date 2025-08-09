@@ -1,6 +1,5 @@
 "use client";
 
-import { authClient } from "@/lib/auth/client";
 import { Button } from "@platter/ui/components/button";
 import {
   Card,
@@ -11,7 +10,8 @@ import {
 } from "@platter/ui/components/card";
 import { toast } from "@platter/ui/components/sonner";
 import { Loader2, MailCheck } from "lucide-react";
-import React, { useState } from "react";
+import { useState } from "react";
+import { authClient } from "@/lib/auth/client";
 
 function PageContent({ userEmail }: { userEmail: string }) {
   const [sending, setSending] = useState(false);
@@ -29,7 +29,7 @@ function PageContent({ userEmail }: { userEmail: string }) {
         callbackURL: "/onboarding",
       });
       setStatus("sent");
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to send");
       setStatus("failed");
     } finally {

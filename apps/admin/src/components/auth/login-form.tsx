@@ -1,7 +1,5 @@
 "use client";
 
-import { authClient } from "@/lib/auth/client";
-import { type AccountData, loginSchema } from "@/lib/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@platter/ui/components/button";
 import {
@@ -12,15 +10,24 @@ import {
   CardHeader,
   CardTitle,
 } from "@platter/ui/components/card";
-import Link from "next/link";
-import { useState, useTransition } from "react";
-import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
 import { Input } from "@platter/ui/components/input";
 import { Label } from "@platter/ui/components/label";
 import { toast } from "@platter/ui/components/sonner";
-import { EyeClosedIcon, EyeIcon, Loader2, Lock, Mail, CheckCircle2 } from "lucide-react";
+import {
+  CheckCircle2,
+  EyeClosedIcon,
+  EyeIcon,
+  Loader2,
+  Lock,
+  Mail,
+} from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
+import { useForm } from "react-hook-form";
 import AuthLoading from "@/app/(auth)/loading";
+import { authClient } from "@/lib/auth/client";
+import { type AccountData, loginSchema } from "@/lib/validations/auth";
 
 function LoginForm() {
   const router = useRouter();
@@ -47,7 +54,7 @@ function LoginForm() {
           onSuccess: () => {
             toast.success("Login Successful");
             setIsRedirecting(true);
-            
+
             // Use startTransition to handle the navigation
             startTransition(() => {
               router.push("/");
@@ -61,7 +68,7 @@ function LoginForm() {
           },
         },
       );
-    } catch (error) {
+    } catch (_error) {
       toast.error("Request failed. Please try again.");
       setIsRedirecting(false);
     }
@@ -73,10 +80,8 @@ function LoginForm() {
   return (
     <>
       {/* Loading Overlay */}
-      {showLoading && (
-        <AuthLoading/>
-      )}
-      
+      {showLoading && <AuthLoading />}
+
       <Card className="w-full max-w-md border-none shadow-lg">
         <CardHeader className="space-y-1 text-center pb-2">
           <div className="mx-auto bg-primary/10 p-2 rounded-full mb-3">
@@ -90,38 +95,46 @@ function LoginForm() {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <CardContent className="space-y-4 pt-4">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+              <Label htmlFor="email" className="text-sm font-medium">
+                Email
+              </Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                <Input 
-                  {...register("email")} 
-                  type="email" 
+                <Input
+                  {...register("email")}
+                  type="email"
                   placeholder="name@example.com"
-                  className="pl-10 bg-muted/30 border-muted focus:bg-background transition-colors" 
+                  className="pl-10 bg-muted/30 border-muted focus:bg-background transition-colors"
                   disabled={isSubmitting || showLoading}
                 />
               </div>
               {errors.email && (
-                <p className="text-destructive text-xs">{errors.email.message}</p>
+                <p className="text-destructive text-xs">
+                  {errors.email.message}
+                </p>
               )}
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-sm font-medium">Password</Label>
+                <Label htmlFor="password" className="text-sm font-medium">
+                  Password
+                </Label>
               </div>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                <Input 
-                  {...register("password")} 
-                  type={type} 
-                  placeholder="••••••••" 
-                  className="pl-10 pr-10 bg-muted/30 border-muted focus:bg-background transition-colors" 
+                <Input
+                  {...register("password")}
+                  type={type}
+                  placeholder="••••••••"
+                  className="pl-10 pr-10 bg-muted/30 border-muted focus:bg-background transition-colors"
                   disabled={isSubmitting || showLoading}
                 />
                 <button
                   type="button"
                   title="toggle password visibility"
-                  onClick={() => setType(type === "password" ? "text" : "password")}
+                  onClick={() =>
+                    setType(type === "password" ? "text" : "password")
+                  }
                   className="absolute top-1/2 right-3 transform -translate-y-1/2 p-1 rounded-md hover:bg-muted/50 disabled:cursor-not-allowed"
                   disabled={isSubmitting || showLoading}
                 >
@@ -133,7 +146,9 @@ function LoginForm() {
                 </button>
               </div>
               {errors.password && (
-                <p className="text-destructive text-xs">{errors.password.message}</p>
+                <p className="text-destructive text-xs">
+                  {errors.password.message}
+                </p>
               )}
             </div>
           </CardContent>
@@ -171,7 +186,10 @@ function LoginForm() {
 
             <p className="text-center text-muted-foreground text-sm">
               Don't have an account?{" "}
-              <Link href="/register" className="text-primary hover:text-primary/80 font-medium">
+              <Link
+                href="/register"
+                className="text-primary hover:text-primary/80 font-medium"
+              >
                 Create account
               </Link>
             </p>

@@ -1,6 +1,5 @@
 "use client";
 
-import type { StaffUser } from "@/utils/auth";
 import { Button } from "@platter/ui/components/button";
 import { Switch } from "@platter/ui/components/switch";
 import {
@@ -13,6 +12,7 @@ import { HourglassLoader } from "@platter/ui/components/timeLoader";
 import type { Category } from "@prisma/client";
 import { MenuIcon } from "lucide-react";
 import { useEffect, useState } from "react";
+import type { StaffUser } from "@/utils/auth";
 
 import { StaffAddCategoryGroupModal } from "./StaffAddCategoryGroupModal";
 // Import staff-specific components
@@ -38,7 +38,7 @@ export function StaffMenuContent({ staff }: StaffMenuContentProps) {
   const [isGroupManagerModalOpen, setIsGroupManagerModalOpen] = useState(false);
 
   // Function to handle opening edit category modal
-  const openEditCategoryModal = (category: Category) => {
+  const _openEditCategoryModal = (category: Category) => {
     setEditCategoryModal({ isOpen: true, category });
   };
 

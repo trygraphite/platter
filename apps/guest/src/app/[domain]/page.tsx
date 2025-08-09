@@ -1,10 +1,10 @@
 // pages/[domain]/page.tsx
 
-import { RestaurantPageContent } from "@/components/sections/restaurant-page-content";
-import type { Params } from "@/types/pages";
 import db from "@platter/db";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { RestaurantPageContent } from "@/components/sections/restaurant-page-content";
+import type { Params } from "@/types/pages";
 
 // Type definitions for database query results
 type CategoryWithMenuItems = {
@@ -51,7 +51,9 @@ const getRestaurantMetadata = async (domain: string) => {
 
 export async function generateMetadata({
   params,
-}: { params: Params }): Promise<Metadata> {
+}: {
+  params: Params;
+}): Promise<Metadata> {
   const domain = (await params).domain;
 
   if (!domain) {
@@ -65,7 +67,7 @@ export async function generateMetadata({
 
   try {
     userData = await getRestaurantMetadata(domain);
-  } catch (error) {
+  } catch (_error) {
     // Error handling remains but without logging
   }
 

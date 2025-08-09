@@ -1,26 +1,24 @@
 "use client";
 
-import React from "react";
-import { format } from "date-fns";
-import { ColumnDef } from "@tanstack/react-table";
-import { AlertTriangle } from "lucide-react";
-import { Button } from "@platter/ui/components/button";
 import { Badge } from "@platter/ui/components/badge";
+import { Button } from "@platter/ui/components/button";
+import type { ColumnDef } from "@tanstack/react-table";
+import { format } from "date-fns";
+import { AlertTriangle } from "lucide-react";
 import Link from "next/link";
-import { DataTable } from "@/components/custom/data-table";
 import { getStatusBadgeVariant } from "utils";
-import { Complaint } from "@/types";
-
-
+import { DataTable } from "@/components/custom/data-table";
+import type { Complaint } from "@/types";
 
 interface CustomerComplaintsTableProps {
   complaints: Complaint[];
   limit?: number;
 }
 
-export function CustomerComplaintsTable({ complaints, limit = 5 }: CustomerComplaintsTableProps) {
-
-
+export function CustomerComplaintsTable({
+  complaints,
+  limit = 5,
+}: CustomerComplaintsTableProps) {
   // Define columns for the complaints table
   const columns: ColumnDef<Complaint>[] = [
     {
@@ -42,21 +40,19 @@ export function CustomerComplaintsTable({ complaints, limit = 5 }: CustomerCompl
       cell: ({ row }) => {
         const description = row.original.content;
         // Truncate long descriptions
-        return description.length > 80 ? `${description.substring(0, 80)}...` : description;
+        return description.length > 80
+          ? `${description.substring(0, 80)}...`
+          : description;
       },
     },
     {
-         accessorKey: "status",
-         header: "Status",
-         cell: ({ row }) => {
-           const status = row.original.status;
-           return (
-             <Badge variant={getStatusBadgeVariant(status)}>
-               {status}
-             </Badge>
-           );
-         },
-       },
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => {
+        const status = row.original.status;
+        return <Badge variant={getStatusBadgeVariant(status)}>{status}</Badge>;
+      },
+    },
     {
       accessorKey: "createdAt",
       header: "Date",
@@ -72,9 +68,7 @@ export function CustomerComplaintsTable({ complaints, limit = 5 }: CustomerCompl
       <div className="flex items-center justify-between mx-6">
         <h3 className="text-lg font-medium">Recent Complaints</h3>
         <Button asChild variant="outline">
-          <Link href="/complaints">
-            View All Complaints
-          </Link>
+          <Link href="/complaints">View All Complaints</Link>
         </Button>
       </div>
 
@@ -85,7 +79,9 @@ export function CustomerComplaintsTable({ complaints, limit = 5 }: CustomerCompl
         showPagination={false}
         showPageSizeSelector={false}
         maxItems={limit}
-        description={complaints.length === 0 ? "No customer complaints yet." : undefined}
+        description={
+          complaints.length === 0 ? "No customer complaints yet." : undefined
+        }
         className="border-none"
       />
     </div>

@@ -1,9 +1,9 @@
 "use server";
 
-import { Resend } from "resend";
-import getServerSession from "../auth/server";
-import { VerifyUserEmail } from "@/components/emails/verify";
 import { NextResponse } from "next/server";
+import { Resend } from "resend";
+import { VerifyUserEmail } from "@/components/emails/verify";
+import getServerSession from "../auth/server";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -30,7 +30,7 @@ export async function sendVerificationEmailAction({
   }
 
   try {
-    const response = await resend.emails.send({
+    const _response = await resend.emails.send({
       from: "Platter Verifications <emails@platterng.com>",
       to: email,
       subject: "Verify your email address",

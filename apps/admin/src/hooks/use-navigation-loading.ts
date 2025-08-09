@@ -1,7 +1,7 @@
 // hooks/useNavigationLoading.ts
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 export function useNavigationLoading() {
   const [isLoading, setIsLoading] = useState(false);
@@ -15,9 +15,9 @@ export function useNavigationLoading() {
     // Handle link clicks
     const handleClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      const link = target.closest('a[href]');
-      
-      if (link && link.getAttribute('href')?.startsWith('/')) {
+      const link = target.closest("a[href]");
+
+      if (link?.getAttribute("href")?.startsWith("/")) {
         handleStart();
       }
     };
@@ -26,12 +26,12 @@ export function useNavigationLoading() {
     const originalPushState = history.pushState;
     const originalReplaceState = history.replaceState;
 
-    history.pushState = function(...args) {
+    history.pushState = function (...args) {
       handleStart();
       return originalPushState.apply(this, args);
     };
 
-    history.replaceState = function(...args) {
+    history.replaceState = function (...args) {
       handleStart();
       return originalReplaceState.apply(this, args);
     };
@@ -47,12 +47,12 @@ export function useNavigationLoading() {
     // Poll for changes (not ideal but works reliably)
     const interval = setInterval(checkUrlChange, 100);
 
-    document.addEventListener('click', handleClick);
-    window.addEventListener('popstate', handleStart);
+    document.addEventListener("click", handleClick);
+    window.addEventListener("popstate", handleStart);
 
     return () => {
-      document.removeEventListener('click', handleClick);
-      window.removeEventListener('popstate', handleStart);
+      document.removeEventListener("click", handleClick);
+      window.removeEventListener("popstate", handleStart);
       history.pushState = originalPushState;
       history.replaceState = originalReplaceState;
       clearInterval(interval);

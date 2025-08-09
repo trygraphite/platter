@@ -11,9 +11,8 @@ import {
 import { Separator } from "@platter/ui/components/separator";
 import type { QRCode } from "@prisma/client";
 import { Share2 } from "lucide-react";
-
-import { QRViewDisplay } from "@/components/qrcode/qr-view-display";
 import { useState } from "react";
+import { QRViewDisplay } from "@/components/qrcode/qr-view-display";
 
 type QRCodeWithRelations = QRCode & {
   user?: { name: string; email: string } | null;

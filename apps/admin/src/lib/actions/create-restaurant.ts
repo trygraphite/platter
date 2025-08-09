@@ -39,7 +39,7 @@ export async function createRestaurantAction(
     return {
       success: true,
     };
-  } catch (error) {
+  } catch (_error) {
     return {
       success: false,
       error: "Failed to create restaurant",

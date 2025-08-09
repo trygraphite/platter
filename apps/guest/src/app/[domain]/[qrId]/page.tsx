@@ -1,8 +1,8 @@
+import db from "@platter/db";
+import { notFound } from "next/navigation";
 import { EnhancedQRView } from "@/components/qr-comps/enhanced-qr-view";
 import Header from "@/components/shared/header";
 import type { Params } from "@/types/pages";
-import db from "@platter/db";
-import { notFound } from "next/navigation";
 
 async function Page({ params }: { params: Params }): Promise<JSX.Element> {
   const { qrId } = await params;

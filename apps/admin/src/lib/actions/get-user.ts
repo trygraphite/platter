@@ -11,7 +11,7 @@ export async function getCurrentUserDetails() {
     select: {
       id: true,
       locationId: true,
-      // Add other fields 
+      // Add other fields
     },
   });
 }

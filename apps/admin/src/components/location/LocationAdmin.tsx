@@ -1,8 +1,12 @@
 "use client";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@platter/ui/components/button";
-import { Input } from "@platter/ui/components/input";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@platter/ui/components/card";
 import {
   Form,
   FormControl,
@@ -11,24 +15,20 @@ import {
   FormLabel,
   FormMessage,
 } from "@platter/ui/components/form";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@platter/ui/components/card";
-import { z } from "zod";
-import { useEffect, useState, useCallback } from "react";
+import { Input } from "@platter/ui/components/input";
+import { toast } from "@platter/ui/components/sonner";
 import type { User } from "better-auth";
+import { Trash2Icon } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 import {
   addRestaurantToLocation,
   createLocation,
   getLocations,
   removeRestaurantFromLocation,
 } from "@/lib/actions/location-actions";
-import { toast } from "@platter/ui/components/sonner";
 import { JoinRequests } from "./JoinRequest";
-import { Trash2Icon } from "lucide-react";
 
 const locationSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters"),
@@ -69,7 +69,7 @@ export function LocationAdmin({ restaurants }: { restaurants: User[] }) {
       } else if (result?.error) {
         toast.error(result.error);
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error("An unexpected error occurred");
     } finally {
       setIsSubmitting(false);
@@ -95,7 +95,7 @@ export function LocationAdmin({ restaurants }: { restaurants: User[] }) {
       } else if (result.error) {
         toast.error(result.error);
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to add restaurant");
     }
   };
@@ -104,7 +104,7 @@ export function LocationAdmin({ restaurants }: { restaurants: User[] }) {
     try {
       const data = await getLocations();
       setLocations(Array.isArray(data) ? data : []);
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to load locations");
       setLocations([]);
     }

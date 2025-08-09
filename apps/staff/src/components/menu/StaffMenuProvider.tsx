@@ -1,18 +1,5 @@
 "use client";
 
-import {
-  assignCategoryToGroupAction,
-  createCategoryAction,
-  createCategoryGroupAction,
-  createMenuItemAction,
-  deleteCategoryAction,
-  deleteMenuItemAction,
-  getMenuData,
-  updateCategoryAction,
-  updateCategoryGroupAction,
-  updateMenuItemAction,
-} from "@/actions/menu";
-import type { StaffUser } from "@/utils/auth";
 import { toast } from "@platter/ui/components/sonner";
 import type {
   Category,
@@ -29,6 +16,19 @@ import {
   useEffect,
   useState,
 } from "react";
+import {
+  assignCategoryToGroupAction,
+  createCategoryAction,
+  createCategoryGroupAction,
+  createMenuItemAction,
+  deleteCategoryAction,
+  deleteMenuItemAction,
+  getMenuData,
+  updateCategoryAction,
+  updateCategoryGroupAction,
+  updateMenuItemAction,
+} from "@/actions/menu";
+import type { StaffUser } from "@/utils/auth";
 
 type MenuItemWithVarieties = MenuItem & {
   varieties: MenuItemVariety[];
@@ -111,7 +111,7 @@ export function StaffMenuContextProvider({
   const [isLoading, setIsLoading] = useState(!initialCategories);
   const [error, setError] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
-  const router = useRouter();
+  const _router = useRouter();
 
   const fetchCategories = useCallback(async () => {
     try {

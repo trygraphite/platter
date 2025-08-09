@@ -1,5 +1,5 @@
-import type { StaffUser } from "@/utils/auth";
 import type { OrderStatus } from "@prisma/client";
+import type { StaffUser } from "@/utils/auth";
 
 // Temporary type until migration is run
 export type OrderItemStatus =

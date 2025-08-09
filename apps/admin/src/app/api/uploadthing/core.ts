@@ -1,12 +1,11 @@
-import getServerSession from "@/lib/auth/server";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
-
+import getServerSession from "@/lib/auth/server";
 
 const f = createUploadthing();
 
 // Auth function to get current user
-const auth = async (req: Request) => {
+const auth = async (_req: Request) => {
   const session = await getServerSession();
   return session?.user ? { id: session.user.id } : null;
 };

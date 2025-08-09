@@ -1,13 +1,12 @@
-import React from "react";
+import { Button } from "@platter/ui/components/button";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@platter/ui/components/dialog";
-import { Button } from "@platter/ui/components/button";
 
 interface DeleteOrderModalProps {
   open: boolean;

@@ -32,7 +32,8 @@ export type SiteConfig = {
 const defaultConfig: SiteConfig = {
   name: "PlatterNG",
   subdomain: "app",
-  description: "PlatterNG The Future of Dining. Order, track, and review your meals with ease.",
+  description:
+    "PlatterNG The Future of Dining. Order, track, and review your meals with ease.",
   url: "https://guest.platterng.com",
   ogImage: "https://guest.platterng.com/og-image.jpg",
   links: {
@@ -49,7 +50,8 @@ const defaultConfig: SiteConfig = {
   features: [
     {
       title: "Table-Based Ordering",
-      description: "Orders are linked to the specific table guests are seated at.",
+      description:
+        "Orders are linked to the specific table guests are seated at.",
     },
     {
       title: "Live Order Status",
@@ -61,26 +63,28 @@ const defaultConfig: SiteConfig = {
     },
     {
       title: "Feedback Options",
-      description: "Help the restaurant improve with food reviews and complaints.",
+      description:
+        "Help the restaurant improve with food reviews and complaints.",
     },
   ],
   contact: {
-    supportNote: "For order issues, please contact a restaurant staff member directly.",
+    supportNote:
+      "For order issues, please contact a restaurant staff member directly.",
   },
 };
 
 // Get current host from URL in client components
 export function getSubdomainFromUrl(): string | null {
   if (typeof window === "undefined") return null;
-  
+
   const hostname = window.location.hostname;
-  
+
   // Local development
   if (hostname.includes("localhost")) {
     const subdomain = hostname.split(".")[0];
-    return subdomain === "localhost" ? null : (subdomain || null);
+    return subdomain === "localhost" ? null : subdomain || null;
   }
-  
+
   // Production with custom domain
   const baseDomain = process.env.NEXT_PUBLIC_BASE_DOMAIN || "platterng.com";
   return hostname.replace(`.${baseDomain}`, "");
@@ -92,14 +96,14 @@ export async function getSiteConfig(subdomain?: string): Promise<SiteConfig> {
     if (!subdomain) {
       return defaultConfig;
     }
-    
+
     // Fetch restaurant data from database
     const siteData = await readSiteDomain(subdomain);
-    
+
     if (!siteData) {
       return defaultConfig;
     }
-    
+
     // Create dynamic site config
     return {
       ...defaultConfig,
@@ -107,9 +111,10 @@ export async function getSiteConfig(subdomain?: string): Promise<SiteConfig> {
       name: `${siteData.name} | PlatterNG`,
       restaurantName: siteData.name,
       description: `Order food, track your meal, and leave reviews at ${siteData.name}.`,
-      url: process.env.NODE_ENV === "production" 
-        ? `https://${subdomain}.${process.env.NEXT_PUBLIC_BASE_DOMAIN}`
-        : `http://${subdomain}.localhost:3000`,
+      url:
+        process.env.NODE_ENV === "production"
+          ? `https://${subdomain}.${process.env.NEXT_PUBLIC_BASE_DOMAIN}`
+          : `http://${subdomain}.localhost:3000`,
       ogImage: `/api/og?restaurant=${encodeURIComponent(siteData.name)}`,
       themeColor: siteData.themeColor || "#000000",
       logoUrl: siteData.logoUrl,
@@ -117,7 +122,7 @@ export async function getSiteConfig(subdomain?: string): Promise<SiteConfig> {
         ...defaultConfig.contact,
         phone: siteData.contactPhone,
         email: siteData.contactEmail,
-      }
+      },
     };
   } catch (error) {
     console.error("Error fetching site configuration:", error);

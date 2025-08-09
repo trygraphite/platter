@@ -1,7 +1,8 @@
 // File: /app/api/category-groups/route.ts
-import getServerSession from "@/lib/auth/server";
+
 import db from "@platter/db";
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
+import getServerSession from "@/lib/auth/server";
 
 export async function GET(request: NextRequest) {
   try {
@@ -67,7 +68,7 @@ export async function GET(request: NextRequest) {
                 },
               },
               orderBy: { position: "asc" },
-            }
+            },
           },
           orderBy: { position: "asc" },
         },
@@ -82,7 +83,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching category groups:", error);
     return NextResponse.json(
       { error: "Failed to fetch category groups" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

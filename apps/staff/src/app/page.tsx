@@ -1,5 +1,5 @@
-import { getCurrentStaff } from "@/utils/auth";
 import { redirect } from "next/navigation";
+import { getCurrentStaff } from "@/utils/auth";
 
 export default async function Home() {
   const user = await getCurrentStaff();

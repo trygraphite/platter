@@ -1,3 +1,14 @@
+import { toast } from "@platter/ui/components/sonner";
+import type {
+  Category,
+  CategoryGroup,
+  MenuItem,
+  MenuItemVariety,
+  User,
+} from "@prisma/client";
+import type React from "react";
+import { createContext, useCallback, useContext, useState } from "react";
+import { useUploadThing } from "utils/uploadThing";
 import {
   updateCategoryGroupPosition,
   updateCategoryPosition,
@@ -16,19 +27,7 @@ import { deleteMenuItem } from "@/lib/actions/delete-menu-item";
 import { updateCategory } from "@/lib/actions/update-category";
 import { updateMenuItem } from "@/lib/actions/update-menu-item";
 import { useSession } from "@/lib/auth/client";
-import { useEdgeStore } from "@/lib/edgestore/edgestore";
 import type { MenuItemVarietyInput } from "@/types";
-import { toast } from "@platter/ui/components/sonner";
-import type {
-  Category,
-  CategoryGroup,
-  MenuItem,
-  MenuItemVariety,
-  User,
-} from "@prisma/client";
-import type React from "react";
-import { createContext, useCallback, useContext, useState } from "react";
-import { useUploadThing } from "utils/uploadThing";
 
 type MenuItemWithVarieties = MenuItem & {
   varieties: MenuItemVariety[];
@@ -199,7 +198,7 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
 
         const uploadResult = await startCategoryImageUpload([imageFile]);
 
-        if (uploadResult && uploadResult[0]) {
+        if (uploadResult?.[0]) {
           categoryToCreate.image = uploadResult[0].ufsUrl;
           toast.dismiss();
         } else {
@@ -240,7 +239,7 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
 
         const uploadResult = await startCategoryImageUpload([imageFile]);
 
-        if (uploadResult && uploadResult[0]) {
+        if (uploadResult?.[0]) {
           updatedData.image = uploadResult[0].ufsUrl;
           toast.dismiss();
         } else {
@@ -278,7 +277,7 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
 
   // Updated client-side functions with variety support
 
-  const handleAddMenuItem = async (categoryId: string, formData: FormData) => {
+  const handleAddMenuItem = async (_categoryId: string, formData: FormData) => {
     if (!session?.user?.id) {
       toast.error("Not authenticated");
       return;
@@ -315,7 +314,7 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
         const varietyIsDefault =
           formData.get(`variety_${i}_isDefault`) === "true";
 
-        if (varietyName && !isNaN(varietyPrice)) {
+        if (varietyName && !Number.isNaN(varietyPrice)) {
           varieties.push({
             name: varietyName,
             description: varietyDescription || null,
@@ -342,7 +341,7 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
         toast.loading("Uploading image...");
 
         const uploadResult = await startMenuItemImageUpload([imageFile]);
-        if (uploadResult && uploadResult[0]) {
+        if (uploadResult?.[0]) {
           menuItemData.image = uploadResult[0].ufsUrl;
           toast.dismiss();
         } else {
@@ -410,7 +409,7 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
         const varietyIsDefault =
           formData.get(`variety_${i}_isDefault`) === "true";
 
-        if (varietyName && !isNaN(varietyPrice)) {
+        if (varietyName && !Number.isNaN(varietyPrice)) {
           varieties.push({
             id: varietyId || undefined, // Include ID for existing varieties
             name: varietyName,
@@ -431,7 +430,7 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
 
         const uploadResult = await startMenuItemImageUpload([imageFile]);
 
-        if (uploadResult && uploadResult[0]) {
+        if (uploadResult?.[0]) {
           updatedData.image = uploadResult[0].ufsUrl;
           toast.dismiss();
         } else {

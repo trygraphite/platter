@@ -1,9 +1,6 @@
 // app/components/app-sidebar.tsx
 "use client";
 
-import { useEffect, useState } from "react";
-import { NavMain } from "@/components/navigation/nav-main";
-import { NavUser } from "@/components/navigation/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -11,9 +8,10 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@platter/ui/components/sidebar";
+import { useEffect, useState } from "react";
+import { NavMain } from "@/components/navigation/nav-main";
+import { NavUser } from "@/components/navigation/nav-user";
 import HomeLink from "./home-link";
-import { NavSecondary } from "./nav-secondary";
-import { items } from "@/lib/constants/nav-items";
 
 export function AppSidebar({ ...props }) {
   const [user, setUser] = useState(null);

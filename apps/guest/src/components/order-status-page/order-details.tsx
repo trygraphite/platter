@@ -1,6 +1,5 @@
 // components/order/OrderDetails.tsx
 
-import { formatNairaWithDecimals } from "@/utils";
 import type { Order, Table } from "@platter/db/client";
 import {
   CheckCircle,
@@ -11,6 +10,7 @@ import {
   XCircle,
 } from "@platter/ui/lib/icons";
 import Image from "next/image";
+import { formatNairaWithDecimals } from "@/utils";
 import { OrderItemSummary } from "./order-item-summary";
 
 interface OrderItem {

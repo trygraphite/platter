@@ -1,11 +1,3 @@
-import type { OrderWithDetails } from "@/types/orders";
-import { formatCurrency } from "@/utils/format";
-import {
-  ORDER_ITEM_STATUSES,
-  getOrderItemStatusIcon,
-  getOrderItemStatusStyle,
-  getStatusColor,
-} from "@/utils/order-utils";
 import {
   Select,
   SelectContent,
@@ -14,7 +6,15 @@ import {
   SelectValue,
 } from "@platter/ui/components/select";
 import { ChefHat, Tag } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import type { OrderWithDetails } from "@/types/orders";
+import { formatCurrency } from "@/utils/format";
+import {
+  getOrderItemStatusIcon,
+  getOrderItemStatusStyle,
+  getStatusColor,
+  ORDER_ITEM_STATUSES,
+} from "@/utils/order-utils";
 
 interface OrderItemCardProps {
   item: OrderWithDetails["items"][0];

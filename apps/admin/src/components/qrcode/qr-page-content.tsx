@@ -1,10 +1,10 @@
 "use client";
 
+import { toast } from "@platter/ui/components/sonner";
+import { useState } from "react";
 import { QRDisplay } from "@/components/qrcode/qr-display";
 import { QRForm } from "@/components/qrcode/qr-form";
 import { createQRCodeAction } from "@/lib/actions/create-qrcode";
-import { toast } from "@platter/ui/components/sonner";
-import { useState } from "react";
 
 export default function QRCodePage() {
   const [qrCode, setQRCode] = useState<string | null>(null);
@@ -38,7 +38,7 @@ export default function QRCodePage() {
       } else {
         toast.error(result.error || "Failed to generate QR code");
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error("An unexpected error occurred");
     } finally {
       setIsLoading(false);

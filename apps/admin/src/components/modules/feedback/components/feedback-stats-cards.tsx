@@ -1,6 +1,5 @@
 "use client";
-import AnimatedStatsCard from '@/components/custom/animated-stats-card';
-import React from 'react';
+import AnimatedStatsCard from "@/components/custom/animated-stats-card";
 
 interface Review {
   id: string;
@@ -21,21 +20,25 @@ interface FeedbackStatsCardsProps {
   complaints: Complaint[] | undefined;
 }
 
-const FeedbackStatsCards = ({ reviews = [], complaints = [] }: FeedbackStatsCardsProps) => {
+const FeedbackStatsCards = ({
+  reviews = [],
+  complaints = [],
+}: FeedbackStatsCardsProps) => {
   // Calculate stats - with default empty arrays if undefined
   const totalReviews = reviews?.length || 0;
   const totalComplaints = complaints?.length || 0;
-  
+
   // Calculate average rating from reviews
-  const averageRating = reviews && reviews.length > 0 
-    ? reviews.reduce((sum, review) => sum + (review.rating || 0), 0) / reviews.length
-    : 0;
-    
+  const averageRating =
+    reviews && reviews.length > 0
+      ? reviews.reduce((sum, review) => sum + (review.rating || 0), 0) /
+        reviews.length
+      : 0;
+
   // Calculate complaint rate as percentage
   const totalFeedback = totalReviews + totalComplaints;
-  const complaintRate = totalFeedback > 0 
-    ? (totalComplaints / totalFeedback) * 100 
-    : 0;
+  const complaintRate =
+    totalFeedback > 0 ? (totalComplaints / totalFeedback) * 100 : 0;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -45,14 +48,14 @@ const FeedbackStatsCards = ({ reviews = [], complaints = [] }: FeedbackStatsCard
         iconName="Star"
         description="All customer reviews received"
       />
-      
+
       <AnimatedStatsCard
         title="Total Complaints"
         value={totalComplaints}
         iconName="AlertCircle"
         description="All customer complaints logged"
       />
-      
+
       <AnimatedStatsCard
         title="Average Rating"
         value={averageRating}
@@ -60,7 +63,7 @@ const FeedbackStatsCards = ({ reviews = [], complaints = [] }: FeedbackStatsCard
         formatType="plain"
         description={`${averageRating.toFixed(1)} out of 5 stars`}
       />
-      
+
       <AnimatedStatsCard
         title="Complaint Rate"
         value={complaintRate}

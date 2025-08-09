@@ -1,7 +1,5 @@
 "use client";
 
-import { items } from "@/lib/constants/nav-items";
-import { Collapsible } from "@platter/ui/components/collapsible";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -13,6 +11,7 @@ import { ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { items } from "@/lib/constants/nav-items";
 
 export function NavMain() {
   const pathname = usePathname();

@@ -1,5 +1,5 @@
 // components/ui/PageHeader.tsx
-import { ReactNode } from 'react';
+import type { ReactNode } from "react";
 
 interface PageHeaderProps {
   title: string;
@@ -16,9 +16,7 @@ export default function PageHeader({
     <div className="flex items-center justify-between mb-8">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
-        {description && (
-          <p className="text-muted-foreground">{description}</p>
-        )}
+        {description && <p className="text-muted-foreground">{description}</p>}
       </div>
       {action && <div>{action}</div>}
     </div>

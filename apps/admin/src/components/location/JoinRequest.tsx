@@ -1,10 +1,19 @@
 "use client";
-import { Button } from "@platter/ui/components/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@platter/ui/components/card";
-import { toast } from "@platter/ui/components/sonner";
-import { approveRequest, getPendingRequests, rejectRequest } from "@/lib/actions/location-actions";
-import { useEffect, useState, useCallback } from "react";
 import { Badge } from "@platter/ui/components/badge"; // Add this import
+import { Button } from "@platter/ui/components/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@platter/ui/components/card";
+import { toast } from "@platter/ui/components/sonner";
+import { useCallback, useEffect, useState } from "react";
+import {
+  approveRequest,
+  getPendingRequests,
+  rejectRequest,
+} from "@/lib/actions/location-actions";
 
 export function JoinRequests() {
   const [requests, setRequests] = useState<any[]>([]);
@@ -13,7 +22,7 @@ export function JoinRequests() {
     try {
       const data = await getPendingRequests();
       setRequests(data);
-    } catch (error) {
+    } catch (_error) {
       toast.error("Failed to load requests");
     }
   }, []);
@@ -59,17 +68,19 @@ export function JoinRequests() {
                 Requesting to join {request.location.name}
               </p>
               {/* Add status badge */}
-              {request.status !== 'PENDING' && (
-                <Badge 
-                  variant={request.status === 'APPROVED' ? 'secondary' : 'destructive'}
+              {request.status !== "PENDING" && (
+                <Badge
+                  variant={
+                    request.status === "APPROVED" ? "secondary" : "destructive"
+                  }
                   className="mt-1"
                 >
                   {request.status}
                 </Badge>
               )}
             </div>
-            
-            {request.status === 'PENDING' ? (
+
+            {request.status === "PENDING" ? (
               <div className="flex gap-2">
                 <Button
                   variant="outline"
@@ -82,8 +93,8 @@ export function JoinRequests() {
                 </Button>
               </div>
             ) : (
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 onClick={() => handleReject(request.id)}
                 disabled
               >

@@ -1,8 +1,8 @@
 "use server";
 
-import { requireAuth } from "@/utils/auth";
 import db from "@platter/db";
 import { revalidatePath } from "next/cache";
+import { requireAuth } from "@/utils/auth";
 
 // Shared types
 interface VarietyInput {

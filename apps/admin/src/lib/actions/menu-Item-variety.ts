@@ -1,12 +1,12 @@
-import { MenuItemVarietyInput } from "@/types";
 import db from "@platter/db/index";
 import type { MenuItemVariety } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import type { MenuItemVarietyInput } from "@/types";
 
 export async function createMenuItemVariety(
   userId: string,
   menuItemId: string,
-  varietyData: Partial<MenuItemVariety>
+  varietyData: Partial<MenuItemVariety>,
 ) {
   try {
     // Verify the menu item belongs to the user
@@ -67,7 +67,7 @@ export async function createMenuItemVariety(
 export async function updateMenuItemVariety(
   userId: string,
   varietyId: string,
-  varietyData: Partial<MenuItemVarietyInput>
+  varietyData: Partial<MenuItemVarietyInput>,
 ) {
   try {
     // If setting as default, unset other defaults for the same menu item
@@ -75,7 +75,7 @@ export async function updateMenuItemVariety(
       const variety = await db.menuItemVariety.findFirst({
         where: { id: varietyId, userId },
       });
-      
+
       if (variety) {
         await db.menuItemVariety.updateMany({
           where: { menuItemId: variety.menuItemId, userId },
@@ -101,35 +101,36 @@ export async function deleteMenuItemVariety(userId: string, varietyId: string) {
   try {
     // Check if there are any order items using this variety
     const orderItemsCount = await db.orderItem.count({
-      where: { varietyId }
+      where: { varietyId },
     });
 
     if (orderItemsCount > 0) {
       // Soft delete: set deletedAt timestamp and mark as unavailable
       await db.menuItemVariety.update({
         where: { id: varietyId, userId },
-        data: { 
+        data: {
           deletedAt: new Date(),
-          isAvailable: false 
-        }
+          isAvailable: false,
+        },
       });
-      
+
       revalidatePath("/menu-items");
-      return { 
-        success: true, 
-        message: "Variety has been archived because it has existing orders. It will no longer appear for new orders." 
+      return {
+        success: true,
+        message:
+          "Variety has been archived because it has existing orders. It will no longer appear for new orders.",
       };
     }
 
     // If no order items exist, proceed with soft deletion anyway for consistency
     await db.menuItemVariety.update({
       where: { id: varietyId, userId },
-      data: { 
+      data: {
         deletedAt: new Date(),
-        isAvailable: false 
-      }
+        isAvailable: false,
+      },
     });
-    
+
     revalidatePath("/menu-items");
     return { success: true, message: "Variety deleted successfully." };
   } catch (error) {
@@ -159,7 +160,7 @@ export async function getMenuItemVarieties(userId: string, menuItemId: string) {
 export async function updateMenuItemVarietyPosition(
   userId: string,
   varietyId: string,
-  direction: "up" | "down"
+  direction: "up" | "down",
 ) {
   try {
     const variety = await db.menuItemVariety.findFirst({
@@ -174,7 +175,8 @@ export async function updateMenuItemVarietyPosition(
     }
 
     const currentPosition = variety.position;
-    const newPosition = direction === "up" ? currentPosition - 1 : currentPosition + 1;
+    const newPosition =
+      direction === "up" ? currentPosition - 1 : currentPosition + 1;
 
     // Find the variety to swap with
     const targetVariety = await db.menuItemVariety.findFirst({
@@ -207,9 +209,11 @@ export async function updateMenuItemVarietyPosition(
   }
 }
 
-
 // Helper function to get all varieties including deleted ones (for admin purposes)
-export async function getAllMenuItemVarieties(userId: string, menuItemId: string) {
+export async function getAllMenuItemVarieties(
+  userId: string,
+  menuItemId: string,
+) {
   try {
     const varieties = await db.menuItemVariety.findMany({
       where: {

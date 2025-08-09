@@ -1,9 +1,4 @@
 import {
-  ORDER_STATUSES,
-  getStatusButtonText,
-  getStatusColor,
-} from "@/utils/order-utils";
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -11,7 +6,12 @@ import {
   SelectValue,
 } from "@platter/ui/components/select";
 import type { OrderStatus } from "@prisma/client";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  getStatusButtonText,
+  getStatusColor,
+  ORDER_STATUSES,
+} from "@/utils/order-utils";
 
 interface OrderStatusSelectorProps {
   currentStatus: OrderStatus;

@@ -1,9 +1,13 @@
-import { OrderSummaryPage } from "@/components/order-summary-page/orderSummaryPage";
-import type { Params } from "@/types/pages";
 import db from "@platter/db";
 import { notFound } from "next/navigation";
+import { OrderSummaryPage } from "@/components/order-summary-page/orderSummaryPage";
+import type { Params } from "@/types/pages";
 
-export default async function Page({ params }: { params: Params }): Promise<JSX.Element> {
+export default async function Page({
+  params,
+}: {
+  params: Params;
+}): Promise<JSX.Element> {
   const { qrId, orderId, domain } = await params;
 
   const qrCodeData = await db.qRCode.findUnique({

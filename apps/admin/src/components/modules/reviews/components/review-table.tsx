@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
-import { ColumnDef } from "@tanstack/react-table";
-import { Eye } from "lucide-react";
 import { Button } from "@platter/ui/components/button";
+import type { ColumnDef } from "@tanstack/react-table";
+import { Eye } from "lucide-react";
+import { useState } from "react";
 import { formatDate } from "utils";
 import { DataTable } from "@/components/custom/data-table";
 import { ReviewDetailsModal } from "./review-detail-modal";
-
 
 // Review type definition based on your data structure
 export interface Review {
@@ -117,7 +116,7 @@ export function ReviewsTable({ reviews }: ReviewsTableProps) {
         showPagination={true}
         showPageSizeSelector={true}
       />
-      
+
       {/* Render the modal component */}
       {selectedReview && (
         <ReviewDetailsModal

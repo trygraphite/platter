@@ -1,8 +1,8 @@
 "use server";
 
-import type { MenuItemVarietyInput } from "@/types";
 import db from "@platter/db";
 import { revalidatePath } from "next/cache";
+import type { MenuItemVarietyInput } from "@/types";
 
 export async function deleteMenuItem(userId: string, menuItemId: string) {
   try {

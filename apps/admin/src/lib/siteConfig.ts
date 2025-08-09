@@ -29,10 +29,7 @@ export const siteConfig = {
       "delete_reviews",
       "view_analytics",
     ],
-    staff: [
-      "manage_orders",
-      "generate_qr",
-    ],
+    staff: ["manage_orders", "generate_qr"],
   },
   support: {
     email: "admin-support@platterng.com",

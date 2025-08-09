@@ -1,7 +1,8 @@
 // components/order/status-config.tsx
-import { StatusConfig } from "@/types/order-status";
-import { Clock, CheckCircle2, XCircle, Package } from "@platter/ui/lib/icons";
-import { OrderStatus } from "@prisma/client";
+
+import { CheckCircle2, Clock, XCircle } from "@platter/ui/lib/icons";
+import type { OrderStatus } from "@prisma/client";
+import type { StatusConfig } from "@/types/order-status";
 
 export const statusConfigs: Record<OrderStatus, StatusConfig> = {
   PENDING: {

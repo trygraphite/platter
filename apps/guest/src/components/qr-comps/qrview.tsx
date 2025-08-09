@@ -1,28 +1,49 @@
-"use client"
-import { Button } from "@platter/ui/components/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@platter/ui/components/card"
-import { UtensilsCrossed, MessageSquare, Star, ScreenShare, ChevronUp, ChevronDown } from "@platter/ui/lib/icons"
-import Link from "next/link"
-import Image from "next/image"
-import resturantLogo from "../../../public/assets/serving-dish.png"
-import type { PageConfig } from "@/types/qr"
-import { useState } from "react"
-import { CallWaiterBell } from "./call-waiter-bell"
+"use client";
+import { Button } from "@platter/ui/components/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@platter/ui/components/card";
+import {
+  ChevronDown,
+  ChevronUp,
+  MessageSquare,
+  ScreenShare,
+  Star,
+  UtensilsCrossed,
+} from "@platter/ui/lib/icons";
+import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
+import type { PageConfig } from "@/types/qr";
+import resturantLogo from "../../../public/assets/serving-dish.png";
+import { CallWaiterBell } from "./call-waiter-bell";
 
 interface QRCodeViewProps {
-  qrId: string
-  config: PageConfig
-  userId: string 
-  tableNumber: string
+  qrId: string;
+  config: PageConfig;
+  userId: string;
+  tableNumber: string;
 }
 
-export function QRCodeView({ qrId, config, userId, tableNumber }: QRCodeViewProps) {
-  const [expanded, setExpanded] = useState(false)
-  console.log("tableNumber", tableNumber)
+export function QRCodeView({
+  qrId,
+  config,
+  userId,
+  tableNumber,
+}: QRCodeViewProps) {
+  const [expanded, setExpanded] = useState(false);
+  console.log("tableNumber", tableNumber);
   const detailedInfo = (
     <>
       {/* Restaurant Hours */}
-      {((config.restaurantInfo.openingHours && config.restaurantInfo.closingHours) || config.restaurantInfo.hours) && (
+      {((config.restaurantInfo.openingHours &&
+        config.restaurantInfo.closingHours) ||
+        config.restaurantInfo.hours) && (
         <div className="flex-1">
           <p className="font-medium">Hours</p>
           <p className="text-muted-foreground">
@@ -36,7 +57,9 @@ export function QRCodeView({ qrId, config, userId, tableNumber }: QRCodeViewProp
       {config.restaurantInfo.cuisine && (
         <div className="flex-1">
           <p className="font-medium">Cuisine</p>
-          <p className="text-muted-foreground">{config.restaurantInfo.cuisine}</p>
+          <p className="text-muted-foreground">
+            {config.restaurantInfo.cuisine}
+          </p>
         </div>
       )}
       {/* Address */}
@@ -47,7 +70,8 @@ export function QRCodeView({ qrId, config, userId, tableNumber }: QRCodeViewProp
         <div>
           <p className="font-medium">Location</p>
           <p className="text-muted-foreground">
-            {config.restaurantInfo.address && `${config.restaurantInfo.address}, `}
+            {config.restaurantInfo.address &&
+              `${config.restaurantInfo.address}, `}
             {config.restaurantInfo.city && `${config.restaurantInfo.city}, `}
             {config.restaurantInfo.state && `${config.restaurantInfo.state} `}
             {config.restaurantInfo.zipCode && config.restaurantInfo.zipCode}
@@ -59,8 +83,16 @@ export function QRCodeView({ qrId, config, userId, tableNumber }: QRCodeViewProp
       {(config.restaurantInfo.phone || config.restaurantInfo.email) && (
         <div>
           <p className="font-medium">Contact</p>
-          {config.restaurantInfo.phone && <p className="text-muted-foreground">{config.restaurantInfo.phone}</p>}
-          {config.restaurantInfo.email && <p className="text-muted-foreground">{config.restaurantInfo.email}</p>}
+          {config.restaurantInfo.phone && (
+            <p className="text-muted-foreground">
+              {config.restaurantInfo.phone}
+            </p>
+          )}
+          {config.restaurantInfo.email && (
+            <p className="text-muted-foreground">
+              {config.restaurantInfo.email}
+            </p>
+          )}
         </div>
       )}
 
@@ -83,11 +115,13 @@ export function QRCodeView({ qrId, config, userId, tableNumber }: QRCodeViewProp
       {config.restaurantInfo.seatingCapacity && (
         <div>
           <p className="font-medium">Seating Capacity</p>
-          <p className="text-muted-foreground">{config.restaurantInfo.seatingCapacity} guests</p>
+          <p className="text-muted-foreground">
+            {config.restaurantInfo.seatingCapacity} guests
+          </p>
         </div>
       )}
     </>
-  )
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
@@ -113,11 +147,15 @@ export function QRCodeView({ qrId, config, userId, tableNumber }: QRCodeViewProp
               </div>
             )}
             <CardTitle className="text-2xl font-bold">{config.title}</CardTitle>
-            <CardDescription className="text-base">{config.description}</CardDescription>
+            <CardDescription className="text-base">
+              {config.description}
+            </CardDescription>
           </CardHeader>
 
           <div className="px-6 ">
-            <div className="text-center mr-2 font-semibold">Place an Order now!</div>
+            <div className="text-center mr-2 font-semibold">
+              Place an Order now!
+            </div>
             <div className="text-sm  rounded-lg dark:bg-gray-900/50 p-4">
               <div
                 className={`overflow-hidden transition-all duration-300 ease-in-out ${
@@ -134,7 +172,11 @@ export function QRCodeView({ qrId, config, userId, tableNumber }: QRCodeViewProp
                 onClick={() => setExpanded(!expanded)}
               >
                 <span>{expanded ? "Show Less" : "Show More"}</span>
-                {expanded ? <ChevronUp className="ml-2 h-4 w-4" /> : <ChevronDown className="ml-2 h-4 w-4" />}
+                {expanded ? (
+                  <ChevronUp className="ml-2 h-4 w-4" />
+                ) : (
+                  <ChevronDown className="ml-2 h-4 w-4" />
+                )}
               </Button>
             </div>
           </div>
@@ -142,7 +184,11 @@ export function QRCodeView({ qrId, config, userId, tableNumber }: QRCodeViewProp
           <CardContent className="p-6">
             <div className="grid gap-4">
               {config.buttons.map((button, index) => (
-                <Link key={index} href={`/${qrId}${button.href}`} className="block">
+                <Link
+                  key={index}
+                  href={`/${qrId}${button.href}`}
+                  className="block"
+                >
                   <Button
                     className="w-full h-14 text-lg flex items-center justify-center gap-3"
                     variant={button.variant}
@@ -156,30 +202,30 @@ export function QRCodeView({ qrId, config, userId, tableNumber }: QRCodeViewProp
           </CardContent>
 
           <CardFooter>
-          <CallWaiterBell
+            <CallWaiterBell
               tableNumber={tableNumber}
               tableId={qrId}
               userId={userId}
               restaurantName={config.restaurantInfo.name || config.title}
-            />     
-         </CardFooter>
+            />
+          </CardFooter>
         </Card>
       </div>
     </div>
-  )
+  );
 }
 
 function getButtonIcon(label: string) {
   switch (label.toLowerCase()) {
     case "restaurant menu":
-      return <UtensilsCrossed className="w-5 h-5" />
+      return <UtensilsCrossed className="w-5 h-5" />;
     case "submit review":
-      return <Star className="w-5 h-5" />
+      return <Star className="w-5 h-5" />;
     case "submit complaint":
-      return <MessageSquare className="w-5 h-5" />
+      return <MessageSquare className="w-5 h-5" />;
     case "view orders":
-      return <ScreenShare className="w-5 h-5" />
+      return <ScreenShare className="w-5 h-5" />;
     default:
-      return null
+      return null;
   }
 }

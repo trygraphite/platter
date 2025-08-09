@@ -1,7 +1,7 @@
-import { formatNaira } from "@/utils";
 import { Button } from "@platter/ui/components/button";
 import type React from "react";
 import { useState } from "react";
+import { formatNaira } from "@/utils";
 
 type VarietyWithWeight = {
   _id: string;

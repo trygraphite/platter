@@ -18,7 +18,7 @@ interface VerifyEmailProps {
   url: string;
 }
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+const _baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 export const VerifyUserEmail = ({ email, url }: VerifyEmailProps) => {
   const previewText = "Verify your email address";

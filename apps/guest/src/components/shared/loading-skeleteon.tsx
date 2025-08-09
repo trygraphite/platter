@@ -1,5 +1,5 @@
+import { Card, CardContent, CardHeader } from "@platter/ui/components/card";
 import { Skeleton } from "@platter/ui/components/skeleton";
-import { Card, CardHeader, CardContent } from "@platter/ui/components/card";
 
 export default function Loading() {
   return (

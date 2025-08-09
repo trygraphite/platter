@@ -1,21 +1,21 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Button } from "@platter/ui/components/button";
 import {
   Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
 } from "@platter/ui/components/card";
 import { Label } from "@platter/ui/components/label";
-import { Textarea } from "@platter/ui/components/textarea";
-import { Button } from "@platter/ui/components/button";
-import { createReview } from "@/app/actions/create-review";
 import { toast } from "@platter/ui/components/sonner";
+import { Textarea } from "@platter/ui/components/textarea";
 import { Star } from "@platter/ui/lib/icons";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { createReview } from "@/app/actions/create-review";
 
 interface ReviewPageProps {
   qrId: string;
@@ -49,7 +49,7 @@ export function ReviewPage({
     setIsSubmitting(true);
 
     try {
-      const response = await createReview(
+      const _response = await createReview(
         userId,
         qrId,
         tableId,
@@ -62,12 +62,11 @@ export function ReviewPage({
         duration: 2000,
         onAutoClose: () => {
           router.push(`/${qrId}`);
-        }
+        },
       });
       setTimeout(() => {
         router.push(`/${qrId}`);
       });
-      
     } catch (error) {
       console.error("Error submitting review:", error);
       toast.error(

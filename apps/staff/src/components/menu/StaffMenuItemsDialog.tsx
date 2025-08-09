@@ -131,7 +131,7 @@ export function StaffMenuItemsDialog({
   };
 
   // Placeholder components for image loading
-  const ImageLoadingPlaceholder = () => (
+  const _ImageLoadingPlaceholder = () => (
     <div className="w-28 h-28 bg-gray-200 animate-pulse rounded-lg" />
   );
 

@@ -1,7 +1,7 @@
+import db from "@platter/db";
 import OrderPageClient from "@/components/modules/orders/order-page";
 import getServerSession from "@/lib/auth/server";
 import type { PaginatedResponse } from "@/types/pagniation";
-import db from "@platter/db";
 
 export default async function OrdersTemplate() {
   const session = await getServerSession();
@@ -45,7 +45,7 @@ export default async function OrdersTemplate() {
       : "N/A",
   }));
 
-  const paginatedOrders: PaginatedResponse<(typeof ordersWithTableNumber)[0]> =
+  const _paginatedOrders: PaginatedResponse<(typeof ordersWithTableNumber)[0]> =
     {
       data: ordersWithTableNumber,
       meta: {

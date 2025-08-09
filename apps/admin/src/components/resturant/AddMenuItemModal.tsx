@@ -1,7 +1,5 @@
 "use client";
 
-import { useRestaurant } from "@/context/resturant-context";
-import { getServicePoints } from "@/lib/actions/get-service-points";
 import { Button } from "@platter/ui/components/button";
 import { Checkbox } from "@platter/ui/components/checkbox";
 import {
@@ -20,8 +18,10 @@ import {
   SelectValue,
 } from "@platter/ui/components/select";
 import { Textarea } from "@platter/ui/components/textarea";
-import { MoveDown, MoveUp, Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useRestaurant } from "@/context/resturant-context";
+import { getServicePoints } from "@/lib/actions/get-service-points";
 
 interface AddMenuItemModalProps {
   isOpen: boolean;

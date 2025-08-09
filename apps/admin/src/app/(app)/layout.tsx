@@ -1,21 +1,20 @@
-"use client"
+"use client";
 
-import { AppSidebar } from "@/components/navigation/app-sidebar";
-import DynamicBreadcrumb from "@/components/navigation/dynamic-breadcrumb";
-import { NotificationCenter } from "@/components/navigation/notification-alert";
-import GlobalLoading from "@/components/shared/global-loader";
-import { ToastProvider } from "@/context/toast-context";
-import { useSession } from "@/lib/auth/client";
 import { Separator } from "@platter/ui/components/separator";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
 } from "@platter/ui/components/sidebar";
-
+import { AppSidebar } from "@/components/navigation/app-sidebar";
+import DynamicBreadcrumb from "@/components/navigation/dynamic-breadcrumb";
+import { NotificationCenter } from "@/components/navigation/notification-alert";
+import { ToastProvider } from "@/context/toast-context";
+import { useSession } from "@/lib/auth/client";
 
 // Get the API URL from environment variables or use a default
-const SERVER_URL = process.env.NEXT_PUBLIC_SOCKET_SERVER_URL || "http://localhost:3002";
+const SERVER_URL =
+  process.env.NEXT_PUBLIC_SOCKET_SERVER_URL || "http://localhost:3002";
 
 export default function AppLayout({
   children,
@@ -24,7 +23,7 @@ export default function AppLayout({
 }>) {
   const { data: session } = useSession();
   const userId = session?.user?.id;
-  
+
   return (
     <ToastProvider>
       <SidebarProvider>
@@ -35,21 +34,18 @@ export default function AppLayout({
               <SidebarTrigger className="-ml-1" />
               <Separator orientation="vertical" className="mr-2 h-4" />
               <DynamicBreadcrumb />
-              
+
               {/* Add notification center to the right side of the header */}
               <div className="ml-auto mr-[10%] flex items-center">
                 {userId && (
-                  <NotificationCenter 
-                    serverUrl={SERVER_URL} 
-                    userId={userId} 
-                  />
+                  <NotificationCenter serverUrl={SERVER_URL} userId={userId} />
                 )}
               </div>
             </div>
           </header>
           <main className="p-4">
-          {/* <GlobalLoading /> */}
-          {children}
+            {/* <GlobalLoading /> */}
+            {children}
           </main>
         </SidebarInset>
       </SidebarProvider>

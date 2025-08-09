@@ -1,6 +1,6 @@
-import { requireAuth } from "@/utils/auth";
 import db from "@platter/db/index";
 import { type NextRequest, NextResponse } from "next/server";
+import { requireAuth } from "@/utils/auth";
 
 export async function PUT(
   request: NextRequest,
@@ -54,7 +54,7 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: { id: string } },
 ) {
   try {

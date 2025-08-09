@@ -36,17 +36,17 @@
 //     </div>
 //   );
 // }
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function SomePage() {
   const router = useRouter();
 
   useEffect(() => {
-    router.push('/');
-  }, []); 
+    router.push("/");
+  }, [router.push]);
 
   return null;
 }

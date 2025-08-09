@@ -4,8 +4,7 @@
 import { Button } from "@platter/ui/components/button";
 import { Card } from "@platter/ui/components/card";
 import { Download } from "lucide-react";
-import { useEffect, useState } from "react";
-import { QRCodeCanvas } from "./qrCodeCanvas";
+import { useState } from "react";
 import { QRCodeViewCanvas } from "./qrCodeViewCanvas";
 
 interface QRDisplayProps {

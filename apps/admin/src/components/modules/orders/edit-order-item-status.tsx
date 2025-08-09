@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@platter/ui/components/select";
 import { Loader2 } from "lucide-react";
-import React, { useState } from "react";
+import { useState } from "react";
 
 type OrderItemStatus =
   | "PENDING"

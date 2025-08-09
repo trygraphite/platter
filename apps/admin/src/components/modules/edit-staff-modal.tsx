@@ -1,11 +1,5 @@
 "use client";
 
-import {
-  type StaffMember,
-  type UpdateStaffFormData,
-  getStaffById,
-  updateStaff,
-} from "@/lib/actions/manage-staff";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@platter/ui/components/button";
 import {
@@ -30,6 +24,12 @@ import { Switch } from "@platter/ui/components/switch";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import {
+  getStaffById,
+  type StaffMember,
+  type UpdateStaffFormData,
+  updateStaff,
+} from "@/lib/actions/manage-staff";
 
 const editStaffSchema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
@@ -59,7 +59,7 @@ export default function EditStaffModal({
   onSuccess,
 }: EditStaffModalProps) {
   const [loading, setLoading] = useState(false);
-  const [staff, setStaff] = useState<StaffMember | null>(null);
+  const [_staff, setStaff] = useState<StaffMember | null>(null);
   const [initialLoading, setInitialLoading] = useState(false);
 
   const {
@@ -91,7 +91,7 @@ export default function EditStaffModal({
     if (isOpen && staffId) {
       loadStaff();
     }
-  }, [isOpen, staffId]);
+  }, [isOpen, staffId, loadStaff]);
 
   const loadStaff = async () => {
     if (!staffId) return;

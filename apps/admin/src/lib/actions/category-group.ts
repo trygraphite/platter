@@ -19,7 +19,11 @@ export async function createCategoryGroup(userId: string, data: any) {
   }
 }
 
-export async function updateCategoryGroup(userId: string, groupId: string, data: any) {
+export async function updateCategoryGroup(
+  userId: string,
+  groupId: string,
+  data: any,
+) {
   try {
     const categoryGroup = await db.categoryGroup.update({
       where: {
@@ -56,7 +60,7 @@ export async function deleteCategoryGroup(userId: string, groupId: string) {
         userId, // Security check
       },
     });
-    
+
     revalidatePath("/categories");
     return { success: true, categoryGroup };
   } catch (error) {
@@ -65,7 +69,11 @@ export async function deleteCategoryGroup(userId: string, groupId: string) {
   }
 }
 
-export async function assignCategoryToGroup(userId: string, categoryId: string, groupId: string | null) {
+export async function assignCategoryToGroup(
+  userId: string,
+  categoryId: string,
+  groupId: string | null,
+) {
   try {
     const category = await db.category.update({
       where: {
@@ -76,7 +84,7 @@ export async function assignCategoryToGroup(userId: string, categoryId: string, 
         groupId,
       },
     });
-    
+
     revalidatePath("/categories");
     return { success: true, category };
   } catch (error) {

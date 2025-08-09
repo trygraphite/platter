@@ -41,7 +41,7 @@ export async function updateRestaurantAction(
     return {
       success: true,
     };
-  } catch (error) {
+  } catch (_error) {
     return {
       success: false,
       error: "Failed to update restaurant details",

@@ -1,30 +1,31 @@
 {
-  "name": "platter",
-  "version": "0.0.1",
-  "private": true,
-  "scripts": {
-    "build": "turbo build",
-    "dev": "turbo dev",
-    "lint": "turbo lint",
-    "format": "biome format --write .",
-    "format-and-lint:fix": "biome check . --write",
-    "web:dev": "turbo dev --filter=web",
-    "admin:dev": "turbo dev --filter=admin",
-    "guest:dev": "turbo dev --filter=guest",
-    "server:dev": "turbo dev --filter=server",
-    "staff:dev": "turbo dev --filter=staff",
-    "db:generate": "turbo run db:generate --filter=@platter/db",
-    "db:push": "turbo run db:push --filter=@platter/db"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "^1.9.4",
-    "@platter/tsconfig": "workspace:*",
-    "prettier": "^3.2.5",
-    "turbo": "^2.3.0",
-    "typescript": "5.5.4"
-  },
-  "packageManager": "pnpm@9.12.3",
-  "engines": {
-    "node": ">=20"
-  }
+	"name": "platter",
+	"version": "0.0.1",
+	"private": true,
+	"scripts": {
+		"build": "turbo build",
+		"dev": "turbo dev",
+		"lint": "turbo lint",
+		"format": "biome format --write apps packages",
+		"format-and-lint:fix": "biome check apps packages --write --unsafe",
+		"format-and-lint:check": "biome ci apps packages",
+		"web:dev": "turbo dev --filter=web",
+		"admin:dev": "turbo dev --filter=admin",
+		"guest:dev": "turbo dev --filter=guest",
+		"server:dev": "turbo dev --filter=server",
+		"staff:dev": "turbo dev --filter=staff",
+		"db:generate": "turbo run db:generate --filter=@platter/db",
+		"db:push": "turbo run db:push --filter=@platter/db"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.1.4",
+		"@platter/tsconfig": "workspace:*",
+		"prettier": "^3.2.5",
+		"turbo": "^2.3.0",
+		"typescript": "5.5.4"
+	},
+	"packageManager": "pnpm@10.13.1",
+	"engines": {
+		"node": ">=20"
+	}
 }

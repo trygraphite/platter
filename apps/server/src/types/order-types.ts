@@ -1,5 +1,5 @@
 export type OrderUpdateData = {
-  status?: 'PENDING' | 'CONFIRMED' | 'PREPARING' | 'DELIVERED' | 'CANCELLED';
+  status?: "PENDING" | "CONFIRMED" | "PREPARING" | "DELIVERED" | "CANCELLED";
   tableId?: string;
   specialNotes?: string;
 };
@@ -8,6 +8,5 @@ export type CreateOrderInput = {
   tableId?: string;
   items: { menuItemId: string; quantity: number }[];
   specialNotes?: string;
-    order: any
-
+  order: any;
 };

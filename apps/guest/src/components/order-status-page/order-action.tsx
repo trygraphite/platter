@@ -1,4 +1,3 @@
-import { cancelOrder } from "@/app/actions/cancel-order";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,6 +16,7 @@ import { Edit, RefreshCcw, XCircle } from "@platter/ui/lib/icons";
 import { OrderStatus } from "@prisma/client";
 // components/order/OrderActions.tsx
 import { useState } from "react";
+import { cancelOrder } from "@/app/actions/cancel-order";
 
 interface OrderActionsProps {
   orderId: string;
@@ -77,14 +77,14 @@ export function OrderActions({
       } else {
         toast.error(result.error || "Failed to cancel order");
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error("An error occurred while cancelling the order");
     } finally {
       setIsCancelling(false);
     }
   };
 
-  const handleOrderModified = (updatedOrder: any) => {
+  const _handleOrderModified = (updatedOrder: any) => {
     // Update local state with the modified order
     onStatusChange(updatedOrder.status);
 
@@ -112,79 +112,77 @@ export function OrderActions({
     status === OrderStatus.PENDING || status === OrderStatus.CONFIRMED;
 
   return (
-    <>
-      <div className="flex justify-between gap-2 p-6">
-        {canModify && (
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="destructive" disabled={isCancelling}>
-                {isCancelling ? (
-                  <>
-                    <RefreshCcw className="mr-2 h-4 w-4 animate-spin" />
-                    Cancelling...
-                  </>
-                ) : (
-                  <>
-                    <XCircle className="mr-2 h-4 w-4" />
-                    Cancel Order
-                  </>
-                )}
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>
-                  Are you sure you want to cancel this order?
-                </AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. Your order will be cancelled and
-                  you will need to place a new order if you change your mind.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>No, keep my order</AlertDialogCancel>
-                <AlertDialogAction onClick={handleCancelOrder}>
-                  Yes, cancel my order
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        )}
+    <div className="flex justify-between gap-2 p-6">
+      {canModify && (
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="destructive" disabled={isCancelling}>
+              {isCancelling ? (
+                <>
+                  <RefreshCcw className="mr-2 h-4 w-4 animate-spin" />
+                  Cancelling...
+                </>
+              ) : (
+                <>
+                  <XCircle className="mr-2 h-4 w-4" />
+                  Cancel Order
+                </>
+              )}
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                Are you sure you want to cancel this order?
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. Your order will be cancelled and
+                you will need to place a new order if you change your mind.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>No, keep my order</AlertDialogCancel>
+              <AlertDialogAction onClick={handleCancelOrder}>
+                Yes, cancel my order
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
 
-        {canModify ? (
-          <Button
-            variant="outline"
-            onClick={() => {
-              // Store the complete order data for modification
-              const orderData = {
-                orderId: order.id,
-                order: order, // Store the complete order object
-                specialNotes: order.specialNotes,
-                totalAmount: order.totalAmount,
-              };
+      {canModify ? (
+        <Button
+          variant="outline"
+          onClick={() => {
+            // Store the complete order data for modification
+            const orderData = {
+              orderId: order.id,
+              order: order, // Store the complete order object
+              specialNotes: order.specialNotes,
+              totalAmount: order.totalAmount,
+            };
 
-              // Store order data in sessionStorage for menu page to access
-              sessionStorage.setItem(
-                "modifyOrderData",
-                JSON.stringify(orderData),
-              );
-              onNavigate(`/${qrId}/menu`);
-            }}
-            className="flex-1"
-          >
-            <Edit className="mr-2 h-4 w-4" />
-            Modify Order
-          </Button>
-        ) : (
-          <Button
-            variant="outline"
-            onClick={() => onNavigate(`/${qrId}/menu`)}
-            className="flex-1"
-          >
-            Place Another Order
-          </Button>
-        )}
-      </div>
-    </>
+            // Store order data in sessionStorage for menu page to access
+            sessionStorage.setItem(
+              "modifyOrderData",
+              JSON.stringify(orderData),
+            );
+            onNavigate(`/${qrId}/menu`);
+          }}
+          className="flex-1"
+        >
+          <Edit className="mr-2 h-4 w-4" />
+          Modify Order
+        </Button>
+      ) : (
+        <Button
+          variant="outline"
+          onClick={() => onNavigate(`/${qrId}/menu`)}
+          className="flex-1"
+        >
+          Place Another Order
+        </Button>
+      )}
+    </div>
   );
 }

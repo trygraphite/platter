@@ -1,15 +1,20 @@
 "use client";
 
-import React from "react";
+import { Button } from "@platter/ui/components/button";
 import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  useReactTable,
-  SortingState,
-  getSortedRowModel,
-} from "@tanstack/react-table";
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@platter/ui/components/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@platter/ui/components/select";
 import {
   Table,
   TableBody,
@@ -18,21 +23,16 @@ import {
   TableHeader,
   TableRow,
 } from "@platter/ui/components/table";
-import { Button } from "@platter/ui/components/button";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@platter/ui/components/select";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@platter/ui/components/card";
+  type ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  type SortingState,
+  useReactTable,
+} from "@tanstack/react-table";
+import React from "react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -61,9 +61,9 @@ export function DataTable<TData, TValue>({
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
   // If pagination is disabled and maxItems is set, limit the data
-  const displayData = React.useMemo(() => 
-    !showPagination && maxItems ? data.slice(0, maxItems) : data,
-    [data, showPagination, maxItems]
+  const displayData = React.useMemo(
+    () => (!showPagination && maxItems ? data.slice(0, maxItems) : data),
+    [data, showPagination, maxItems],
   );
 
   // Memoize the table configuration to improve performance
@@ -72,7 +72,9 @@ export function DataTable<TData, TValue>({
       data: displayData,
       columns,
       getCoreRowModel: getCoreRowModel(),
-      getPaginationRowModel: showPagination ? getPaginationRowModel() : undefined,
+      getPaginationRowModel: showPagination
+        ? getPaginationRowModel()
+        : undefined,
       onSortingChange: setSorting,
       getSortedRowModel: getSortedRowModel(),
       state: {
@@ -84,7 +86,7 @@ export function DataTable<TData, TValue>({
         },
       },
     }),
-    [columns, displayData, pageSize, showPagination, sorting]
+    [columns, displayData, pageSize, showPagination, sorting],
   );
 
   const table = useReactTable(tableConfig);
@@ -109,7 +111,7 @@ export function DataTable<TData, TValue>({
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                     </TableHead>
                   ))}
@@ -125,14 +127,20 @@ export function DataTable<TData, TValue>({
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id} className="text-left pl-5">
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
                       </TableCell>
                     ))}
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={columns.length} className="h-24 text-center">
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
                     No results.
                   </TableCell>
                 </TableRow>
@@ -140,7 +148,7 @@ export function DataTable<TData, TValue>({
             </TableBody>
           </Table>
         </div>
-        
+
         {showPagination && (
           <div className="flex items-center justify-between space-x-2 py-4">
             {showPageSizeSelector && (
@@ -156,7 +164,9 @@ export function DataTable<TData, TValue>({
                   }}
                 >
                   <SelectTrigger className="h-8 w-[70px]">
-                    <SelectValue placeholder={table.getState().pagination.pageSize} />
+                    <SelectValue
+                      placeholder={table.getState().pagination.pageSize}
+                    />
                   </SelectTrigger>
                   <SelectContent side="top">
                     {[5, 10, 20, 30, 40, 50].map((size) => (

@@ -1,12 +1,4 @@
 "use client";
-import React from "react";
-import {
-  Bar,
-  BarChart,
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-} from "@platter/ui/lib/charts";
 import {
   Card,
   CardContent,
@@ -19,6 +11,14 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@platter/ui/components/chart";
+import {
+  Bar,
+  BarChart,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+} from "@platter/ui/lib/charts";
+import React from "react";
 
 interface RatingsDistributionProps extends React.ComponentProps<typeof Card> {
   reviews: Array<{ rating: number }>;

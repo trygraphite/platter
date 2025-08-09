@@ -1,6 +1,5 @@
 "use client";
 
-import { useRestaurant } from "@/context/resturant-context";
 import { Button } from "@platter/ui/components/button";
 import {
   Dialog,
@@ -10,16 +9,17 @@ import {
 } from "@platter/ui/components/dialog";
 import { Input } from "@platter/ui/components/input";
 import { Label } from "@platter/ui/components/label";
-import { Textarea } from "@platter/ui/components/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "@platter/ui/components/select";
+import { Textarea } from "@platter/ui/components/textarea";
 import type { Category } from "@prisma/client";
 import { useEffect, useState } from "react";
+import { useRestaurant } from "@/context/resturant-context";
 
 interface EditCategoryModalProps {
   isOpen: boolean;
@@ -35,11 +35,16 @@ export function EditCategoryModal({
   const [name, setName] = useState(category.name);
   const [description, setDescription] = useState(category.description || "");
   const [image, setImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(category.image || null);
-  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(category.groupId || null);
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    category.image || null,
+  );
+  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(
+    category.groupId || null,
+  );
   const [isLoading, setIsLoading] = useState(false);
-  
-  const { handleUpdateCategory, handleAssignCategoryToGroup, categoryGroups } = useRestaurant();
+
+  const { handleUpdateCategory, handleAssignCategoryToGroup, categoryGroups } =
+    useRestaurant();
 
   useEffect(() => {
     setName(category.name);
@@ -50,7 +55,7 @@ export function EditCategoryModal({
   }, [category]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
+    if (e.target.files?.[0]) {
       const file = e.target.files[0];
       setImage(file);
       setImagePreview(URL.createObjectURL(file));
@@ -60,26 +65,26 @@ export function EditCategoryModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     try {
       const formData = new FormData();
       formData.append("name", name);
       formData.append("description", description);
-      
+
       if (image) {
         formData.append("image", image);
       } else if (imagePreview) {
         // If there's an existing image but no new upload
         formData.append("existingImage", imagePreview);
       }
-      
+
       await handleUpdateCategory(category.id, formData);
-      
+
       // Update category group assignment if changed
       if (selectedGroupId !== category.groupId) {
         await handleAssignCategoryToGroup(category.id, selectedGroupId);
       }
-      
+
       onClose();
     } catch (error) {
       console.error("Error updating category:", error);
@@ -122,10 +127,10 @@ export function EditCategoryModal({
             />
             {imagePreview && (
               <div className="mt-2">
-                <img 
-                  src={imagePreview} 
-                  alt={name} 
-                  className="max-w-full h-32 object-cover rounded-md" 
+                <img
+                  src={imagePreview}
+                  alt={name}
+                  className="max-w-full h-32 object-cover rounded-md"
                 />
               </div>
             )}
@@ -135,9 +140,11 @@ export function EditCategoryModal({
           </div>
           <div>
             <Label htmlFor="categoryGroup">Category Group</Label>
-            <Select 
+            <Select
               value={selectedGroupId || "none"}
-              onValueChange={(value) => setSelectedGroupId(value === "none" ? null : value)}
+              onValueChange={(value) =>
+                setSelectedGroupId(value === "none" ? null : value)
+              }
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select a group" />
@@ -145,12 +152,14 @@ export function EditCategoryModal({
               <SelectContent>
                 <SelectItem value="none">None (Ungrouped)</SelectItem>
                 {categoryGroups.map((group) => (
-                  <SelectItem key={group.id} value={group.id}>{group.name}</SelectItem>
+                  <SelectItem key={group.id} value={group.id}>
+                    {group.name}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
-          <Button 
+          <Button
             type="submit"
             disabled={isLoading}
             className={isLoading ? "opacity-70 cursor-not-allowed" : ""}

@@ -1,7 +1,4 @@
 "use client";
-import React from 'react';
-import { LabelList, Pie, PieChart, } from '@platter/ui/lib/charts';
-import { TrendingUp } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -11,11 +8,13 @@ import {
   CardTitle,
 } from "@platter/ui/components/card";
 import {
-  ChartConfig,
+  type ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from "@platter/ui/components/chart";
+import { LabelList, Pie, PieChart } from "@platter/ui/lib/charts";
+import { TrendingUp } from "lucide-react";
 
 interface Review {
   id: string;
@@ -36,15 +35,18 @@ interface FeedbackPieChartProps {
   complaints: Complaint[] | undefined;
 }
 
-const FeedbackPieChart = ({ reviews = [], complaints = [] }: FeedbackPieChartProps) => {
+const FeedbackPieChart = ({
+  reviews = [],
+  complaints = [],
+}: FeedbackPieChartProps) => {
   const totalReviews = reviews?.length || 0;
   const totalComplaints = complaints?.length || 0;
-  
+
   const chartData = [
-    { name: 'Reviews', value: totalReviews, fill: "hsl(var(--chart-1))" },
-    { name: 'Complaints', value: totalComplaints, fill: "hsl(var(--chart-2))" },
+    { name: "Reviews", value: totalReviews, fill: "hsl(var(--chart-1))" },
+    { name: "Complaints", value: totalComplaints, fill: "hsl(var(--chart-2))" },
   ];
-  
+
   const chartConfig = {
     value: {
       label: "Count",
@@ -58,7 +60,7 @@ const FeedbackPieChart = ({ reviews = [], complaints = [] }: FeedbackPieChartPro
       color: "hsl(var(--chart-2))",
     },
   } satisfies ChartConfig;
-  
+
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
@@ -71,11 +73,9 @@ const FeedbackPieChart = ({ reviews = [], complaints = [] }: FeedbackPieChartPro
           className="mx-auto aspect-square max-h-[250px] [&_.recharts-text]:fill-background"
         >
           <PieChart>
-            <ChartTooltip
-              content={<ChartTooltipContent nameKey="value" />}
-            />
-            <Pie 
-              data={chartData} 
+            <ChartTooltip content={<ChartTooltipContent nameKey="value" />} />
+            <Pie
+              data={chartData}
               dataKey="value"
               nameKey="name"
               cx="50%"
@@ -98,12 +98,12 @@ const FeedbackPieChart = ({ reviews = [], complaints = [] }: FeedbackPieChartPro
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="flex items-center gap-2 font-medium leading-none">
           Total Feedback: {totalReviews + totalComplaints}
-          {totalReviews > totalComplaints && 
+          {totalReviews > totalComplaints && (
             <div className="flex items-center text-green-600">
               <TrendingUp className="h-4 w-4 ml-2" />
               More positive feedback
             </div>
-          }
+          )}
         </div>
         <div className="leading-none text-muted-foreground">
           Showing distribution between reviews and complaints

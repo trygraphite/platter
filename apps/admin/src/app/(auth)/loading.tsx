@@ -1,6 +1,6 @@
 // app/loading.tsx (for root level) or app/dashboard/loading.tsx (for specific routes)
 
-import { Loader2, CheckCircle2 } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 
 export default function AuthLoading() {
   return (
@@ -12,7 +12,9 @@ export default function AuthLoading() {
         </div>
         <div className="text-center">
           <h3 className="text-lg font-semibold text-foreground">Loading...</h3>
-          <p className="text-sm text-muted-foreground mt-1">Please wait a moment...</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            Please wait a moment...
+          </p>
         </div>
       </div>
     </div>

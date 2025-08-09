@@ -1,6 +1,6 @@
-import getServerSession from "@/lib/auth/server";
 import db from "@platter/db";
 import { NextResponse } from "next/server";
+import getServerSession from "@/lib/auth/server";
 
 export async function GET() {
   try {
@@ -47,7 +47,7 @@ export async function GET() {
         seatingCapacity: user.seatingCapacity,
       },
     });
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

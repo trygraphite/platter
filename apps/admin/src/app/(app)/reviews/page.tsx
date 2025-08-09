@@ -1,10 +1,11 @@
-import ReviewsPage from '@/components/modules/reviews/review-template'
-import React from 'react'
+import ReviewsPage from "@/components/modules/reviews/review-template";
 
 const page = () => {
   return (
-    <div><ReviewsPage/></div>
-  )
-}
+    <div>
+      <ReviewsPage />
+    </div>
+  );
+};
 
-export default page
+export default page;

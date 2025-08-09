@@ -1,7 +1,6 @@
 "use server";
 
 import db from "@platter/db";
-import { revalidatePath } from "next/cache";
 
 interface CreateOrderParams {
   userId: string;

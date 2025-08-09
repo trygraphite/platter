@@ -1,22 +1,31 @@
 // app/api/support/route.ts
-import { Resend } from 'resend';
-import { type NextRequest, NextResponse } from 'next/server';
-import { cleanupRateLimit, isRateLimited, RATE_LIMIT } from '@/app/lib/rateLimit';
+
+import { type NextRequest, NextResponse } from "next/server";
+import { Resend } from "resend";
+import {
+  cleanupRateLimit,
+  isRateLimited,
+  RATE_LIMIT,
+} from "@/app/lib/rateLimit";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Support-specific rate limit key function with prefix
-function getSupportRateLimitKey(ip: string, type: 'ip' | 'email', identifier?: string): string {
-  return type === 'ip' ? `support:ip:${ip}` : `support:email:${identifier}`;
+function getSupportRateLimitKey(
+  ip: string,
+  type: "ip" | "email",
+  identifier?: string,
+): string {
+  return type === "ip" ? `support:ip:${ip}` : `support:email:${identifier}`;
 }
 
 function getClientIP(request: NextRequest): string {
   // Check various headers for the real IP
-  const forwarded = request.headers.get('x-forwarded-for');
-  const realIP = request.headers.get('x-real-ip');
-  const cfConnectingIP = request.headers.get('cf-connecting-ip');
-  
-  return realIP || cfConnectingIP || 'unknown';
+  const _forwarded = request.headers.get("x-forwarded-for");
+  const realIP = request.headers.get("x-real-ip");
+  const cfConnectingIP = request.headers.get("cf-connecting-ip");
+
+  return realIP || cfConnectingIP || "unknown";
 }
 
 function validateEmail(email: string): boolean {
@@ -26,7 +35,7 @@ function validateEmail(email: string): boolean {
 
 function validatePhone(phone: string): boolean {
   // Allow various phone formats, optional field
-  const phoneRegex = /^[\+]?[\d\s\-\(\)]{7,20}$/;
+  const phoneRegex = /^[+]?[\d\s\-()]{7,20}$/;
   return phoneRegex.test(phone);
 }
 
@@ -37,83 +46,86 @@ function sanitizeInput(input: string, maxLength: number = 500): string {
 export async function POST(request: NextRequest) {
   try {
     const clientIP = getClientIP(request);
-    
+
     // Rate limit by IP
-    const ipKey = getSupportRateLimitKey(clientIP, 'ip');
+    const ipKey = getSupportRateLimitKey(clientIP, "ip");
     if (isRateLimited(ipKey, RATE_LIMIT.maxRequests, RATE_LIMIT.windowMs)) {
       return NextResponse.json(
-        { 
-          error: 'Too many support requests. Please try again later.',
-          retryAfter: Math.ceil(RATE_LIMIT.windowMs / 1000 / 60) // minutes
-        }, 
-        { 
+        {
+          error: "Too many support requests. Please try again later.",
+          retryAfter: Math.ceil(RATE_LIMIT.windowMs / 1000 / 60), // minutes
+        },
+        {
           status: 429,
           headers: {
-            'Retry-After': String(Math.ceil(RATE_LIMIT.windowMs / 1000))
-          }
-        }
+            "Retry-After": String(Math.ceil(RATE_LIMIT.windowMs / 1000)),
+          },
+        },
       );
     }
 
     const body = await request.json();
     const { name, email, phone, subject, message } = body;
-    
+
     // Validate required fields
     if (!name || !email || !message) {
       return NextResponse.json(
-        { error: 'Name, email, and message are required' }, 
-        { status: 400 }
+        { error: "Name, email, and message are required" },
+        { status: 400 },
       );
     }
 
     // Validate email format
     if (!validateEmail(email)) {
       return NextResponse.json(
-        { error: 'Invalid email format' }, 
-        { status: 400 }
+        { error: "Invalid email format" },
+        { status: 400 },
       );
     }
 
     // Validate phone if provided
     if (phone && !validatePhone(phone)) {
       return NextResponse.json(
-        { error: 'Invalid phone number format' }, 
-        { status: 400 }
+        { error: "Invalid phone number format" },
+        { status: 400 },
       );
     }
 
     // Sanitize inputs
     const sanitizedName = sanitizeInput(name, 100);
     const sanitizedEmail = email.toLowerCase().trim();
-    const sanitizedPhone = phone ? sanitizeInput(phone, 20) : '';
-    const sanitizedSubject = subject ? sanitizeInput(subject, 200) : '';
+    const sanitizedPhone = phone ? sanitizeInput(phone, 20) : "";
+    const sanitizedSubject = subject ? sanitizeInput(subject, 200) : "";
     const sanitizedMessage = sanitizeInput(message, 2000);
 
     // Additional validation for message length
     if (sanitizedMessage.length < 10) {
       return NextResponse.json(
-        { error: 'Message must be at least 10 characters long' }, 
-        { status: 400 }
+        { error: "Message must be at least 10 characters long" },
+        { status: 400 },
       );
     }
 
     // Rate limit by email
-    const emailKey = getSupportRateLimitKey(clientIP, 'email', sanitizedEmail);
-    if (isRateLimited(emailKey, RATE_LIMIT.maxPerEmail, RATE_LIMIT.emailWindowMs)) {
+    const emailKey = getSupportRateLimitKey(clientIP, "email", sanitizedEmail);
+    if (
+      isRateLimited(emailKey, RATE_LIMIT.maxPerEmail, RATE_LIMIT.emailWindowMs)
+    ) {
       return NextResponse.json(
-        { 
-          error: 'This email has already submitted a support request recently. Please try again tomorrow.',
-          retryAfter: Math.ceil(RATE_LIMIT.emailWindowMs / 1000 / 60 / 60) // hours
-        }, 
-        { status: 429 }
+        {
+          error:
+            "This email has already submitted a support request recently. Please try again tomorrow.",
+          retryAfter: Math.ceil(RATE_LIMIT.emailWindowMs / 1000 / 60 / 60), // hours
+        },
+        { status: 429 },
       );
     }
 
     // Send email to support team
     await resend.emails.send({
-      from: 'noreply@platterng.com',
-      to: 'ibrahimdoba55@gmail.com',
-      subject: `Support Request: ${sanitizedSubject || 'General Inquiry'}`,
+      from: "noreply@platterng.com",
+      to: "ibrahimdoba55@gmail.com",
+      subject: `Support Request: ${sanitizedSubject || "General Inquiry"}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #333; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;">
@@ -124,8 +136,8 @@ export async function POST(request: NextRequest) {
             <h3 style="margin-top: 0; color: #555;">Contact Information</h3>
             <p><strong>Name:</strong> ${sanitizedName}</p>
             <p><strong>Email:</strong> ${sanitizedEmail}</p>
-            ${sanitizedPhone ? `<p><strong>Phone:</strong> ${sanitizedPhone}</p>` : ''}
-            <p><strong>Subject:</strong> ${sanitizedSubject || 'General Inquiry'}</p>
+            ${sanitizedPhone ? `<p><strong>Phone:</strong> ${sanitizedPhone}</p>` : ""}
+            <p><strong>Subject:</strong> ${sanitizedSubject || "General Inquiry"}</p>
             <p><strong>IP Address:</strong> ${clientIP}</p>
             <p><strong>Submitted:</strong> ${new Date().toLocaleString()}</p>
           </div>
@@ -140,19 +152,19 @@ export async function POST(request: NextRequest) {
               <strong>Quick Actions:</strong><br>
               • Reply directly to this email to respond to the customer<br>
               • Customer email: <a href="mailto:${sanitizedEmail}" style="color: #0066cc;">${sanitizedEmail}</a><br>
-              ${sanitizedPhone ? `• Customer phone: <a href="tel:${sanitizedPhone}" style="color: #0066cc;">${sanitizedPhone}</a><br>` : ''}
-              ${sanitizedPhone ? `• WhatsApp: <a href="https://wa.me/${sanitizedPhone.replace(/\D/g, '')}" style="color: #0066cc;">Send WhatsApp message</a>` : ''}
+              ${sanitizedPhone ? `• Customer phone: <a href="tel:${sanitizedPhone}" style="color: #0066cc;">${sanitizedPhone}</a><br>` : ""}
+              ${sanitizedPhone ? `• WhatsApp: <a href="https://wa.me/${sanitizedPhone.replace(/\D/g, "")}" style="color: #0066cc;">Send WhatsApp message</a>` : ""}
             </p>
           </div>
         </div>
-      `
+      `,
     });
 
     // Send confirmation email to customer
     await resend.emails.send({
-      from: 'support@platterng.com',
+      from: "support@platterng.com",
       to: sanitizedEmail,
-      subject: 'We received your message - Platter Support',
+      subject: "We received your message - Platter Support",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #333;">Thank you for contacting us!</h2>
@@ -163,7 +175,7 @@ export async function POST(request: NextRequest) {
           
           <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h3 style="margin-top: 0;">Your Request Details:</h3>
-            <p><strong>Subject:</strong> ${sanitizedSubject || 'General Inquiry'}</p>
+            <p><strong>Subject:</strong> ${sanitizedSubject || "General Inquiry"}</p>
             <p><strong>Submitted:</strong> ${new Date().toLocaleString()}</p>
           </div>
           
@@ -187,22 +199,24 @@ export async function POST(request: NextRequest) {
             <strong>Platter Support Team</strong>
           </p>
         </div>
-      `
+      `,
     });
 
     // Clean up old rate limit entries (now calls internal function)
     cleanupRateLimit();
-    
-    return NextResponse.json({ 
+
+    return NextResponse.json({
       success: true,
-      message: 'Support request sent successfully'
+      message: "Support request sent successfully",
     });
-    
   } catch (error) {
-    console.error('Support email error:', error);
+    console.error("Support email error:", error);
     return NextResponse.json(
-      { error: 'Failed to send support request. Please try again or contact us directly.' }, 
-      { status: 500 }
+      {
+        error:
+          "Failed to send support request. Please try again or contact us directly.",
+      },
+      { status: 500 },
     );
   }
 }

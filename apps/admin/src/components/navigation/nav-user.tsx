@@ -1,14 +1,6 @@
 "use client";
 
 import {
-  BadgeCheck,
-  Bell,
-  ChevronsUpDown,
-  CreditCard,
-  LogOut,
-} from "lucide-react";
-import { signOut } from "@/lib/auth/client";
-import {
   Avatar,
   AvatarFallback,
   AvatarImage,
@@ -16,7 +8,6 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -28,7 +19,9 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@platter/ui/components/sidebar";
+import { ChevronsUpDown, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { signOut } from "@/lib/auth/client";
 
 export function NavUser({ user }: { user: any }) {
   const { isMobile } = useSidebar();

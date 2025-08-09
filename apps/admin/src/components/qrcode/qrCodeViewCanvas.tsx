@@ -1,8 +1,8 @@
 "use client";
 
 import { HourglassLoader } from "@platter/ui/components/timeLoader";
-import React, { useEffect, useState } from "react";
 import QRCode from "qrcode"; // You'll need to install this package
+import { useEffect, useState } from "react";
 
 interface QRCodeCanvasProps {
   qrCodeUrl: string; // This is the URL the QR code will link to
@@ -36,7 +36,9 @@ export function QRCodeViewCanvas({
   onImageGenerated,
 }: QRCodeCanvasProps) {
   const [combinedImageUrl, setCombinedImageUrl] = useState<string | null>(null);
-  const [qrCodeImageDataUrl, setQrCodeImageDataUrl] = useState<string | null>(null);
+  const [qrCodeImageDataUrl, setQrCodeImageDataUrl] = useState<string | null>(
+    null,
+  );
 
   // First generate the QR code as a data URL
   useEffect(() => {
@@ -47,8 +49,8 @@ export function QRCodeViewCanvas({
           width: Math.min(width, height) * 0.45,
           margin: 1,
           color: {
-            dark: '#000000',
-            light: '#FFFFFF',
+            dark: "#000000",
+            light: "#FFFFFF",
           },
         });
         setQrCodeImageDataUrl(dataUrl);
@@ -56,14 +58,14 @@ export function QRCodeViewCanvas({
         console.error("Error generating QR code:", err);
       }
     };
-    
+
     generateQrCode();
   }, [qrCodeUrl, width, height]);
 
   // Then combine the QR code with the background
   useEffect(() => {
     if (!qrCodeImageDataUrl) return;
-    
+
     let sketch: any;
 
     const generateCombinedImage = async () => {
@@ -86,7 +88,7 @@ export function QRCodeViewCanvas({
 
           // Text styling constants
           const titleMargin = 30;
-          const qrMargin = 60;
+          const _qrMargin = 60;
           const textBelowMargin = 40;
 
           // Helper function to add text shadow
@@ -112,14 +114,14 @@ export function QRCodeViewCanvas({
             p.fill(255, 255, 255, 250); // Bright white
             p.textSize(32);
             p.textStyle(p.BOLD);
-            
+
             // Strong shadow for restaurant name
             addTextShadow(0.9);
-            
+
             p.text(restaurantName.toUpperCase(), width / 2, currentY);
-            
+
             resetShadow();
-            
+
             currentY += 60;
           }
 
@@ -128,12 +130,12 @@ export function QRCodeViewCanvas({
           p.fill(255, 255, 255, 240);
           p.textSize(24);
           p.textStyle(p.BOLD); // Made bold
-          
+
           // Strong shadow for call-to-action
           addTextShadow(0.8);
-          
+
           p.text("Scan to Place an Order Now!", width / 2, currentY);
-          
+
           resetShadow();
 
           // Calculate QR code position
@@ -181,7 +183,7 @@ export function QRCodeViewCanvas({
           p.fill(255, 255, 255, 250);
           p.textSize(28);
           p.textStyle(p.BOLD); // Made bold
-          
+
           // Strong shadow for location/target text
           addTextShadow(0.8);
 
@@ -196,11 +198,12 @@ export function QRCodeViewCanvas({
             p.textSize(36);
             p.textStyle(p.BOLD);
             p.fill(255, 255, 255, 255); // Pure white
-            
+
             // Extra strong shadow for target ID
             addTextShadow(0.9);
-            
-            const idText = target === "location" ? `TABLE ${targetId}` : targetId;
+
+            const idText =
+              target === "location" ? `TABLE ${targetId}` : targetId;
             p.text(idText, width / 2, infoStartY + 50);
           }
 
@@ -218,11 +221,22 @@ export function QRCodeViewCanvas({
     generateCombinedImage();
 
     return () => sketch?.remove();
-  }, [qrCodeImageDataUrl, width, height, target, targetId, locationName, restaurantName, onImageGenerated]);
+  }, [
+    qrCodeImageDataUrl,
+    width,
+    height,
+    target,
+    targetId,
+    locationName,
+    restaurantName,
+    onImageGenerated,
+  ]);
 
   if (!combinedImageUrl) {
     return (
-      <div><HourglassLoader label="Generating QR Code..."/></div>
+      <div>
+        <HourglassLoader label="Generating QR Code..." />
+      </div>
     );
   }
 

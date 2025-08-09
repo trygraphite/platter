@@ -1,7 +1,7 @@
 "use client";
 
-import { createOrder } from "@/lib/actions/order-actions";
 import type { Table } from "@prisma/client";
+import { createOrder } from "@/lib/actions/order-actions";
 
 interface MenuItemWithServicePoint {
   id: string;
@@ -22,10 +22,6 @@ interface MenuItemWithServicePoint {
     isActive: boolean;
   } | null;
 }
-import { Info, Minus, Plus, Search, X } from "lucide-react";
-import { useRouter } from "next/navigation";
-import type React from "react";
-import { useEffect, useState } from "react";
 
 import { Badge } from "@platter/ui/components/badge";
 import { Button } from "@platter/ui/components/button";
@@ -45,6 +41,10 @@ import {
   SelectValue,
 } from "@platter/ui/components/select";
 import { Separator } from "@platter/ui/components/separator";
+import { Info, Minus, Plus, Search, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import type React from "react";
+import { useEffect, useState } from "react";
 
 interface CreateOrderProps {
   onCancel: () => void;
@@ -79,7 +79,7 @@ export default function CreateOrder({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [orderType, setOrderType] = useState<"TABLE" | "PICKUP">("TABLE");
-  const [lastOrderNumber, setLastOrderNumber] = useState<number>(0);
+  const [_lastOrderNumber, setLastOrderNumber] = useState<number>(0);
 
   const router = useRouter();
 

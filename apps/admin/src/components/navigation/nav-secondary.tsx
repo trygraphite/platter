@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -6,7 +5,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@platter/ui/components/sidebar";
-import { type LucideIcon, ChevronDown } from "lucide-react";
+import { ChevronDown, type LucideIcon } from "lucide-react";
+import { useState } from "react";
 
 export function NavSecondary({
   items,
