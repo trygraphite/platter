@@ -1,25 +1,25 @@
 // components/order/OrderStatusPage.tsx
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import type { Order } from "@prisma/client";
-import { ArrowLeft, AlertTriangle, RefreshCw } from "@platter/ui/lib/icons";
+import type { OrderStatusPageProps } from "@/types/order-status";
 import { Button } from "@platter/ui/components/button";
 import {
   Card,
-  CardHeader,
-  CardTitle,
   CardContent,
   CardFooter,
+  CardHeader,
+  CardTitle,
 } from "@platter/ui/components/card";
-import type { OrderStatusPageProps } from "@/types/order-status";
-import { OrderStatusDisplay } from "./order-status";
-import { OrderDetails } from "./order-details";
-import { OrderActions } from "./order-action";
-import { ReviewModal } from "./review-modal";
-import ErrorCard from "../shared/error-card";
 import useSocketIO from "@platter/ui/hooks/useSocketIO";
+import { AlertTriangle, ArrowLeft, RefreshCw } from "@platter/ui/lib/icons";
+import type { Order } from "@prisma/client";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import ErrorCard from "../shared/error-card";
+import { OrderActions } from "./order-action";
+import { OrderDetails } from "./order-details";
+import { OrderStatusDisplay } from "./order-status";
+import { ReviewModal } from "./review-modal";
 
 export default function OrderStatusPage({
   initialOrder,
@@ -33,13 +33,14 @@ export default function OrderStatusPage({
   const [connectionAttempts, setConnectionAttempts] = useState(0);
   const [connectionFailed, setConnectionFailed] = useState(false);
   const router = useRouter();
-  
+
   // Extract restaurant userId from the order
   const restaurantUserId = initialOrder?.userId;
-  
-  const serverUrl = socketServerUrl || 
-    (typeof window !== 'undefined' ? window.location.origin : '');
-  
+
+  const serverUrl =
+    socketServerUrl ||
+    (typeof window !== "undefined" ? window.location.origin : "");
+
   // Use the socket hook
   const { socket, isConnected, error, connect } = useSocketIO({
     serverUrl,
@@ -56,7 +57,7 @@ export default function OrderStatusPage({
   // Retry connection
   const handleRetryConnection = () => {
     if (socket && !isConnected) {
-      setConnectionAttempts(prev => prev + 1);
+      setConnectionAttempts((prev) => prev + 1);
       setConnectionFailed(false);
       connect();
     }
@@ -75,28 +76,35 @@ export default function OrderStatusPage({
       !order.shownReview
     ) {
       setIsReviewModalOpen(true);
-      
+
       // Update the order's shownReview flag to true via socket
       if (socket && isConnected) {
-        socket.emit('updateOrder', {
+        socket.emit("updateOrder", {
           id: order.id,
-          shownReview: true
+          shownReview: true,
         });
       }
-      
+
       // Also update locally
       setOrder((prev: any) => ({
         ...prev,
-        shownReview: true
+        shownReview: true,
       }));
     }
-  }, [order.status, order.review, order.cancelledAt, order.shownReview, socket, isConnected]);
+  }, [
+    order.status,
+    order.review,
+    order.cancelledAt,
+    order.shownReview,
+    socket,
+    isConnected,
+  ]);
 
   useEffect(() => {
     if (!socket || !isConnected) return;
-    
-    socket.emit('joinOrderRoom', initialOrder.id);
-    
+
+    socket.emit("joinOrderRoom", initialOrder.id);
+
     // Order-specific events
     const handleOrderUpdate = (updatedOrder: Order) => {
       // Only update if this is our order
@@ -104,21 +112,21 @@ export default function OrderStatusPage({
         setOrder(updatedOrder);
       }
     };
-    
+
     const handleOrderDeleted = (deletedId: string) => {
       if (deletedId === initialOrder.id) {
         setTimeout(() => {
-          router.push(`/${qrId}`); 
+          router.push(`/${qrId}`);
         }, 3000);
       }
     };
-    
-    socket.on('orderUpdate', handleOrderUpdate);
-    socket.on('orderDeleted', handleOrderDeleted);
-    
+
+    socket.on("orderUpdate", handleOrderUpdate);
+    socket.on("orderDeleted", handleOrderDeleted);
+
     return () => {
-      socket.off('orderUpdate', handleOrderUpdate);
-      socket.off('orderDeleted', handleOrderDeleted);
+      socket.off("orderUpdate", handleOrderUpdate);
+      socket.off("orderDeleted", handleOrderDeleted);
     };
   }, [socket, isConnected, initialOrder.id, qrId, router]);
 
@@ -128,10 +136,10 @@ export default function OrderStatusPage({
         <div className="flex items-center gap-1 text-xs text-red-600 absolute top-2 right-2">
           <AlertTriangle className="h-3 w-3" />
           <span>Offline</span>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="h-5 w-5 p-0 ml-1" 
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-5 w-5 p-0 ml-1"
             onClick={handleRetryConnection}
           >
             <RefreshCw className="h-3 w-3" />
@@ -158,6 +166,11 @@ export default function OrderStatusPage({
     setIsReviewModalOpen(false);
   };
 
+  // Handle order modification
+  const handleOrderModified = (updatedOrder: any) => {
+    setOrder(updatedOrder);
+  };
+
   // Instead of returning an error screen, we'll show the page but with a notification
   if (error && !connectionFailed) {
     return (
@@ -172,19 +185,21 @@ export default function OrderStatusPage({
             <ArrowLeft className="mr-1 h-3 w-3" />
             <span className="text-xs">Back to Menu</span>
           </Button>
-          
+
           <Card className="mb-3">
             <CardContent className="p-3">
               <div className="flex items-center gap-2 text-red-600">
                 <AlertTriangle className="h-5 w-5" />
                 <div>
                   <p className="font-semibold">Connection Error</p>
-                  <p className="text-sm text-muted-foreground">Unable to connect to real-time updates.</p>
+                  <p className="text-sm text-muted-foreground">
+                    Unable to connect to real-time updates.
+                  </p>
                 </div>
               </div>
-              <Button 
-                className="w-full mt-3" 
-                size="sm" 
+              <Button
+                className="w-full mt-3"
+                size="sm"
                 onClick={handleRetryConnection}
               >
                 <RefreshCw className="mr-2 h-3 w-3" />
@@ -192,10 +207,12 @@ export default function OrderStatusPage({
               </Button>
             </CardContent>
           </Card>
-          
+
           <Card className="relative overflow-hidden">
             <CardHeader className="py-3 px-3">
-              <CardTitle className="text-lg font-medium">Order Status</CardTitle>
+              <CardTitle className="text-lg font-medium">
+                Order Status
+              </CardTitle>
               <p className="text-xs text-muted-foreground">
                 Order #{order.orderNumber}
               </p>
@@ -216,6 +233,7 @@ export default function OrderStatusPage({
                 socketServerUrl={socketServerUrl}
                 restaurantUserId={restaurantUserId}
                 order={order}
+                onOrderModified={handleOrderModified}
               />
             </CardFooter>
           </Card>
@@ -255,14 +273,14 @@ export default function OrderStatusPage({
               <div>
                 <p className="font-semibold">Connection Failed</p>
                 <p className="text-sm text-muted-foreground">
-                  Unable to establish a connection for real-time updates. 
-                  Your order is still valid, but status updates may be delayed.
+                  Unable to establish a connection for real-time updates. Your
+                  order is still valid, but status updates may be delayed.
                 </p>
               </div>
             </div>
-            <Button 
-              className="w-full mt-3" 
-              size="sm" 
+            <Button
+              className="w-full mt-3"
+              size="sm"
               onClick={handleRetryConnection}
             >
               <RefreshCw className="mr-2 h-3 w-3" />
@@ -295,6 +313,7 @@ export default function OrderStatusPage({
               socketServerUrl={socketServerUrl}
               restaurantUserId={restaurantUserId}
               order={order}
+              onOrderModified={handleOrderModified}
             />
           </CardFooter>
         </Card>

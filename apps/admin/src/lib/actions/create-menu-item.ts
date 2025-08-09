@@ -9,19 +9,20 @@ interface CreateMenuItemData {
   image: string | null;
   categoryId: string;
   isAvailable?: boolean;
+  servicePointId?: string | null;
 }
 
 export async function createMenuItem(
-  data: CreateMenuItemData, 
-  varieties: { 
+  data: CreateMenuItemData,
+  userId: string,
+  varieties: {
     name: string;
     description: string | null | undefined;
     price: number;
     position: number;
     isAvailable: boolean;
     isDefault: boolean;
-  }[] = [], 
-  userId: string
+  }[] = [],
 ) {
   if (!data.categoryId || !userId) {
     throw new Error("Category ID and User ID are required");
@@ -35,12 +36,16 @@ export async function createMenuItem(
 
     // Ensure only one variety is marked as default
     if (varieties.length > 0) {
-      const defaultVarieties = varieties.filter(v => v.isDefault);
+      const defaultVarieties = varieties.filter((v) => v.isDefault);
       if (defaultVarieties.length > 1) {
         throw new Error("Only one variety can be marked as default");
       }
       // If no default is set, make the first one default
-      if (defaultVarieties.length === 0 && varieties.length > 0 && varieties[0]) {
+      if (
+        defaultVarieties.length === 0 &&
+        varieties.length > 0 &&
+        varieties[0]
+      ) {
         varieties[0].isDefault = true;
       }
     }
@@ -58,26 +63,43 @@ export async function createMenuItem(
         user: {
           connect: { id: userId },
         },
+        // Connect service point if provided
+        ...(data.servicePointId && {
+          servicePoint: {
+            connect: { id: data.servicePointId },
+          },
+        }),
         // Create varieties if provided
-        varieties: varieties.length > 0 ? {
-          create: varieties.map(variety => ({
-            name: variety.name,
-            description: variety.description || null,
-            price: variety.price,
-            position: variety.position,
-            isAvailable: variety.isAvailable,
-            isDefault: variety.isDefault,
-            userId: userId,
-          }))
-        } : undefined,
+        varieties:
+          varieties.length > 0
+            ? {
+                create: varieties.map((variety) => ({
+                  name: variety.name,
+                  description: variety.description || null,
+                  price: variety.price,
+                  position: variety.position,
+                  isAvailable: variety.isAvailable,
+                  isDefault: variety.isDefault,
+                  userId: userId,
+                })),
+              }
+            : undefined,
       },
       include: {
         varieties: true,
+        servicePoint: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            isActive: true,
+          },
+        },
       },
     });
 
     console.log("Created menu item:", menuItem);
-    revalidatePath("/menu-items");
+    revalidatePath("/menu");
     return { success: true, menuItem };
   } catch (error) {
     console.error("Failed to create menu item:", error);

@@ -42,7 +42,7 @@ function Header({ restaurantName, reviewLink }: HeaderProps) {
 
           <div className="flex items-center gap-4">
             <ul className="hidden md:flex items-center gap-6">
-              <li>
+              {/* <li>
                 <Link
                   href="/menu"
                   target="_blank"
@@ -54,7 +54,7 @@ function Header({ restaurantName, reviewLink }: HeaderProps) {
                   Menu
                   <ForkKnifeCrossedIcon className="ml-1 h-4 w-4" />
                 </Link>
-              </li>
+              </li> */}
 
             
               <li>

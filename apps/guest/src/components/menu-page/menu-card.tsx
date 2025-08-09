@@ -18,7 +18,7 @@ interface MenuCardProps {
   item: MenuItem
 }
 
-export function MenuCard({ item }: MenuCardProps) {
+export function MenuCard({ item }: MenuCardProps): JSX.Element {
   const [showVarieties, setShowVarieties] = useState(false)
   
   // Format price to Naira with comma after every 3 zeros

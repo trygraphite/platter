@@ -12,6 +12,7 @@
     "admin:dev": "turbo dev --filter=admin",
     "guest:dev": "turbo dev --filter=guest",
     "server:dev": "turbo dev --filter=server",
+    "staff:dev": "turbo dev --filter=staff",
     "db:generate": "turbo run db:generate --filter=@platter/db",
     "db:push": "turbo run db:push --filter=@platter/db"
   },

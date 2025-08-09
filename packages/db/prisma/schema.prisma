@@ -5,7 +5,7 @@ datasource db {
 
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
+  // previewFeatures = ["driverAdapters"]
 }
 
 // user = restaurant
@@ -28,7 +28,7 @@ model User {
   userType        UserType    @default(RESTAURANT)
   role            UserRole?   @default(RESTAURANT)
   staffRole       StaffRole?  // Used when userType is STAFF
-  restaurantRole  UserRole?   // Used when userType is RESTAURANT
+  restaurantRole  UserRole?   
 
   // Restaurant-specific fields
   website         String?
@@ -64,12 +64,13 @@ model User {
   location        Location?   @relation(fields: [locationId], references: [id])
   joinRequests    JoinRequest[]
   CategoryGroup   CategoryGroup[]
+  servicePoints   ServicePoint[]
   
-  // Staff relations (only applicable when userType is STAFF)
+  
+  // Staff relations
+  staff           Staff[]   
   restaurantId    String?     // The restaurant this staff member belongs to
-  restaurant      User?       @relation("StaffToRestaurant", fields: [restaurantId], references: [id])
-  staffMembers    User[]      @relation("StaffToRestaurant")
-  
+
   // Staff-specific permissions
   canManageMenu   Boolean?    @default(false)
   canManageOrders Boolean?    @default(false)
@@ -187,6 +188,11 @@ model Table {
   userId          String
   location   Location? @relation(fields: [locationId], references: [id])
   locationId String?
+
+    // Staff assignments
+  staffAssignments StaffTable[]
+
+
   qrCodes      QRCode[]
   orders       Order[]
   review       Review[]
@@ -250,6 +256,11 @@ model MenuItem {
   userId      String
   category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade) 
   categoryId  String
+  
+  // Service point assignment
+  servicePointId String?
+  servicePoint   ServicePoint? @relation(fields: [servicePointId], references: [id])
+  
   orderItems  OrderItem[]
   varieties   MenuItemVariety[]
 
@@ -314,6 +325,9 @@ model Order {
   items           OrderItem[]
   review          Review?
   
+   // Optional staff assignment
+  staffId         String?
+  staff           Staff?      @relation(fields: [staffId], references: [id])
 
   @@index([status])
   @@index([orderNumber])
@@ -324,8 +338,16 @@ model OrderItem {
   quantity     Int
   price        Int      // Price at time of order (from variety or base menu item)
   specialNotes String?
+  status       OrderItemStatus @default(PENDING) // Status of this specific item
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  
+  // Status timestamps for individual items
+  confirmedAt  DateTime?
+  preparingAt  DateTime?
+  readyAt      DateTime?
+  deliveredAt  DateTime?
+  cancelledAt  DateTime?
   
   // Relations
   order         Order              @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -381,9 +403,121 @@ model JoinRequest {
   updatedAt   DateTime    @updatedAt
 }
 
+model ServicePoint {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  
+  menuItems   MenuItem[]
+  staff       ServicePointStaff[]
+
+  @@index([userId])
+}
+
+model ServicePointStaff {
+  id            String   @id @default(cuid())
+  servicePointId String
+  staffId       String
+  role          String?
+  isActive      Boolean  @default(true)
+  assignedAt    DateTime @default(now())
+
+  // Relations
+  servicePoint  ServicePoint @relation(fields: [servicePointId], references: [id], onDelete: Cascade)
+  staff         Staff        @relation(fields: [staffId], references: [id], onDelete: Cascade)
+
+  @@unique([servicePointId, staffId])
+  @@index([servicePointId])
+  @@index([staffId])
+}
+
+model Staff {
+  id              String      @id @default(cuid())
+  name            String
+  email           String      @unique
+  phone           String?
+  password        String?    
+  // Staff-specific fields
+  position        String?
+  staffRole       StaffRole   @default(STAFF)
+  
+  // Timestamps
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  isActive        Boolean     @default(true)
+  
+  // Staff permissions
+  canManageMenu   Boolean     @default(false)
+  canManageOrders Boolean     @default(false)
+  canManageTables Boolean     @default(false)
+  canViewReports  Boolean     @default(false)
+  
+  // Relations
+  restaurantId    String
+  restaurant      User        @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  
+  // Staff auth relations (separate from restaurant auth)
+  staffSessions   StaffSession[]
+  
+  // Optional relations to orders and tables
+  orders          Order[]     // Orders handled by this staff member
+  assignedTables  StaffTable[] // Tables assigned to this staff member
+  
+  // Service point relations
+  servicePointStaff ServicePointStaff[]
+  
+  @@index([restaurantId])
+  @@index([staffRole])
+}
+
+model StaffSession {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  
+  staffId   String
+  staff     Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  
+  @@map("staff_session")
+}
+
+// Junction table for staff-table assignments (optional)
+model StaffTable {
+  id       String @id @default(cuid())
+  staffId  String
+  tableId  String
+  
+  staff    Staff  @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  table    Table  @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  
+  assignedAt DateTime @default(now())
+  isActive   Boolean  @default(true)
+  
+  @@unique([staffId, tableId])
+  @@map("staff_table")
+}
+
+
 enum OrderType {
   TABLE
   PICKUP
+}
+enum StaffRole {
+  STAFF
+  ADMIN
+  MANAGER
+  OPERATOR
 }
 
 enum RequestStatus {
@@ -412,12 +546,6 @@ enum UserRole {
   RESTAURANT
 }
 
-enum StaffRole {
-  STAFF       // Basic staff access
-  MANAGER     // Manager with more permissions
-  ADMIN       // Full admin access for the restaurant
-}
-
 enum AuthRole {
   USER_ADMIN
   USER_RESTAURANT
@@ -429,4 +557,13 @@ enum AuthRole {
 enum UserType {
   RESTAURANT
   STAFF
+}
+
+enum OrderItemStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  READY
+  DELIVERED
+  CANCELLED
 }

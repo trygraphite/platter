@@ -1,14 +1,42 @@
 "use client";
 
 import { createOrder } from "@/lib/actions/order-actions";
-import type { MenuItem, Table } from "@prisma/client";
-import { Minus, Plus, X, Search, Info } from "lucide-react";
+import type { Table } from "@prisma/client";
+
+interface MenuItemWithServicePoint {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  image: string | null;
+  isAvailable: boolean;
+  categoryId: string;
+  servicePointId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+  servicePoint?: {
+    id: string;
+    name: string;
+    description: string | null;
+    isActive: boolean;
+  } | null;
+}
+import { Info, Minus, Plus, Search, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type React from "react";
 import { useEffect, useState } from "react";
 
-import { Input } from "@platter/ui/components/input";
+import { Badge } from "@platter/ui/components/badge";
 import { Button } from "@platter/ui/components/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@platter/ui/components/card";
+import { Input } from "@platter/ui/components/input";
+import { ScrollArea } from "@platter/ui/components/scroll-area";
 import {
   Select,
   SelectContent,
@@ -16,15 +44,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@platter/ui/components/select";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@platter/ui/components/card";
 import { Separator } from "@platter/ui/components/separator";
-import { ScrollArea } from "@platter/ui/components/scroll-area";
-import { Badge } from "@platter/ui/components/badge";
 
 interface CreateOrderProps {
   onCancel: () => void;
@@ -38,12 +58,23 @@ export default function CreateOrder({
   tables,
 }: CreateOrderProps) {
   const [selectedItems, setSelectedItems] = useState<
-    Array<{ menuItemId: string; name: string; quantity: number; price: number }>
+    Array<{
+      menuItemId: string;
+      name: string;
+      quantity: number;
+      price: number;
+      servicePoint?: {
+        id: string;
+        name: string;
+        description: string | null;
+        isActive: boolean;
+      } | null;
+    }>
   >([]);
   const [tableId, setTableId] = useState("");
   const [specialNotes, setSpecialNotes] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [menuItems, setMenuItems] = useState<MenuItemWithServicePoint[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -91,7 +122,7 @@ export default function CreateOrder({
     item.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  const addItem = (menuItem: MenuItem) => {
+  const addItem = (menuItem: MenuItemWithServicePoint) => {
     const existingItem = selectedItems.find(
       (item) => item.menuItemId === menuItem.id,
     );
@@ -111,6 +142,7 @@ export default function CreateOrder({
           name: menuItem.name,
           quantity: 1,
           price: menuItem.price,
+          servicePoint: menuItem.servicePoint,
         },
       ]);
     }
@@ -222,7 +254,14 @@ export default function CreateOrder({
                     type="button"
                     onClick={() => addItem(item)}
                   >
-                    <span>{item.name}</span>
+                    <span>
+                      {item.name}
+                      {item.servicePoint && (
+                        <span className="text-sm text-gray-500 ml-2">
+                          ({item.servicePoint.name})
+                        </span>
+                      )}
+                    </span>
                     <Badge variant="secondary">₦{item.price.toFixed(2)}</Badge>
                   </Button>
                 ))}
@@ -239,7 +278,14 @@ export default function CreateOrder({
                       key={item.menuItemId}
                       className="flex items-center justify-between p-3 bg-secondary/20 rounded-md"
                     >
-                      <span className="flex-1">{item.name}</span>
+                      <span className="flex-1">
+                        {item.name}
+                        {item.servicePoint && (
+                          <span className="text-sm text-gray-500 ml-2">
+                            ({item.servicePoint.name})
+                          </span>
+                        )}
+                      </span>
                       <div className="flex items-center space-x-3">
                         <Button
                           variant="ghost"

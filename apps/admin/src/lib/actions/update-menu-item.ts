@@ -1,36 +1,53 @@
 "use server";
 
-import { MenuItemVarietyInput } from "@/types";
+import type { MenuItemVarietyInput } from "@/types";
 import db from "@platter/db";
 import type { MenuItem } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
+interface UpdateMenuItemData extends Partial<MenuItem> {
+  servicePointId?: string | null;
+}
+
 export async function updateMenuItem(
   userId: string,
   menuItemId: string,
-  data: Partial<MenuItem>,
+  data: UpdateMenuItemData,
   varieties: MenuItemVarietyInput[] = [],
 ) {
   try {
     // Ensure only one variety is marked as default
     if (varieties.length > 0) {
-      const defaultVarieties = varieties.filter(v => v.isDefault);
+      const defaultVarieties = varieties.filter((v) => v.isDefault);
       if (defaultVarieties.length > 1) {
         throw new Error("Only one variety can be marked as default");
       }
       // If no default is set, make the first one default
-      if (defaultVarieties.length === 0 && varieties.length > 0 && varieties[0]) {
+      if (
+        defaultVarieties.length === 0 &&
+        varieties.length > 0 &&
+        varieties[0]
+      ) {
         varieties[0].isDefault = true;
       }
     }
 
+    // Extract servicePointId from data
+    const { servicePointId, ...menuItemData } = data;
+
     // Start a transaction to handle menu item and varieties update
-    const result = await db.$transaction(async (tx: { menuItem: { update: (arg0: { where: { id: string; userId: string; }; data: { name?: string | undefined; id?: string | undefined; description?: string | undefined; price?: number | undefined; image?: string | null | undefined; position?: number | undefined; isAvailable?: boolean | undefined; hasVarieties?: boolean | undefined; createdAt?: Date | undefined; updatedAt?: Date | undefined; userId?: string | undefined; categoryId?: string | undefined; }; }) => any; }; menuItemVariety: { findMany: (arg0: { where: { menuItemId: string; userId: string; }; }) => any; deleteMany: (arg0: { where: { id: { in: any; }; userId: string; }; }) => any; update: (arg0: { where: { id: string | undefined; userId: string; }; data: { name: string; description: string | null | undefined; price: number; position: number; isAvailable: boolean; isDefault: boolean; }; }) => any; createMany: (arg0: { data: { name: string; description: string | null | undefined; price: number; position: number; isAvailable: boolean; isDefault: boolean; menuItemId: string; userId: string; }[]; }) => any; }; }) => {
+    const result = await db.$transaction(async (tx) => {
       // Update the menu item
       const menuItem = await tx.menuItem.update({
         where: { id: menuItemId, userId },
         data: {
-          ...data,
+          ...menuItemData,
+          // Handle service point assignment
+          ...(servicePointId !== undefined && {
+            servicePoint: servicePointId
+              ? { connect: { id: servicePointId } }
+              : { disconnect: true },
+          }),
         },
       });
 
@@ -42,19 +59,19 @@ export async function updateMenuItem(
         });
 
         // Separate new and existing varieties
-        const newVarieties = varieties.filter(v => !v.id);
-        const updatingVarieties = varieties.filter(v => v.id);
-        const updatingVarietyIds = updatingVarieties.map(v => v.id);
+        const newVarieties = varieties.filter((v) => !v.id);
+        const updatingVarieties = varieties.filter((v) => v.id);
+        const updatingVarietyIds = updatingVarieties.map((v) => v.id);
 
         // Delete varieties that are no longer in the list
         const varietiesToDelete = existingVarieties.filter(
-          (          existing: { id: string | undefined; }) => !updatingVarietyIds.includes(existing.id)
+          (existing) => !updatingVarietyIds.includes(existing.id),
         );
 
         if (varietiesToDelete.length > 0) {
           await tx.menuItemVariety.deleteMany({
             where: {
-              id: { in: varietiesToDelete.map((v: { id: any; }) => v.id) },
+              id: { in: varietiesToDelete.map((v) => v.id) },
               userId,
             },
           });
@@ -81,7 +98,7 @@ export async function updateMenuItem(
         // Create new varieties
         if (newVarieties.length > 0) {
           await tx.menuItemVariety.createMany({
-            data: newVarieties.map(variety => ({
+            data: newVarieties.map((variety) => ({
               name: variety.name,
               description: variety.description,
               price: variety.price,
@@ -98,13 +115,14 @@ export async function updateMenuItem(
       return menuItem;
     });
 
-    revalidatePath("/menu-items");
+    revalidatePath("/menu");
     return { success: true, menuItem: result };
   } catch (error) {
     console.error("Failed to update menu item:", error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : "Failed to update menu item" 
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to update menu item",
     };
   }
 }

@@ -31,7 +31,7 @@ export function CategoryNav({
   selectedCategory,
   onSelectGroup,
   onSelectCategory,
-}: CategoryNavProps) {
+}: CategoryNavProps): JSX.Element {
   const groupsScrollContainerRef = useRef<HTMLDivElement>(null)
   const categoriesScrollContainerRef = useRef<HTMLDivElement>(null)
   

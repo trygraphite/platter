@@ -39,13 +39,13 @@ type ComplaintCategory =
   | "ATMOSPHERE"
   | "OTHER";
 
-export function ComplaintPage({
+export const ComplaintPage: React.FC<ComplaintPageProps> = ({
   qrId,
   tableId,
   title,
   description,
   userId,
-}: ComplaintPageProps) {
+}) => {
   const [content, setContent] = useState("");
   const [category, setCategory] = useState<ComplaintCategory | "">("");
   const [isSubmitting, setIsSubmitting] = useState(false);

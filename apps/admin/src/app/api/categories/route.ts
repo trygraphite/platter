@@ -12,7 +12,7 @@ export async function GET(request: Request) {
 
   try {
     const categories = await db.category.findMany({
-      where: { 
+      where: {
         userId,
         deletedAt: null, // Only get non-deleted categories
       },
@@ -55,11 +55,13 @@ export async function GET(request: Request) {
               },
               orderBy: { position: "asc" },
             },
+            servicePoint: true,
           },
           orderBy: { position: "asc" },
         },
       },
     });
+
     return NextResponse.json(categories);
   } catch (error) {
     console.error("Failed to fetch categories:", error);

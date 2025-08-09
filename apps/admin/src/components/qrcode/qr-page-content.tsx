@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { QRDisplay } from "@/components/qrcode/qr-display";
+import { QRForm } from "@/components/qrcode/qr-form";
 import { createQRCodeAction } from "@/lib/actions/create-qrcode";
 import { toast } from "@platter/ui/components/sonner";
-import { QRForm } from "@/components/qrcode/qr-form";
-import { QRDisplay } from "@/components/qrcode/qr-display";
+import { useState } from "react";
 
 export default function QRCodePage() {
   const [qrCode, setQRCode] = useState<string | null>(null);
-  const [currentTable, setCurrentTable] = useState<number | null>(null);
+  const [currentTable, setCurrentTable] = useState<string | null>(null);
   const [locationName, setLocationName] = useState<string>("");
   const [restaurantName, setRestaurantName] = useState<string>("");
 
@@ -18,18 +18,18 @@ export default function QRCodePage() {
   const [isLoading, setIsLoading] = useState(false);
   const handleGenerateQR = async (data: {
     target: "table" | "menu" | "location";
-    tableNumber?: number | null;
+    tableName?: string | null;
   }) => {
     setIsLoading(true);
     try {
       const result = await createQRCodeAction(
-        data.tableNumber || undefined,
+        data.tableName || undefined,
         data.target,
       );
 
       if (result.success && result.qrCodeUrl) {
         setQRCode(result.qrCodeUrl);
-        setCurrentTable(data.tableNumber ?? null);
+        setCurrentTable(data.tableName ?? null);
         setCurrentType(data.target);
         setLocationName(result.locationName || "");
         setRestaurantName(result.restaurantName || "");
@@ -60,7 +60,7 @@ export default function QRCodePage() {
         {qrCode && (
           <QRDisplay
             qrCodeUrl={qrCode}
-            tableNumber={currentTable}
+            tableName={currentTable}
             type={currentType}
             locationName={locationName}
             restaurantName={restaurantName}

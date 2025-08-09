@@ -1,6 +1,6 @@
 // app/api/support/route.ts
 import { Resend } from 'resend';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { cleanupRateLimit, isRateLimited, RATE_LIMIT } from '@/app/lib/rateLimit';
 
 const resend = new Resend(process.env.RESEND_API_KEY);

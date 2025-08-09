@@ -8,6 +8,7 @@
       "outputs": [".next/**", "!.next/cache/**", "dist"],
       "env": [
         "BASE_DOMAIN",
+        "MARKETING_DOMAIN",
         "RESEND_API_KEY",
         "DATABASE_URL",
         "NEXT_PUBLIC_APP_URL",

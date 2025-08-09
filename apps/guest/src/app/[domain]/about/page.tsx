@@ -7,7 +7,7 @@ import {
 } from "@platter/ui/lib/icons";
 import Link from "next/link";
 
-export default function AboutPage() {
+export default function AboutPage(): JSX.Element {
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4 py-16">

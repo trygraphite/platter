@@ -1,14 +1,12 @@
 "use client";
 
-import { deleteOrder, updateOrder } from "@/lib/actions/order-actions";
-import type { Order, OrderStatus, Table } from "@prisma/client";
-import { PlusCircle } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
-import CreateOrder from "./create-order";
-import EditOrderModal from "./edit-order";
-import OrdersTable from "./order-table";
 import useAdminOrdersSocket from "@/hooks/useAdminSocket";
-import { Pagination } from "../../custom/pagination";
+import {
+  deleteOrder,
+  updateAllOrderItemsStatus,
+  updateOrder,
+  updateOrderItemStatus,
+} from "@/lib/actions/order-actions";
 import {
   Select,
   SelectContent,
@@ -16,12 +14,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@platter/ui/components/select";
+import type { Order, OrderStatus, Table } from "@prisma/client";
+import { PlusCircle } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Pagination } from "../../custom/pagination";
+import CreateOrder from "./create-order";
+import EditOrderModal from "./edit-order";
+import OrdersTable from "./order-table";
 
 interface OrderPageClientProps {
   initialOrders: (Order & {
     tableNumber: string;
     items: {
+      id: string;
       quantity: number;
+      status:
+        | "PENDING"
+        | "CONFIRMED"
+        | "PREPARING"
+        | "READY"
+        | "DELIVERED"
+        | "CANCELLED";
       menuItem: {
         name: string;
         price: number;
@@ -33,11 +46,11 @@ interface OrderPageClientProps {
   totalOrders: number;
 }
 
-export default function OrderPageClient({ 
-  initialOrders, 
-  tables, 
-  userId, 
-  totalOrders 
+export default function OrderPageClient({
+  initialOrders,
+  tables,
+  userId,
+  totalOrders,
 }: OrderPageClientProps) {
   const [showCreateOrder, setShowCreateOrder] = useState(false);
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "all">("all");
@@ -50,14 +63,15 @@ export default function OrderPageClient({
 
   // Socket handling
   const { orders: socketOrders, isConnected } = useAdminOrdersSocket({
-    serverUrl: process.env.NEXT_PUBLIC_SOCKET_SERVER_URL || "http://localhost:3002",
+    serverUrl:
+      process.env.NEXT_PUBLIC_SOCKET_SERVER_URL || "http://localhost:3002",
     initialOrders,
     userId,
-  }) as { 
-    orders: (Order & { 
-      items?: { quantity: number; menuItem: { name: string; price: number } }[] 
-    })[], 
-    isConnected: boolean 
+  }) as {
+    orders: (Order & {
+      items?: { quantity: number; menuItem: { name: string; price: number } }[];
+    })[];
+    isConnected: boolean;
   };
 
   useEffect(() => {
@@ -66,34 +80,47 @@ export default function OrderPageClient({
 
   useEffect(() => {
     if (isConnected) {
-      console.log(`Admin connected and joined restaurant room for user: ${userId}`);
+      console.log(
+        `Admin connected and joined restaurant room for user: ${userId}`,
+      );
     }
   }, [isConnected, userId]);
 
   useEffect(() => {
     if (socketOrders && socketOrders.length > 0) {
-      const processedOrders = socketOrders.map((order) => {
-        const tableNumber = tables.find((t) => t.id === order.tableId)?.number || "Unknown";
-        const existingOrder = ordersRef.current.find((o) => o.id === order.id);
-        const orderItems =
-          Array.isArray(order.items) && order.items.length > 0 ? order.items : existingOrder?.items || [];
+      // Only update orders that exist in our current state to preserve complete item structure
+      setOrders((currentOrders) => {
+        return currentOrders.map((existingOrder) => {
+          const socketOrder = socketOrders.find(
+            (so) => so.id === existingOrder.id,
+          );
 
-        return {
-          ...order,
-          tableNumber,
-          items: orderItems,
-        };
+          if (socketOrder) {
+            // Update the order with socket data but preserve the complete items structure
+            return {
+              ...existingOrder,
+              ...socketOrder,
+              // Keep the existing items with complete details
+              items: existingOrder.items,
+            };
+          }
+
+          return existingOrder;
+        });
       });
-
-      setOrders(processedOrders);
     }
-  }, [socketOrders, tables]);
+  }, [socketOrders]);
 
   const handleEditOrder = async (updatedOrder: Order) => {
     try {
       const result = await updateOrder(updatedOrder);
-      const tableNumber = tables.find((t) => t.id === result.tableId)?.number || "Unknown";
-      setOrders(orders.map((o) => (o.id === result.id ? { ...result, tableNumber } : o)));
+      const tableNumber =
+        tables.find((t) => t.id === result.tableId)?.number || "Unknown";
+      setOrders((currentOrders) =>
+        currentOrders.map((o) =>
+          o.id === result.id ? { ...result, tableNumber } : o,
+        ),
+      );
       setEditingOrder(null);
     } catch (err) {
       console.error("Error updating order:", err);
@@ -103,8 +130,68 @@ export default function OrderPageClient({
   const handleDeleteOrder = async (orderId: string) => {
     try {
       await deleteOrder(orderId);
+
+      // Update the local state to remove the deleted order
+      setOrders((currentOrders) =>
+        currentOrders.filter((order) => order.id !== orderId),
+      );
     } catch (err) {
       console.error("Error deleting order:", err);
+    }
+  };
+
+  const handleUpdateOrderItemStatus = async (
+    orderItemId: string,
+    newStatus:
+      | "PENDING"
+      | "CONFIRMED"
+      | "PREPARING"
+      | "READY"
+      | "DELIVERED"
+      | "CANCELLED",
+  ) => {
+    try {
+      await updateOrderItemStatus(orderItemId, newStatus, userId);
+
+      // Update the local state to reflect the change using functional update
+      // This ensures we're always working with the most current state
+      setOrders((currentOrders) =>
+        currentOrders.map((order) => ({
+          ...order,
+          items: order.items.map((item) =>
+            item.id === orderItemId ? { ...item, status: newStatus } : item,
+          ),
+        })),
+      );
+    } catch (err) {
+      console.error("Error updating order item status:", err);
+    }
+  };
+
+  const handleUpdateAllOrderItemsStatus = async (
+    orderId: string,
+    newStatus: OrderStatus,
+  ) => {
+    try {
+      await updateAllOrderItemsStatus(orderId, newStatus, userId);
+
+      // Update the local state to reflect the change for all items in the order
+      setOrders((currentOrders) =>
+        currentOrders.map((order) =>
+          order.id === orderId
+            ? {
+                ...order,
+                status: newStatus,
+                items: order.items.map((item) => ({
+                  ...item,
+                  status: newStatus,
+                })),
+              }
+            : order,
+        ),
+      );
+    } catch (err) {
+      console.error("Error updating all order items status:", err);
     }
   };
 
@@ -115,14 +202,14 @@ export default function OrderPageClient({
   // Calculate paginated data
   const paginatedOrders = filteredOrders.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
 
   const paginationMeta = {
     currentPage,
     totalPages: Math.ceil(filteredOrders.length / itemsPerPage),
     totalItems: filteredOrders.length,
-    itemsPerPage
+    itemsPerPage,
   };
 
   return (
@@ -131,17 +218,23 @@ export default function OrderPageClient({
         <div className="mb-8">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Orders Management</h1>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Orders Management
+              </h1>
               {isConnected && (
                 <div className="flex items-center mt-1">
-                  <div className="h-2 w-2 rounded-full bg-green-500 mr-2"></div>
-                  <span className="text-sm text-green-600">Live updates enabled</span>
+                  <div className="h-2 w-2 rounded-full bg-green-500 mr-2" />
+                  <span className="text-sm text-green-600">
+                    Live updates enabled
+                  </span>
                 </div>
               )}
               {!isConnected && (
                 <div className="flex items-center mt-1">
-                  <div className="h-2 w-2 rounded-full bg-red-500 mr-2"></div>
-                  <span className="text-sm text-red-600">Disconnected - refresh to reconnect</span>
+                  <div className="h-2 w-2 rounded-full bg-red-500 mr-2" />
+                  <span className="text-sm text-red-600">
+                    Disconnected - refresh to reconnect
+                  </span>
                 </div>
               )}
             </div>
@@ -160,7 +253,7 @@ export default function OrderPageClient({
                 <SelectContent>
                   <SelectItem value="all">All Status</SelectItem>
                   <SelectItem value="PENDING">Pending</SelectItem>
-                  {/* <SelectItem value="CONFIRMED">Confirmed</SelectItem> */}
+                  <SelectItem value="CONFIRMED">Confirmed</SelectItem>
                   <SelectItem value="PREPARING">Preparing</SelectItem>
                   <SelectItem value="DELIVERED">Delivered</SelectItem>
                   <SelectItem value="CANCELLED">Cancelled</SelectItem>
@@ -178,7 +271,11 @@ export default function OrderPageClient({
           </div>
 
           {showCreateOrder ? (
-            <CreateOrder onCancel={() => setShowCreateOrder(false)} tables={tables} userId={userId} />
+            <CreateOrder
+              onCancel={() => setShowCreateOrder(false)}
+              tables={tables}
+              userId={userId}
+            />
           ) : (
             <div className="space-y-6">
               <div className="bg-white rounded-lg p-2 border">
@@ -188,6 +285,7 @@ export default function OrderPageClient({
                       orders={paginatedOrders}
                       onEditOrder={setEditingOrder}
                       onDeleteOrder={handleDeleteOrder}
+                      onUpdateOrderItemStatus={handleUpdateOrderItemStatus}
                     />
                     <Pagination
                       pagination={paginationMeta}
@@ -197,8 +295,8 @@ export default function OrderPageClient({
                 ) : (
                   <div className="text-center py-8">
                     <p className="text-xl text-gray-600">
-                      {statusFilter === "all" 
-                        ? "No orders yet. Create your first order!" 
+                      {statusFilter === "all"
+                        ? "No orders yet. Create your first order!"
                         : `No orders with status ${statusFilter.toLowerCase()}`}
                     </p>
                   </div>
@@ -213,6 +311,7 @@ export default function OrderPageClient({
           order={editingOrder}
           onClose={() => setEditingOrder(null)}
           onSave={handleEditOrder}
+          onUpdateAllOrderItemsStatus={handleUpdateAllOrderItemsStatus}
           tables={tables}
           open={true}
         />

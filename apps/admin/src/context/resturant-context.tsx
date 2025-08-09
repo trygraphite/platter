@@ -1,5 +1,14 @@
-import { updateCategoryGroupPosition, updateCategoryPosition, updateMenuItemPosition } from "@/components/resturant/updatePosition";
-import { assignCategoryToGroup, createCategoryGroup, deleteCategoryGroup, updateCategoryGroup } from "@/lib/actions/category-group";
+import {
+  updateCategoryGroupPosition,
+  updateCategoryPosition,
+  updateMenuItemPosition,
+} from "@/components/resturant/updatePosition";
+import {
+  assignCategoryToGroup,
+  createCategoryGroup,
+  deleteCategoryGroup,
+  updateCategoryGroup,
+} from "@/lib/actions/category-group";
 import { createCategory } from "@/lib/actions/create-category";
 import { createMenuItem } from "@/lib/actions/create-menu-item";
 import { deleteCategory } from "@/lib/actions/delete-category";
@@ -8,18 +17,32 @@ import { updateCategory } from "@/lib/actions/update-category";
 import { updateMenuItem } from "@/lib/actions/update-menu-item";
 import { useSession } from "@/lib/auth/client";
 import { useEdgeStore } from "@/lib/edgestore/edgestore";
-import { MenuItemVarietyInput } from "@/types";
+import type { MenuItemVarietyInput } from "@/types";
 import { toast } from "@platter/ui/components/sonner";
-import type { Category, CategoryGroup, MenuItem, MenuItemVariety, User } from "@prisma/client";
+import type {
+  Category,
+  CategoryGroup,
+  MenuItem,
+  MenuItemVariety,
+  User,
+} from "@prisma/client";
 import type React from "react";
 import { createContext, useCallback, useContext, useState } from "react";
 import { useUploadThing } from "utils/uploadThing";
 
-type MenuItemWithVarieties = MenuItem & { 
-  varieties: MenuItemVariety[] 
+type MenuItemWithVarieties = MenuItem & {
+  varieties: MenuItemVariety[];
+  servicePoint?: {
+    id: string;
+    name: string;
+    description: string | null;
+    isActive: boolean;
+  } | null;
 };
 type CategoryWithMenuItems = Category & { menuItems: MenuItemWithVarieties[] };
-type CategoryGroupWithCategories = CategoryGroup & { categories: CategoryWithMenuItems[] };
+type CategoryGroupWithCategories = CategoryGroup & {
+  categories: CategoryWithMenuItems[];
+};
 
 type MenuItemInput = Partial<Omit<MenuItem, "image">> & {
   name: string;
@@ -28,6 +51,7 @@ type MenuItemInput = Partial<Omit<MenuItem, "image">> & {
   categoryId: string;
   isAvailable: boolean;
   image: string | null;
+  servicePointId?: string | null;
   varieties?: MenuItemVarietyInput[];
 };
 
@@ -66,11 +90,23 @@ interface RestaurantContextType {
     groupData: Partial<CategoryGroup>,
   ) => Promise<void>;
   handleDeleteCategoryGroup: (groupId: string) => Promise<void>;
-  handleAssignCategoryToGroup: (categoryId: string, groupId: string | null) => Promise<void>;
+  handleAssignCategoryToGroup: (
+    categoryId: string,
+    groupId: string | null,
+  ) => Promise<void>;
   // Position management methods
-  handleUpdateCategoryPosition: (categoryId: string, direction: "up" | "down") => Promise<void>;
-  handleUpdateMenuItemPosition: (menuItemId: string, direction: "up" | "down") => Promise<void>;
-  handleUpdateCategoryGroupPosition: (groupId: string, direction: "up" | "down") => Promise<void>;
+  handleUpdateCategoryPosition: (
+    categoryId: string,
+    direction: "up" | "down",
+  ) => Promise<void>;
+  handleUpdateMenuItemPosition: (
+    menuItemId: string,
+    direction: "up" | "down",
+  ) => Promise<void>;
+  handleUpdateCategoryGroupPosition: (
+    groupId: string,
+    direction: "up" | "down",
+  ) => Promise<void>;
 }
 
 const RestaurantContext = createContext<RestaurantContextType | undefined>(
@@ -83,15 +119,23 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
   const { data: session } = useSession();
   const [user, setUser] = useState<User | null>(null);
   const [categories, setCategories] = useState<CategoryWithMenuItems[]>([]);
-  const [categoryGroups, setCategoryGroups] = useState<CategoryGroupWithCategories[]>([]);
+  const [categoryGroups, setCategoryGroups] = useState<
+    CategoryGroupWithCategories[]
+  >([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editMode, setEditMode] = useState(false);
-  
+
   // UploadThing hooks
-  const { startUpload: startCategoryImageUpload, isUploading: isCategoryImageUploading } = useUploadThing("categoryImageUploader");
-  const { startUpload: startMenuItemImageUpload, isUploading: isMenuItemImageUploading } = useUploadThing("menuItemImageUploader");
-  
+  const {
+    startUpload: startCategoryImageUpload,
+    isUploading: isCategoryImageUploading,
+  } = useUploadThing("categoryImageUploader");
+  const {
+    startUpload: startMenuItemImageUpload,
+    isUploading: isMenuItemImageUploading,
+  } = useUploadThing("menuItemImageUploader");
+
   const fetchUserAndCategories = useCallback(async () => {
     if (!session?.user?.id) {
       toast.error("Loading Menu");
@@ -101,19 +145,26 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
     setIsLoading(true);
     setError(null);
     try {
-      const [userResponse, categoriesResponse, categoryGroupsResponse] = await Promise.all([
-        fetch("/api/user"),
-        fetch(`/api/categories?userId=${session.user.id}`),
-        fetch(`/api/category-groups?userId=${session.user.id}`),
-      ]);
+      const [userResponse, categoriesResponse, categoryGroupsResponse] =
+        await Promise.all([
+          fetch("/api/user"),
+          fetch(`/api/categories?userId=${session.user.id}`),
+          fetch(`/api/category-groups?userId=${session.user.id}`),
+        ]);
 
-      if (!userResponse.ok || !categoriesResponse.ok || !categoryGroupsResponse.ok) {
+      if (
+        !userResponse.ok ||
+        !categoriesResponse.ok ||
+        !categoryGroupsResponse.ok
+      ) {
         throw new Error("Failed to fetch data");
       }
 
       const userData = await userResponse.json();
-      const categoriesData: CategoryWithMenuItems[] = await categoriesResponse.json();
-      const categoryGroupsData: CategoryGroupWithCategories[] = await categoryGroupsResponse.json();
+      const categoriesData: CategoryWithMenuItems[] =
+        await categoriesResponse.json();
+      const categoryGroupsData: CategoryGroupWithCategories[] =
+        await categoryGroupsResponse.json();
 
       setUser(userData);
       setCategories(categoriesData || []);
@@ -142,12 +193,12 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
 
       // Handle image upload if present
       const imageFile = categoryData.image;
-      
+
       if (imageFile instanceof File) {
         toast.loading("Uploading image...");
-        
+
         const uploadResult = await startCategoryImageUpload([imageFile]);
-        
+
         if (uploadResult && uploadResult[0]) {
           categoryToCreate.image = uploadResult[0].ufsUrl;
           toast.dismiss();
@@ -165,7 +216,6 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
       throw error;
     }
   };
-
 
   const handleUpdateCategory = async (
     categoryId: string,
@@ -187,9 +237,9 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
 
       if (imageFile instanceof File) {
         toast.loading("Uploading image...");
-        
+
         const uploadResult = await startCategoryImageUpload([imageFile]);
-        
+
         if (uploadResult && uploadResult[0]) {
           updatedData.image = uploadResult[0].ufsUrl;
           toast.dismiss();
@@ -233,10 +283,10 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
       toast.error("Not authenticated");
       return;
     }
-  
+
     try {
       const imageFile = formData.get("image") as File | null;
-  
+
       const menuItemData: MenuItemInput = {
         name: formData.get("name") as string,
         description: formData.get("description") as string,
@@ -244,20 +294,27 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
         categoryId: formData.get("categoryId") as string,
         isAvailable: formData.get("isAvailable") === "true",
         image: null,
+        servicePointId: (formData.get("servicePointId") as string) || null,
       };
-  
+
       // Extract varieties data from formData
       const varieties: MenuItemVarietyInput[] = [];
       const varietyCount = Number(formData.get("varietyCount") || "0");
-      
+
       for (let i = 0; i < varietyCount; i++) {
         const varietyName = formData.get(`variety_${i}_name`) as string;
-        const varietyDescription = formData.get(`variety_${i}_description`) as string;
+        const varietyDescription = formData.get(
+          `variety_${i}_description`,
+        ) as string;
         const varietyPrice = Number(formData.get(`variety_${i}_price`));
-        const varietyPosition = Number(formData.get(`variety_${i}_position`) || i);
-        const varietyIsAvailable = formData.get(`variety_${i}_isAvailable`) === "true";
-        const varietyIsDefault = formData.get(`variety_${i}_isDefault`) === "true";
-  
+        const varietyPosition = Number(
+          formData.get(`variety_${i}_position`) || i,
+        );
+        const varietyIsAvailable =
+          formData.get(`variety_${i}_isAvailable`) === "true";
+        const varietyIsDefault =
+          formData.get(`variety_${i}_isDefault`) === "true";
+
         if (varietyName && !isNaN(varietyPrice)) {
           varieties.push({
             name: varietyName,
@@ -269,9 +326,9 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
           });
         }
       }
-  
+
       // Transform varieties to match expected type (remove undefined from description)
-      const transformedVarieties = varieties.map(variety => ({
+      const transformedVarieties = varieties.map((variety) => ({
         name: variety.name,
         description: variety.description ?? null, // Convert undefined to null
         price: variety.price,
@@ -279,11 +336,11 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
         isAvailable: variety.isAvailable,
         isDefault: variety.isDefault,
       }));
-  
+
       // Handle image upload if present
       if (imageFile instanceof File) {
         toast.loading("Uploading image...");
-        
+
         const uploadResult = await startMenuItemImageUpload([imageFile]);
         if (uploadResult && uploadResult[0]) {
           menuItemData.image = uploadResult[0].ufsUrl;
@@ -294,10 +351,18 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
       } else {
         menuItemData.image = null;
       }
-  
-      await createMenuItem(menuItemData, transformedVarieties, session.user.id);
+
+      const result = await createMenuItem(
+        menuItemData,
+        session.user.id,
+        transformedVarieties,
+      );
+
+      if (!result.success) {
+        throw new Error(result.error || "Failed to create menu item");
+      }
+
       fetchUserAndCategories();
-  
       toast.success("Menu item added successfully");
     } catch (error) {
       console.error("Error adding menu item:", error);
@@ -316,25 +381,34 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
     }
 
     try {
-      const updatedData: Partial<MenuItem> = {
+      const updatedData: Partial<MenuItem> & {
+        servicePointId?: string | null;
+      } = {
         name: formData.get("name") as string,
         description: formData.get("description") as string,
         price: Number(formData.get("price")),
         isAvailable: formData.get("isAvailable") === "true",
+        servicePointId: (formData.get("servicePointId") as string) || null,
       };
 
       // Extract varieties data from formData
       const varieties: MenuItemVarietyInput[] = [];
       const varietyCount = Number(formData.get("varietyCount") || "0");
-      
+
       for (let i = 0; i < varietyCount; i++) {
         const varietyId = formData.get(`variety_${i}_id`) as string;
         const varietyName = formData.get(`variety_${i}_name`) as string;
-        const varietyDescription = formData.get(`variety_${i}_description`) as string;
+        const varietyDescription = formData.get(
+          `variety_${i}_description`,
+        ) as string;
         const varietyPrice = Number(formData.get(`variety_${i}_price`));
-        const varietyPosition = Number(formData.get(`variety_${i}_position`) || i);
-        const varietyIsAvailable = formData.get(`variety_${i}_isAvailable`) === "true";
-        const varietyIsDefault = formData.get(`variety_${i}_isDefault`) === "true";
+        const varietyPosition = Number(
+          formData.get(`variety_${i}_position`) || i,
+        );
+        const varietyIsAvailable =
+          formData.get(`variety_${i}_isAvailable`) === "true";
+        const varietyIsDefault =
+          formData.get(`variety_${i}_isDefault`) === "true";
 
         if (varietyName && !isNaN(varietyPrice)) {
           varieties.push({
@@ -354,9 +428,9 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
 
       if (imageFile instanceof File) {
         toast.loading("Uploading image...");
-        
+
         const uploadResult = await startMenuItemImageUpload([imageFile]);
-        
+
         if (uploadResult && uploadResult[0]) {
           updatedData.image = uploadResult[0].ufsUrl;
           toast.dismiss();
@@ -367,7 +441,17 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
         updatedData.image = existingImage;
       }
 
-      await updateMenuItem(session.user.id, menuItemId, updatedData, varieties);
+      const result = await updateMenuItem(
+        session.user.id,
+        menuItemId,
+        updatedData,
+        varieties,
+      );
+
+      if (!result.success) {
+        throw new Error(result.error || "Failed to update menu item");
+      }
+
       toast.success("Menu item updated");
       fetchUserAndCategories();
     } catch (error) {
@@ -384,7 +468,12 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
     }
 
     try {
-      await deleteMenuItem(session.user.id, menuItemId);
+      const result = await deleteMenuItem(session.user.id, menuItemId);
+
+      if (!result.success) {
+        throw new Error(result.error || "Failed to delete menu item");
+      }
+
       toast.success("Menu item deleted");
       fetchUserAndCategories();
     } catch (error) {
@@ -392,7 +481,6 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
       toast.error("Failed to delete menu item");
     }
   };
-
 
   // Category group methods
   const handleAddCategoryGroup = async (groupData: Partial<CategoryGroup>) => {
@@ -446,7 +534,10 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
     }
   };
 
-  const handleAssignCategoryToGroup = async (categoryId: string, groupId: string | null) => {
+  const handleAssignCategoryToGroup = async (
+    categoryId: string,
+    groupId: string | null,
+  ) => {
     if (!session?.user?.id) {
       toast.error("Not authenticated");
       return;
@@ -454,7 +545,9 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
 
     try {
       await assignCategoryToGroup(session.user.id, categoryId, groupId);
-      toast.success(groupId ? "Category assigned to group" : "Category removed from group");
+      toast.success(
+        groupId ? "Category assigned to group" : "Category removed from group",
+      );
       fetchUserAndCategories();
     } catch (error) {
       console.error("Error assigning category to group:", error);
@@ -463,14 +556,21 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
   };
 
   // Position management methods
-  const handleUpdateCategoryPosition = async (categoryId: string, direction: "up" | "down") => {
+  const handleUpdateCategoryPosition = async (
+    categoryId: string,
+    direction: "up" | "down",
+  ) => {
     if (!session?.user?.id) {
       toast.error("Not authenticated");
       return;
     }
 
     try {
-      const result = await updateCategoryPosition(session.user.id, categoryId, direction);
+      const result = await updateCategoryPosition(
+        session.user.id,
+        categoryId,
+        direction,
+      );
       if (result.success) {
         toast.success(`Category moved ${direction}`);
         fetchUserAndCategories();
@@ -483,14 +583,21 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
     }
   };
 
-  const handleUpdateMenuItemPosition = async (menuItemId: string, direction: "up" | "down") => {
+  const handleUpdateMenuItemPosition = async (
+    menuItemId: string,
+    direction: "up" | "down",
+  ) => {
     if (!session?.user?.id) {
       toast.error("Not authenticated");
       return;
     }
 
     try {
-      const result = await updateMenuItemPosition(session.user.id, menuItemId, direction);
+      const result = await updateMenuItemPosition(
+        session.user.id,
+        menuItemId,
+        direction,
+      );
       if (result.success) {
         toast.success(`Menu item moved ${direction}`);
         fetchUserAndCategories();
@@ -503,14 +610,21 @@ export const RestaurantProvider: React.FC<React.PropsWithChildren> = ({
     }
   };
 
-  const handleUpdateCategoryGroupPosition = async (groupId: string, direction: "up" | "down") => {
+  const handleUpdateCategoryGroupPosition = async (
+    groupId: string,
+    direction: "up" | "down",
+  ) => {
     if (!session?.user?.id) {
       toast.error("Not authenticated");
       return;
     }
 
     try {
-      const result = await updateCategoryGroupPosition(session.user.id, groupId, direction);
+      const result = await updateCategoryGroupPosition(
+        session.user.id,
+        groupId,
+        direction,
+      );
       if (result.success) {
         toast.success(`Group moved ${direction}`);
         fetchUserAndCategories();

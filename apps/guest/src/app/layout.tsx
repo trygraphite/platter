@@ -30,7 +30,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-          <Toaster position="top-center" richColors />
+        <Toaster position="top-center" richColors />
         <div className="grid grid-rows-[auto,1fr,auto] min-h-screen">
           <main className="min-h-[calc(100vh-3.5rem)]">{children}</main>
           <Footer />

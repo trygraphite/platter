@@ -1,4 +1,10 @@
-export function MenuHeader({ userDetails }: { userDetails: String }) {
+import { FC } from 'react';
+
+interface MenuHeaderProps {
+  userDetails: string;
+}
+
+export const MenuHeader: FC<MenuHeaderProps> = ({ userDetails }) => {
   return (
     <header className="w-full bg-white shadow-sm py-6 px-4">
       <div className="container max-w-6xl mx-auto">
