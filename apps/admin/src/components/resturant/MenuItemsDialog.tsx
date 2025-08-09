@@ -1,5 +1,4 @@
 "use client";
-
 import { useRestaurant } from "@/context/resturant-context";
 import { Badge } from "@platter/ui/components/badge";
 import { Button } from "@platter/ui/components/button";
@@ -14,6 +13,7 @@ import { Label } from "@platter/ui/components/label";
 import type { Category, MenuItem, MenuItemVariety } from "@prisma/client";
 import { ChevronDown, ChevronUp, Pencil, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
+import type { ComponentProps } from "react";
 import { Suspense, useState } from "react";
 import { ImageLoadingPlaceholder, NoImagePlaceholder } from "utils";
 import { AddMenuItemModal } from "./AddMenuItemModal";
@@ -112,7 +112,9 @@ export function MenuItemsDialog({
       return formatPrice(item.price);
     }
 
-    const prices = item.varieties!.map((v) => v.price).sort((a, b) => a - b);
+    const prices = (item.varieties ?? [])
+      .map((v) => v.price)
+      .sort((a, b) => a - b);
     if (prices.length === 0) {
       return formatPrice(0);
     }
@@ -201,7 +203,7 @@ export function MenuItemsDialog({
                               {hasVarieties && (
                                 <div className="flex items-center gap-2 mt-2">
                                   <Badge variant="secondary">
-                                    {item.varieties!.length} varieties
+                                    {(item.varieties ?? []).length} varieties
                                   </Badge>
                                   <Button
                                     variant="ghost"
@@ -274,8 +276,8 @@ export function MenuItemsDialog({
                           Available Varieties:
                         </h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          {item
-                            .varieties!.sort((a, b) => a.position - b.position)
+                          {(item.varieties ?? [])
+                            .sort((a, b) => a.position - b.position)
                             .map((variety) => (
                               <div
                                 key={variety.id}
@@ -360,7 +362,20 @@ export function MenuItemsDialog({
         <EditMenuItemModal
           isOpen={!!editingMenuItem}
           onClose={() => setEditingMenuItem(null)}
-          menuItem={editingMenuItem}
+          menuItem={
+            {
+              ...editingMenuItem,
+              varieties: (editingMenuItem.varieties ?? []).map((v) => ({
+                id: v.id,
+                name: v.name,
+                description: v.description ?? "",
+                price: v.price.toString(),
+                position: v.position,
+                isAvailable: v.isAvailable,
+                isDefault: v.isDefault,
+              })),
+            } as ComponentProps<typeof EditMenuItemModal>["menuItem"]
+          }
         />
       )}
     </>

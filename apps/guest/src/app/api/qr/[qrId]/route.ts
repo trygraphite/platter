@@ -4,10 +4,10 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { qrId: string } },
+  { params }: { params: Promise<{ qrId: string }> },
 ) {
   try {
-    const { qrId } = params;
+    const { qrId } = await params;
 
     const qrCodeData = await db.qRCode.findUnique({
       where: {

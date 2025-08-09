@@ -8,8 +8,6 @@ import { Badge } from "@platter/ui/components/badge";
 import { DataTable } from "@/components/custom/data-table";
 import { formatCurrency } from "@platter/ui/lib/utils";
 
-
-
 interface MenuItemWithOrderCount {
   id: string;
   name: string;
@@ -41,21 +39,21 @@ interface MostOrderedItemsProps {
   maxItems?: number;
 }
 
-export function MostOrderedItems({ 
-  className, 
-  orders, 
-  showPagination = false, 
-  maxItems = 5 
+export function MostOrderedItems({
+  className,
+  orders,
+  showPagination = false,
+  maxItems = 5,
 }: MostOrderedItemsProps) {
   // Process orders to calculate most ordered items
   const mostOrderedItems = useMemo(() => {
     const itemMap = new Map<string, MenuItemWithOrderCount>();
 
     // Process all orders and their items
-    orders.forEach(order => {
-      order.items.forEach(item => {
+    orders.forEach((order) => {
+      order.items.forEach((item) => {
         const { menuItem, quantity, price } = item;
-        
+
         if (!itemMap.has(menuItem.id)) {
           itemMap.set(menuItem.id, {
             id: menuItem.id,
@@ -63,7 +61,7 @@ export function MostOrderedItems({
             totalOrdered: 0,
             price: menuItem.price,
             category: menuItem.category.name,
-            revenue: 0
+            revenue: 0,
           });
         }
 
@@ -75,8 +73,9 @@ export function MostOrderedItems({
     });
 
     // Convert to array and sort by totalOrdered
-    return Array.from(itemMap.values())
-      .sort((a, b) => b.totalOrdered - a.totalOrdered);
+    return Array.from(itemMap.values()).sort(
+      (a, b) => b.totalOrdered - a.totalOrdered,
+    );
   }, [orders]);
 
   // Define columns for the table
@@ -92,7 +91,6 @@ export function MostOrderedItems({
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
-      
     },
     {
       accessorKey: "totalOrdered",
@@ -106,7 +104,9 @@ export function MostOrderedItems({
         </Button>
       ),
       cell: ({ row }) => {
-        return <div className="font-medium">{row.getValue("totalOrdered")}</div>;
+        return (
+          <div className="font-medium">{row.getValue("totalOrdered")}</div>
+        );
       },
     },
     {

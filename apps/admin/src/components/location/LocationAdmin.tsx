@@ -1,8 +1,18 @@
 "use client";
-import { useForm } from "react-hook-form";
+import {
+  addRestaurantToLocation,
+  createLocation,
+  getLocations,
+  removeRestaurantFromLocation,
+} from "@/lib/actions/location-actions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@platter/ui/components/button";
-import { Input } from "@platter/ui/components/input";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@platter/ui/components/card";
 import {
   Form,
   FormControl,
@@ -11,24 +21,25 @@ import {
   FormLabel,
   FormMessage,
 } from "@platter/ui/components/form";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@platter/ui/components/card";
-import { z } from "zod";
-import { useEffect, useState, useCallback } from "react";
-import type { User } from "better-auth";
-import {
-  addRestaurantToLocation,
-  createLocation,
-  getLocations,
-  removeRestaurantFromLocation,
-} from "@/lib/actions/location-actions";
+import { Input } from "@platter/ui/components/input";
 import { toast } from "@platter/ui/components/sonner";
-import { JoinRequests } from "./JoinRequest";
+import type { User } from "better-auth";
 import { Trash2Icon } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { JoinRequests } from "./JoinRequest";
+
+interface Location {
+  id: string;
+  name: string;
+  address: string;
+  city: string;
+  state: string;
+  seatingCapacity: number;
+  description?: string;
+  users: User[];
+}
 
 const locationSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters"),
@@ -40,7 +51,7 @@ const locationSchema = z.object({
 });
 
 export function LocationAdmin({ restaurants }: { restaurants: User[] }) {
-  const [locations, setLocations] = useState<any[]>([]);
+  const [locations, setLocations] = useState<Location[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<z.infer<typeof locationSchema>>({
@@ -122,14 +133,16 @@ export function LocationAdmin({ restaurants }: { restaurants: User[] }) {
           <CardTitle>Create New Location</CardTitle>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+          <Form {...(form as any)}>
             <form
               onSubmit={form.handleSubmit(handleCreateLocation)}
               className="space-y-4"
             >
               <div className="grid grid-cols-2 gap-4">
                 <FormField
-                  control={form.control}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  control={form.control as any}
                   name="name"
                   render={({ field }) => (
                     <FormItem>
@@ -142,7 +155,8 @@ export function LocationAdmin({ restaurants }: { restaurants: User[] }) {
                   )}
                 />
                 <FormField
-                  control={form.control}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  control={form.control as any}
                   name="seatingCapacity"
                   render={({ field }) => (
                     <FormItem>
@@ -161,7 +175,8 @@ export function LocationAdmin({ restaurants }: { restaurants: User[] }) {
                   )}
                 />
                 <FormField
-                  control={form.control}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  control={form.control as any}
                   name="address"
                   render={({ field }) => (
                     <FormItem>
@@ -174,7 +189,8 @@ export function LocationAdmin({ restaurants }: { restaurants: User[] }) {
                   )}
                 />
                 <FormField
-                  control={form.control}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  control={form.control as any}
                   name="city"
                   render={({ field }) => (
                     <FormItem>
@@ -187,7 +203,8 @@ export function LocationAdmin({ restaurants }: { restaurants: User[] }) {
                   )}
                 />
                 <FormField
-                  control={form.control}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  control={form.control as any}
                   name="state"
                   render={({ field }) => (
                     <FormItem>
@@ -201,7 +218,8 @@ export function LocationAdmin({ restaurants }: { restaurants: User[] }) {
                 />
 
                 <FormField
-                  control={form.control}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  control={form.control as any}
                   name="description"
                   render={({ field }) => (
                     <FormItem>

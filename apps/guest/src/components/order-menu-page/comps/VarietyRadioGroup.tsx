@@ -26,9 +26,14 @@ const VarietyRadioGroup: React.FC<VarietyRadioGroupProps> = ({
   closeModal,
 }) => {
   const availableVarieties = varieties.filter((v) => !v.outOfStock);
-  const [selected, setSelected] = useState<VarietyWithWeight>(
-    availableVarieties.length > 0 ? availableVarieties[0] : varieties[0],
-  );
+  const [selected, setSelected] = useState<
+    VarietyWithWeight | null | undefined
+  >(() => {
+    if (availableVarieties.length > 0) return availableVarieties[0];
+    if (varieties.length > 0) return varieties[0];
+    return null;
+  });
+  if (!selected) throw new Error("No varieties provided");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

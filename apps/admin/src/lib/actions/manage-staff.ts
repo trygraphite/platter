@@ -55,6 +55,10 @@ export interface ManageStaffResult {
   staff?: StaffMember;
 }
 
+// Helper types derived from Prisma query return types
+type StaffFindManyResult = Awaited<ReturnType<typeof db.staff.findMany>>;
+type RawStaff = StaffFindManyResult[number];
+
 // Fetch all staff members for a restaurant
 export async function getAllStaff(
   restaurantId: string,
@@ -111,7 +115,7 @@ export async function getAllStaff(
     });
 
     // Transform the data to match the interface
-    return staff.map((member) => ({
+    return staff.map((member: RawStaff) => ({
       ...member,
       assignedServicePoints: member.servicePointStaff,
     }));
